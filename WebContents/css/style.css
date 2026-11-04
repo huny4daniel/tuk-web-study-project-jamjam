@@ -1,0 +1,247 @@
+@charset "utf-8";
+/* =========================================================
+   호텔 잠잠 - 공통 스타일 (모든 페이지가 이 파일 하나를 씀)
+   콘셉트 : 바닷가 라군(청록) + 선셋(노랑), 둥근 모서리, 알약 모양 버튼
+   1) 색/글꼴 변수  2) 기본  3) 헤더/푸터  4) 공통 부품(버튼, 표, 폼, 배지)
+   5) 메인  6) 객실 목록/상세  7) 마이페이지/정보 페이지  8) 관리자 화면
+   ========================================================= */
+
+/* ---------- 1) 색 / 글꼴 변수 : 여기 값만 바꾸면 전체 분위기가 바뀜 ---------- */
+:root {
+	--brand: #12b5a6;        /* 메인 색 (라군 청록) */
+	--brand-dark: #0b8f84;
+	--brand-soft: #e3f7f4;
+	--ocean: #3b82f6;        /* 그라데이션 짝 색 (오션 블루) */
+	--sun: #ffb547;          /* 포인트 색 (선셋 옐로) */
+	--sun-soft: #fff4df;
+	--grad: linear-gradient(120deg, #12b5a6 0%, #3b82f6 100%);
+	--ink: #16181d;          /* 기본 글자 */
+	--sub: #6b7280;          /* 보조 글자 */
+	--line: #eceef1;         /* 구분선 */
+	--bg-soft: #f6f7f9;      /* 연한 배경 */
+	--radius: 16px;
+	--shadow: 0 6px 24px rgba(17, 24, 39, 0.08);
+	--font: "Pretendard", "Noto Sans KR", "맑은 고딕", "Malgun Gothic", sans-serif;
+}
+
+/* ---------- 2) 기본 ---------- */
+* { box-sizing: border-box; }
+body {
+	margin: 0;
+	font-family: var(--font);
+	font-size: 15px;
+	line-height: 1.65;
+	color: var(--ink);
+	background-color: #fff;
+	-webkit-font-smoothing: antialiased;
+	letter-spacing: -0.2px;
+}
+a { color: inherit; text-decoration: none; }
+img { border: 0; max-width: 100%; }
+h1, h2, h3 { margin: 0 0 12px 0; font-weight: 800; letter-spacing: -0.6px; }
+h3 { font-size: 18px; font-weight: 700; }
+.container { width: 1160px; margin: 0 auto; padding: 44px 0 90px 0; }
+.page-title { font-size: 32px; margin-bottom: 6px; }
+.page-sub { color: var(--sub); margin: 0 0 32px 0; }
+.eyebrow {
+	display: inline-block; font-size: 12px; font-weight: 700; color: var(--brand-dark);
+	background-color: var(--brand-soft); padding: 4px 12px; border-radius: 999px; margin-bottom: 12px; letter-spacing: 0.5px;
+}
+.muted { color: var(--sub); font-size: 13px; }
+.pre { white-space: pre-line; }   /* 줄바꿈 그대로 보여주기 (리뷰, 문의 내용) */
+
+/* ---------- 3) 이용자 화면 헤더 / 푸터 ---------- */
+.site-header { background-color: rgba(255,255,255,0.9); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 10; }
+.site-header .inner { width: 1160px; margin: 0 auto; height: 72px; display: flex; align-items: center; }
+.site-header .logo { font-size: 26px; font-weight: 900; letter-spacing: -1px; margin-right: 48px; }
+.site-header .logo span { color: var(--sun); }
+.site-header .gnb { display: flex; gap: 8px; flex: 1; font-size: 15px; font-weight: 600; }
+.site-header .gnb a { padding: 8px 16px; border-radius: 999px; color: #374151; transition: 0.2s; }
+.site-header .gnb a:hover { background-color: var(--bg-soft); color: var(--ink); }
+.site-header .util { font-size: 14px; display: flex; gap: 14px; align-items: center; color: #4b5563; font-weight: 500; }
+.site-header .util a:hover { color: var(--brand-dark); }
+.site-header .util .btn-line { padding: 8px 18px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink); background-color: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.site-header .util .btn-line:hover { box-shadow: var(--shadow); color: var(--ink); }
+
+.site-footer { background-color: var(--bg-soft); color: var(--sub); font-size: 14px; margin-top: 40px; }
+.site-footer .inner { width: 1160px; margin: 0 auto; padding: 50px 0 36px 0; display: flex; justify-content: space-between; }
+.site-footer .brand { font-size: 24px; font-weight: 900; color: var(--ink); letter-spacing: -1px; margin-bottom: 6px; }
+.site-footer b { color: var(--ink); display: block; margin-bottom: 6px; font-size: 14px; }
+.site-footer .copy { width: 1160px; margin: 0 auto; border-top: 1px solid #e3e5e8; padding: 18px 0 28px 0; font-size: 13px; }
+
+/* ---------- 4) 공통 부품 ---------- */
+.btn {
+	display: inline-block; padding: 11px 22px; border: 0; border-radius: 999px; cursor: pointer;
+	background-color: var(--ink); color: #fff; font-size: 14px; font-weight: 700; font-family: var(--font); transition: 0.2s;
+}
+.btn:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+.btn-gold { background: var(--grad); color: #fff; }          /* 메인 버튼 (그라데이션) */
+.btn-line { background: #fff; color: var(--ink); border: 1px solid #d9dce1; }
+.btn-gray { background-color: var(--bg-soft); color: #4b5563; }
+.btn-red { background-color: #fff0f0; color: #d93a3a; }
+.btn-small { padding: 6px 14px; font-size: 12px; }
+.btn-block { display: block; width: 100%; text-align: center; padding: 15px; font-size: 16px; }
+
+.box { background-color: #fff; border-radius: 20px; padding: 28px; margin-bottom: 24px; box-shadow: var(--shadow); }
+
+table.list { width: 100%; border-collapse: separate; border-spacing: 0; background-color: #fff; font-size: 14px; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+table.list th { padding: 14px 10px; font-weight: 700; color: #4b5563; background-color: var(--bg-soft); font-size: 13px; }
+table.list td { border-bottom: 1px solid var(--line); padding: 14px 10px; text-align: center; }
+table.list tr:last-child td { border-bottom: 0; }
+table.list tr:hover td { background-color: #fafbfc; }
+table.list td.left { text-align: left; }
+.box table.list { box-shadow: none; border: 1px solid var(--line); }
+
+table.form { width: 100%; border-collapse: collapse; }
+table.form th { width: 150px; text-align: left; font-weight: 600; color: #4b5563; vertical-align: top; padding: 22px 0 10px 0; }
+table.form td { padding: 10px 0; }
+
+input[type=text], input[type=password], input[type=date], input[type=number], input[type=email], select, textarea {
+	padding: 12px 14px; border: 1.5px solid #e2e5e9; border-radius: 12px; font-size: 15px; font-family: var(--font);
+	background-color: #fff; color: var(--ink); outline: none; transition: 0.2s;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--brand); box-shadow: 0 0 0 4px var(--brand-soft); }
+input[type=checkbox] { accent-color: var(--brand); width: 17px; height: 17px; vertical-align: -3px; }
+textarea { width: 100%; height: 130px; resize: vertical; }
+.full { width: 100%; }
+
+.badge { display: inline-block; padding: 3px 11px; font-size: 12px; font-weight: 600; border-radius: 999px; background-color: var(--bg-soft); color: #4b5563; margin-right: 4px; }
+.badge-gold { background-color: var(--sun-soft); color: #b46a00; }
+.badge-blue { background-color: #e8f0ff; color: #2459c7; }
+.badge-green { background-color: var(--brand-soft); color: var(--brand-dark); }
+.badge-red { background-color: #ffeceb; color: #d93a3a; }
+.stars { color: var(--sun); letter-spacing: 1px; }
+
+.form-box { width: 440px; margin: 30px auto; padding: 44px 40px; }
+.form-box .page-title { text-align: center; font-size: 28px; }
+.form-box .page-sub { text-align: center; }
+.form-box p { margin: 0 0 16px 0; }
+.form-box label { display: block; font-size: 13px; font-weight: 600; color: #4b5563; margin-bottom: 6px; }
+.form-box input[type=text], .form-box input[type=password], .form-box input[type=email] { width: 100%; }
+.form-box .row { display: flex; gap: 8px; }
+
+/* ---------- 5) 메인 ---------- */
+.hero {
+	width: calc(100% - 48px); max-width: 1400px; height: 600px; margin: 20px auto 0 auto; border-radius: 32px;
+	color: #fff; text-align: center; padding-top: 140px;
+	background: linear-gradient(160deg, rgba(18,181,166,0.55), rgba(59,130,246,0.35) 60%, rgba(0,0,0,0.25)), url(../images/hero.svg) center/cover;
+}
+.hero .eyebrow { background-color: rgba(255,255,255,0.2); color: #fff; }
+.hero h1 { color: #fff; font-size: 64px; font-weight: 900; letter-spacing: -2px; margin-bottom: 8px; line-height: 1.1; }
+.hero p { font-size: 19px; margin: 0 0 48px 0; color: rgba(255,255,255,0.92); }
+.search-bar {
+	display: inline-flex; align-items: center; background-color: #fff; color: var(--ink);
+	border-radius: 999px; padding: 8px 8px 8px 12px; box-shadow: 0 18px 50px rgba(0,0,0,0.22); text-align: left;
+}
+.search-bar .field { padding: 6px 22px; border-right: 1px solid var(--line); }
+.search-bar .field:nth-child(3) { border-right: 0; }
+.search-bar label { display: block; font-size: 12px; font-weight: 800; color: var(--ink); }
+.search-bar input, .search-bar select { border: 0; padding: 2px 0; font-size: 14px; color: var(--sub); box-shadow: none !important; border-radius: 0; }
+.search-bar input.btn { padding: 16px 30px; font-size: 15px; color: #fff; border-radius: 999px; }
+.section { padding: 80px 0 0 0; }
+.section-title { text-align: center; margin-bottom: 40px; font-size: 34px; }
+.section-title .eyebrow { display: table; margin: 0 auto 12px auto; }
+.intro { display: flex; gap: 60px; align-items: center; }
+.intro .text { flex: 1; }
+.intro .text h2 { font-size: 40px; line-height: 1.25; letter-spacing: -1.5px; }
+.intro .text p { color: var(--sub); font-size: 16px; margin-bottom: 26px; }
+.intro .pic { flex: 1; height: 380px; border-radius: 28px; background: url(../room/photo.jsp?roomId=4) center/cover; box-shadow: var(--shadow); }
+.features { display: flex; gap: 20px; }
+.features .item { flex: 1; padding: 30px; border-radius: 24px; background-color: var(--bg-soft); transition: 0.25s; }
+.features .item:hover { background-color: var(--brand-soft); transform: translateY(-4px); }
+.features .item .num {
+	display: inline-block; width: 44px; height: 44px; line-height: 44px; text-align: center; border-radius: 14px;
+	background: var(--grad); color: #fff; font-weight: 800; margin-bottom: 18px;
+}
+.features .item p { color: var(--sub); margin: 0; font-size: 14px; }
+
+/* ---------- 6) 객실 목록 / 상세 ---------- */
+.room-layout { display: flex; gap: 32px; align-items: flex-start; }
+.filter { width: 270px; background-color: #fff; border-radius: 24px; padding: 26px; box-shadow: var(--shadow); position: sticky; top: 96px; }
+.filter h3 { font-size: 13px; font-weight: 800; color: var(--brand-dark); margin: 22px 0 12px 0; letter-spacing: 0.5px; }
+.filter h3:first-child { margin-top: 0; }
+.filter p { margin: 0 0 12px 0; }
+.filter label { font-size: 14px; }
+.filter label.title { display: block; font-size: 12px; font-weight: 600; color: var(--sub); margin-bottom: 5px; }
+.filter input[type=date], .filter input[type=number], .filter select { width: 100%; }
+.room-area { flex: 1; }
+.room-area .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; color: var(--sub); }
+.room-area .top b { color: var(--ink); }
+
+.cards { display: flex; flex-wrap: wrap; gap: 26px; }
+.card { width: calc((100% - 52px) / 3); background-color: #fff; display: flex; flex-direction: column; transition: 0.25s; }
+.card > a { display: flex; flex-direction: column; height: 100%; }
+.card .photo { height: 210px; overflow: hidden; border-radius: 20px; }
+.card .photo img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s; }
+.card:hover .photo img { transform: scale(1.06); }
+.card .body { padding: 14px 4px 4px 4px; display: flex; flex-direction: column; flex: 1; }
+.card .type { font-size: 12px; font-weight: 700; color: var(--sub); }
+.card .name { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; margin: 0 0 2px 0; }
+.card .info { font-size: 13px; color: var(--sub); margin-bottom: 8px; }
+.card .tags { min-height: 26px; margin-bottom: 8px; }
+.card .price { margin-top: auto; }
+.price .origin { text-decoration: line-through; color: #9ca3af; font-size: 13px; margin-right: 4px; }
+.price .rate { color: #e8590c; font-weight: 800; margin-right: 4px; }
+.price .sale { font-size: 19px; font-weight: 800; }
+.price .unit { font-size: 13px; color: var(--sub); }
+.new { font-size: 11px; font-weight: 800; color: #fff; background: var(--grad); padding: 1px 8px; border-radius: 999px; }
+
+.paging { text-align: center; margin-top: 44px; }
+.paging a { display: inline-block; width: 40px; height: 40px; line-height: 40px; margin: 0 3px; border-radius: 50%; color: #4b5563; font-weight: 600; }
+.paging a:hover { background-color: var(--bg-soft); }
+.paging a.on { background-color: var(--ink); color: #fff; }
+
+.detail { display: flex; gap: 44px; align-items: flex-start; }
+.detail .left { flex: 1; }
+.detail .left img.main-photo { width: 100%; height: 480px; object-fit: cover; display: block; border-radius: 28px; }
+.detail .right { width: 380px; position: sticky; top: 96px; }
+.detail .room-head { margin: 28px 0 18px 0; }
+.detail .room-head h1 { font-size: 36px; margin-bottom: 4px; letter-spacing: -1.2px; }
+.detail .spec { display: flex; gap: 12px; margin: 22px 0; }
+.detail .spec div { flex: 1; padding: 16px; text-align: center; font-size: 12px; font-weight: 600; color: var(--sub); background-color: var(--bg-soft); border-radius: 18px; }
+.detail .spec b { display: block; font-size: 17px; color: var(--ink); margin-top: 2px; }
+.reserve-box { border-radius: 24px; box-shadow: 0 10px 40px rgba(17,24,39,0.12); border: 1px solid var(--line); }
+.reserve-box p { margin: 0 0 12px 0; }
+.reserve-box label { display: block; font-size: 12px; font-weight: 700; color: #4b5563; margin-bottom: 5px; }
+.reserve-box input, .reserve-box select { width: 100%; }
+.reserve-box .dates { display: flex; gap: 8px; }
+.reserve-box .dates p { flex: 1; }
+.estimate { background-color: var(--bg-soft); padding: 14px 16px; border-radius: 14px; margin: 14px 0 16px 0; font-size: 14px; text-align: right; color: var(--sub); }
+.estimate b { font-size: 22px; color: var(--ink); }
+.review { border-bottom: 1px solid var(--line); padding: 18px 0; }
+.review:last-of-type { border-bottom: 0; }
+.review .head { font-size: 13px; color: var(--sub); margin-bottom: 4px; }
+
+/* ---------- 7) 마이페이지 / 정보 페이지 ---------- */
+.tabs { margin-bottom: 28px; display: flex; gap: 8px; }
+.tabs a { display: inline-block; padding: 9px 20px; border-radius: 999px; background-color: var(--bg-soft); color: #4b5563; font-weight: 600; font-size: 14px; }
+.tabs a:hover { background-color: #eceef1; }
+.tabs a.on { background-color: var(--ink); color: #fff; }
+.qna-item { border-bottom: 1px solid var(--line); padding: 20px 0; }
+.qna-item:last-child { border-bottom: 0; }
+.qna-item .answer { background-color: var(--brand-soft); border-radius: 14px; padding: 14px 18px; margin-top: 10px; }
+.info-grid { display: flex; flex-wrap: wrap; gap: 20px; }
+.info-grid .item { width: calc((100% - 40px) / 3); background-color: var(--bg-soft); border-radius: 22px; padding: 26px; transition: 0.25s; }
+.info-grid .item:hover { background-color: var(--brand-soft); transform: translateY(-3px); }
+.info-grid .item .tag { display: inline-block; font-size: 12px; font-weight: 700; color: #b46a00; background-color: var(--sun-soft); padding: 2px 10px; border-radius: 999px; margin-bottom: 10px; }
+.info-grid .item p { margin: 0; color: var(--sub); font-size: 14px; }
+.map { width: 100%; height: 420px; border: 0; display: block; border-radius: 28px; }
+.info-head { margin: 40px 0 18px 0; }
+
+/* ---------- 8) 관리자 화면 (이용자 화면과 다른 레이아웃) ---------- */
+body.admin { background-color: var(--bg-soft); display: flex; min-height: 100vh; }
+.admin-side { width: 240px; background-color: #111827; color: #9ca3af; flex-shrink: 0; display: flex; flex-direction: column; padding: 0 14px; }
+.admin-side .logo { padding: 26px 12px; font-size: 22px; font-weight: 900; letter-spacing: -1px; color: #fff; }
+.admin-side .logo small { display: inline-block; margin-top: 6px; font-size: 11px; font-weight: 700; color: #111827; background-color: var(--sun); padding: 1px 8px; border-radius: 999px; letter-spacing: 0; }
+.admin-side ul { list-style: none; margin: 0; padding: 0; flex: 1; }
+.admin-side li a { display: block; padding: 11px 14px; font-size: 14px; font-weight: 600; border-radius: 12px; margin-bottom: 2px; }
+.admin-side li a:hover { background-color: #1f2937; color: #fff; }
+.admin-side .bottom { padding: 18px 12px; border-top: 1px solid #1f2937; font-size: 13px; line-height: 2.1; }
+.admin-main { flex: 1; padding: 30px 40px; }
+.admin-main .topbar { display: flex; justify-content: space-between; margin-bottom: 22px; color: var(--sub); font-size: 13px; }
+.admin-main .page-title { font-size: 28px; margin-bottom: 22px; }
+.dash { display: flex; gap: 18px; margin-bottom: 24px; }
+.dash .item { flex: 1; background-color: #fff; padding: 22px 24px; border-radius: 20px; box-shadow: var(--shadow); color: var(--sub); font-size: 13px; font-weight: 600; }
+.dash .item:first-child { background: var(--grad); color: rgba(255,255,255,0.85); }
+.dash .item:first-child b { color: #fff; }
+.dash .item b { display: block; font-size: 32px; font-weight: 900; color: var(--ink); margin-top: 4px; letter-spacing: -1px; }

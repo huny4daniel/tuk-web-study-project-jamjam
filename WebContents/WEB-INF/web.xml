@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+		                    http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+		version="3.0">
+
+	<!-- 서버가 켜질 때 JDBC 드라이버와 DBCP 커넥션 풀을 준비 (수업 DBCPInit 그대로) -->
+	<servlet>
+		<servlet-name>DBCPInit</servlet-name>
+		<servlet-class>my.util.DBCPInit</servlet-class>
+		<init-param>
+			<param-name>jdbcdriver</param-name>
+			<param-value>com.mysql.cj.jdbc.Driver</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+</web-app>
