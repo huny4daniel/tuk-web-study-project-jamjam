@@ -9,8 +9,10 @@
 
 ## 1. 실행 방법
 
-1. **DB 만들기** : HeidiSQL로 접속(root / 12345)해서 `db/hotel.sql`을 열고 전체 실행(F9)
-   → `hotel` 데이터베이스와 테이블 6개, 샘플 데이터가 만들어집니다.
+1. **DB 만들기** : HeidiSQL로 접속(root / 12345)해서 아래 중 하나를 열고 전체 실행(F9)
+   - `db/hotel.sql` : 테이블 6개 + 샘플 데이터(테스트 계정, 객실, 사진) → **개발·발표용은 이것**
+   - `db/hotel_schema.sql` : 테이블 구조만 (데이터 없음) → 빈 DB가 필요한 다른 서버용
+   - 둘 다 `hotel` 데이터베이스를 새로 만듭니다 (이미 있으면 지우고 다시 만듦)
 2. **이클립스로 가져오기** : File → Import → General → Existing Projects into Workspace → `hotel` 폴더 선택
 3. **실행** : 프로젝트 우클릭 → Run As → Run on Server (Tomcat v9.0)
 4. 브라우저 주소 : `http://localhost:8080/hotel/`
@@ -30,6 +32,7 @@
 ```
 hotel/
 ├─ db/hotel.sql                  DB 테이블 + 샘플 데이터 (샘플 객실 사진 포함)
+├─ db/hotel_schema.sql           DB 구조만 (빈 테이블)
 ├─ db/sample-photos/             샘플 사진 원본 (참고용, 이미 hotel.sql 안에 들어 있음)
 ├─ src/main/java/
 │   ├─ pool.jocl                 DB 접속 정보 (수업과 동일, DB 이름만 hotel)
