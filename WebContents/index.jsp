@@ -11,6 +11,10 @@
 	} finally {
 		JdbcUtil.close(conn);
 	}
+
+	// 검색 띠의 날짜 기본값 : 오늘 체크인, 내일 체크아웃 ('yyyy-MM-dd' 문자열)
+	String today = java.time.LocalDate.now().toString();
+	String tomorrow = java.time.LocalDate.now().plusDays(1).toString();
 %>
 <c:set var="popularList" value="<%= popularList %>"/>
 
@@ -26,8 +30,8 @@
 
 	<!-- 검색 버튼을 누르면 객실 목록 페이지로 날짜/인원이 전달된다 (GET 방식) -->
 	<form class="search-bar" action="<%= ctx %>/room/roomList.jsp" method="get" onsubmit="return checkDate(this)">
-		<div class="field"><label for="checkIn">체크인</label><input type="date" id="checkIn" name="checkIn"></div>
-		<div class="field"><label for="checkOut">체크아웃</label><input type="date" id="checkOut" name="checkOut"></div>
+		<div class="field"><label for="checkIn">체크인</label><input type="date" id="checkIn" name="checkIn" value="<%= today %>" min="<%= today %>" onchange="fixCheckOut(this.form)"></div>
+		<div class="field"><label for="checkOut">체크아웃</label><input type="date" id="checkOut" name="checkOut" value="<%= tomorrow %>" min="<%= tomorrow %>"></div>
 		<div class="field"><label for="guests">인원</label>
 			<select id="guests" name="guests">
 				<option value="1">성인 1명</option>
@@ -98,6 +102,18 @@
 </div>
 
 <script>
+	// 체크인을 바꿨을 때 체크아웃이 같은 날이거나 더 빠르면 체크인 다음 날로 맞춰 준다
+	function fixCheckOut(f) {
+		if (f.checkIn.value == "") return;
+		var next = new Date(f.checkIn.value);
+		next.setDate(next.getDate() + 1);
+		var nextStr = next.toISOString().substring(0, 10);   // 'yyyy-MM-dd'
+		f.checkOut.min = nextStr;
+		if (f.checkOut.value == "" || f.checkOut.value <= f.checkIn.value) {
+			f.checkOut.value = nextStr;
+		}
+	}
+
 	// 체크인/체크아웃 둘 중 하나만 넣었거나 순서가 거꾸로면 막기
 	function checkDate(f) {
 		if ((f.checkIn.value == "") != (f.checkOut.value == "")) {
