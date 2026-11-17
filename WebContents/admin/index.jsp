@@ -29,9 +29,9 @@
 <div class="box">
 	<h3>오늘 체크인 예정</h3>
 	<table class="list">
-		<tr><th>예약번호</th><th>객실</th><th>예약자</th><th>숙박 기간</th><th>인원</th><th>결제</th></tr>
+		<tr><th>예약번호</th><th>객실</th><th>예약자</th><th>숙박 기간</th><th>인원</th><th>결제</th><th>요청사항</th></tr>
 		<c:if test="${empty todayList}">
-			<tr><td colspan="6">오늘 체크인 예정인 예약이 없습니다.</td></tr>
+			<tr><td colspan="7">오늘 체크인 예정인 예약이 없습니다.</td></tr>
 		</c:if>
 		<c:forEach var="res" items="${todayList}">
 			<tr>
@@ -41,6 +41,7 @@
 				<td>${res.checkIn} ~ ${res.checkOut}</td>
 				<td>${res.guests}명</td>
 				<td><fmt:formatNumber value="${res.totalPrice}" pattern="#,###"/>원 · ${res.payMethod}</td>
+				<td class="left"><c:out value="${empty res.requestNote ? '-' : res.requestNote}"/></td>
 			</tr>
 		</c:forEach>
 	</table>

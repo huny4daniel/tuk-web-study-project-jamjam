@@ -54,6 +54,7 @@
 				<tr><th>인원</th><td>${res.guests}명</td></tr>
 				<tr><th>결제 금액</th><td><b><fmt:formatNumber value="${res.totalPrice}" pattern="#,###"/>원</b>
 					<c:if test="${not empty res.couponCode}"><span class="muted"> · 쿠폰 ${res.couponCode} 적용</span></c:if></td></tr>
+				<tr><th>요청사항</th><td class="pre">${empty res.requestNote ? '없음' : ''}<c:out value="${res.requestNote}"/></td></tr>
 				<tr><th>결제 방법</th><td>${res.payMethod}<c:if test="${not empty res.payDetail}"> <span class="muted">· <c:out value="${res.payDetail}"/></span></c:if></td></tr>
 			</table>
 			<p class="muted" style="margin-bottom:0;">

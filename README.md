@@ -108,7 +108,7 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 |---|---|---|
 | member | 회원 | userId (admin 이면 관리자) |
 | room | 객실 | roomType, roomNo, roomSize(평, 화면에는 ㎡ 도 같이 표시), price, discountRate(객실 할인율), capacity(최대 인원), baseGuests(기준 인원), extraPrice(1인 추가 요금), bedCount, breakfast, pet, amenities, photo(LONGBLOB), photoType, **avgRating, reviewCount, resCount**(수업 freq 처럼 update 로 갱신) |
-| reservation | 예약 | roomId, **roomType, roomNo**(예약할 때 같이 저장 → join 불필요), userId, checkIn, checkOut, totalPrice, couponCode, payMethod, payDetail(카드사·할부, 입금자명 등), status('예약완료'/'취소'), **reviewed**(리뷰 썼으면 1) |
+| reservation | 예약 | roomId, **roomType, roomNo**(예약할 때 같이 저장 → join 불필요), userId, checkIn, checkOut, totalPrice, couponCode, payMethod, payDetail(카드사·할부, 입금자명 등), requestNote(고객 요청사항), status('예약완료'/'취소'), **reviewed**(리뷰 썼으면 1) |
 | review | 리뷰 | resId(예약 1건당 1개), roomId, roomType, rating(1~5), content |
 | coupon | 쿠폰 | couponCode, discountRate, startDate ~ endDate |
 | qna | 1:1 문의 | title, content, answer(NULL 이면 답변 대기) |
@@ -129,6 +129,7 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 | 4) 정렬 | RoomDao.makeOrderBy() | 가격 / 평점 / 인기(예약 수) 컬럼으로 order by. 예약 수는 `updateResCount()`(수업 updateFreq 와 같음), 평점은 `addRating()` 으로 갱신 |
 | 5) 예약 + 중복 방지 | reserve/payForm.jsp → reserve.jsp → resDetail.jsp, inc/reserveCheck.jsp, ReservationDao.countOverlap() | 결제 화면과 처리 페이지가 같은 검사·금액 계산 조각(reserveCheck)을 include → 화면 금액과 저장 금액이 항상 같고, 처리 페이지에서 한 번 더 검사. 모의 결제(카드사·할부 / 계좌이체 입금자 / 현장결제)와 취소 규정 동의.  겹치는 조건 : `기존 체크인 < 새 체크아웃 AND 기존 체크아웃 > 새 체크인`. 같은 날 체크아웃·체크인은 허용 |
 | 예약 취소 | reserve/cancel.jsp (이용자), admin/reservation/resCancel.jsp (관리자) | 이용자는 체크인 전까지만 취소 가능 |
+| 고객 요청사항 | reserve/payForm.jsp, reserve.jsp, resDetail.jsp, admin/index.jsp, admin/reservation/reservationList.jsp | 결제 화면에서 자주 쓰는 요청 버튼 + 직접 입력 → reservation.requestNote 에 저장, 확인서와 관리자 화면(대시보드 오늘 체크인, 예약 관리)에 표시 |
 | 6) 할인 | 객실 할인율(room.discountRate) + 기간 쿠폰(coupon) | 금액 = 1박 요금 × 박 수 × (100 − 쿠폰 할인율) / 100 |
 | 인원별 요금 | Room.getNightPrice(), reserve/reserve.jsp, roomDetail.jsp 의 nightPrice() | 1박 요금 = 객실 할인가 + (인원 − 기준 인원, 0 미만이면 0) × 1인 추가 요금 |
 | 7) 리뷰 | review/reviewForm.jsp, reviewWrite.jsp | 체크아웃이 지난 '예약완료' 예약에만, 1건당 1번(reviewed 컬럼). 리뷰 저장 → reviewed=1 → 객실 평균 갱신 |

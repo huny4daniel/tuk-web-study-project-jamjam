@@ -83,6 +83,20 @@
 					<p class="muted">정보가 다르면 <a href="<%= ctx %>/member/memberUpdateForm.jsp"><b>회원 정보 수정</b></a>에서 바꿀 수 있습니다.</p>
 				</div>
 
+				<!-- 고객 요청사항 : 자주 쓰는 요청 버튼을 누르면 글이 덧붙고, 직접 써도 됨 -->
+				<div class="box">
+					<h3>요청사항 <span class="muted">(선택)</span></h3>
+					<div class="chips">
+						<button type="button" onclick="addRequest(this)">높은 층 희망</button>
+						<button type="button" onclick="addRequest(this)">조용한 객실 희망</button>
+						<button type="button" onclick="addRequest(this)">늦은 체크인 (21시 이후)</button>
+						<button type="button" onclick="addRequest(this)">얼리 체크인 희망</button>
+						<button type="button" onclick="addRequest(this)">아기 침대 요청</button>
+						<button type="button" onclick="addRequest(this)">기념일 (케이크 문의)</button>
+					</div>
+					<textarea name="requestNote" maxlength="500" placeholder="호텔에 전달할 내용을 적어 주세요. 요청사항은 객실 사정에 따라 제공되지 않을 수 있습니다."></textarea>
+				</div>
+
 				<div class="box">
 					<h3>결제 방법</h3>
 					<div class="pay-methods">
@@ -178,6 +192,15 @@
 	}
 	function applyCoupon() {
 		applyCouponCode(document.getElementById("couponInput").value.trim());
+	}
+
+	// 요청사항 버튼 : 이미 들어 있지 않으면 글 끝에 덧붙인다
+	function addRequest(btn) {
+		var box = document.pf.requestNote;
+		var text = btn.textContent;
+		if (box.value.indexOf(text) >= 0) return;
+		box.value = box.value.trim() == "" ? text : box.value.trim() + ", " + text;
+		btn.className = "on";
 	}
 
 	function checkPay(f) {

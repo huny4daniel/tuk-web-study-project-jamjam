@@ -76,6 +76,7 @@ CREATE TABLE reservation (
 	couponCode    VARCHAR(30),
 	payMethod     VARCHAR(20)  NOT NULL,          -- 현장결제 / 계좌이체 / 카드결제
 	payDetail     VARCHAR(100),                   -- 결제 상세 (카드사 / 할부, 입금자명 ...) 예약 확인서에 표시
+	requestNote   VARCHAR(500),                   -- 고객 요청사항 (없으면 NULL)
 	status        VARCHAR(10)  NOT NULL DEFAULT '예약완료',
 	reviewed      TINYINT      NOT NULL DEFAULT 0,-- 리뷰를 썼으면 1
 	resDate       DATETIME     NOT NULL,
@@ -133,11 +134,11 @@ INSERT INTO coupon VALUES
 
 -- user1 : 지난 숙박 2건(리뷰 작성 가능/작성 완료), 앞으로의 예약 1건
 -- user2 : 지난 숙박 1건(리뷰 작성 완료)
-INSERT INTO reservation (userId, roomId, roomType, roomNo, checkIn, checkOut, guests, totalPrice, couponCode, payMethod, status, reviewed, resDate) VALUES
-('user1', 3, '디럭스', '501호', '2026-10-01', '2026-10-03', 2, 278000, NULL, '카드결제', '예약완료', 1, '2026-09-20 10:00:00'),
-('user1', 4, '디럭스 오션뷰', '502호', '2026-10-15', '2026-10-16', 2, 143650, NULL, '현장결제', '예약완료', 0, '2026-10-01 12:00:00'),
-('user2', 3, '디럭스', '501호', '2026-09-10', '2026-09-12', 3, 318000, NULL, '계좌이체', '예약완료', 1, '2026-09-01 09:00:00'),
-('user1', 5, '패밀리', '601호', '2026-12-24', '2026-12-26', 4, 458000, NULL, '카드결제', '예약완료', 0, '2026-11-01 15:00:00');
+INSERT INTO reservation (userId, roomId, roomType, roomNo, checkIn, checkOut, guests, totalPrice, couponCode, payMethod, requestNote, status, reviewed, resDate) VALUES
+('user1', 3, '디럭스', '501호', '2026-10-01', '2026-10-03', 2, 278000, NULL, '카드결제', NULL, '예약완료', 1, '2026-09-20 10:00:00'),
+('user1', 4, '디럭스 오션뷰', '502호', '2026-10-15', '2026-10-16', 2, 143650, NULL, '현장결제', '바다가 잘 보이는 높은 층으로 부탁드려요.', '예약완료', 0, '2026-10-01 12:00:00'),
+('user2', 3, '디럭스', '501호', '2026-09-10', '2026-09-12', 3, 318000, NULL, '계좌이체', NULL, '예약완료', 1, '2026-09-01 09:00:00'),
+('user1', 5, '패밀리', '601호', '2026-12-24', '2026-12-26', 4, 458000, NULL, '카드결제', '아이가 있어서 아기 침대가 필요합니다. 크리스마스 케이크 준비가 가능할까요?', '예약완료', 0, '2026-11-01 15:00:00');
 
 INSERT INTO review (resId, userId, roomId, roomType, rating, content, regDate) VALUES
 (1, 'user1', 3, '디럭스', 5, '객실이 깨끗하고 조식이 맛있었어요. 다음에도 이용하겠습니다.', '2026-10-04 09:00:00'),

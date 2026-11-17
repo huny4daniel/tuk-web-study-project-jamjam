@@ -222,6 +222,11 @@ table.sum tr.minus td:last-child { color: var(--glass); }
 table.sum tr.total td { border-top: 1px solid var(--line); padding-top: 14px; font-size: 18px; font-weight: 600; }
 .coupon-row { display: flex; gap: 6px; margin-bottom: 8px; }
 .coupon-row input { flex: 1; min-width: 0; }
+/* 요청사항 빠른 선택 버튼 */
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.chips button { font: inherit; font-size: 13px; padding: 6px 12px; background: transparent; color: var(--soft); border: 1px solid var(--line); cursor: pointer; }
+.chips button:hover, .chips button.on { color: var(--text); border-color: var(--glass); }
+table.list tr.note-row td { font-size: 13px; padding-top: 0; border-top: 0; }
 /* 예약 확인서 (reserve/resDetail.jsp) */
 .receipt { max-width: 720px; margin: 0 auto; }
 .receipt .done { text-align: center; margin-bottom: 32px; }

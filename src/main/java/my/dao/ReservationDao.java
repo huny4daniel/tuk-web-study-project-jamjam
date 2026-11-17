@@ -25,6 +25,7 @@ public class ReservationDao {
 		res.setCouponCode(rs.getString("couponCode"));
 		res.setPayMethod(rs.getString("payMethod"));
 		res.setPayDetail(rs.getString("payDetail"));
+		res.setRequestNote(rs.getString("requestNote"));
 		res.setStatus(rs.getString("status"));
 		res.setReviewed(rs.getInt("reviewed") == 1);
 		res.setResDate(rs.getTimestamp("resDate"));
@@ -36,8 +37,8 @@ public class ReservationDao {
 		try {
 			pstmt = conn.prepareStatement(
 					"insert into reservation (userId, roomId, roomType, roomNo, checkIn, checkOut, guests,"
-					+ " totalPrice, couponCode, payMethod, payDetail, status, reviewed, resDate)"
-					+ " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '예약완료', 0, now())");
+					+ " totalPrice, couponCode, payMethod, payDetail, requestNote, status, reviewed, resDate)"
+					+ " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '예약완료', 0, now())");
 			pstmt.setString(1, res.getUserId());
 			pstmt.setInt(2, res.getRoomId());
 			pstmt.setString(3, res.getRoomType());
@@ -49,6 +50,7 @@ public class ReservationDao {
 			pstmt.setString(9, res.getCouponCode());
 			pstmt.setString(10, res.getPayMethod());
 			pstmt.setString(11, res.getPayDetail());
+			pstmt.setString(12, res.getRequestNote());
 			pstmt.executeUpdate();
 		} finally {
 			JdbcUtil.close(pstmt);

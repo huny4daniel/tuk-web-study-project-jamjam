@@ -45,6 +45,12 @@
 		res.setCouponCode(coupon == null ? null : coupon.getCouponCode());
 		res.setPayMethod(payMethod);
 		res.setPayDetail(payDetail);
+		// 요청사항 : 비어 있으면 null 로 저장 (화면에서 "요청사항 없음" 판단이 쉽게)
+		String requestNote = request.getParameter("requestNote");
+		if (requestNote != null && requestNote.trim().length() > 500) {
+			requestNote = requestNote.trim().substring(0, 500);
+		}
+		res.setRequestNote(requestNote == null || requestNote.trim().equals("") ? null : requestNote.trim());
 
 		Connection conn = ConnectionProvider.getConnection();
 		try {

@@ -33,7 +33,9 @@
 			<td>${res.resId}</td>
 			<td><fmt:formatDate value="${res.resDate}" pattern="yyyy-MM-dd"/></td>
 			<td>${res.userId}</td>
-			<td>${res.roomType} ${res.roomNo}</td>
+			<td>${res.roomType} ${res.roomNo}
+				<c:if test="${not empty res.requestNote}"><br><span class="badge badge-gold" title="<c:out value='${res.requestNote}'/>">요청사항</span></c:if>
+			</td>
 			<td>${res.checkIn} ~ ${res.checkOut}</td>
 			<td>${res.guests}명</td>
 			<td><fmt:formatNumber value="${res.totalPrice}" pattern="#,###"/>원</td>
@@ -47,6 +49,9 @@
 				</c:if>
 			</td>
 		</tr>
+		<c:if test="${not empty res.requestNote}">
+			<tr class="note-row"><td></td><td colspan="10" class="left"><span class="muted">요청사항 ·</span> <c:out value="${res.requestNote}"/></td></tr>
+		</c:if>
 	</c:forEach>
 </table>
 <%@ include file="/inc/adminFooter.jsp" %>
