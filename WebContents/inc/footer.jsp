@@ -3,7 +3,7 @@
 <footer class="site-footer">
 	<div class="inner">
 		<div>
-			<div class="brand">jamjam.</div>
+			<div class="brand">JAMJAM</div>
 			호텔 잠잠 · 경기도 시흥시 배곧동 (가상 주소)
 		</div>
 		<div>

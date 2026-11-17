@@ -24,7 +24,7 @@
 <body>
 <header class="site-header">
 	<div class="inner">
-		<a class="logo" href="<%= ctx %>/index.jsp">jamjam<span>.</span></a>
+		<a class="logo" href="<%= ctx %>/index.jsp">JAMJAM</a>
 		<nav class="gnb">
 			<a href="<%= ctx %>/room/roomList.jsp">객실 예약</a>
 			<a href="<%= ctx %>/info/location.jsp">오시는 길</a>

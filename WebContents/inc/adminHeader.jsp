@@ -22,7 +22,7 @@
 </head>
 <body class="admin">
 <aside class="admin-side">
-	<div class="logo">jamjam<span style="color:#ffb547">.</span><br><small>ADMIN</small></div>
+	<div class="logo">JAMJAM<br><small>ADMIN</small></div>
 	<ul>
 		<li><a href="<%= ctx %>/admin/index.jsp">대시보드</a></li>
 		<li><a href="<%= ctx %>/admin/roomList.jsp">객실 관리</a></li>
