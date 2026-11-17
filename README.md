@@ -58,7 +58,7 @@ hotel/
     │   ├─ roomCard.jsp                       객실 카드 한 장
     │   └─ kakaoMap.jsp                       카카오 지도 SDK + 호텔 좌표 + 길찾기 함수
     ├─ index.jsp                 메인
-    ├─ member/                   회원가입, 아이디 중복확인, 로그인/로그아웃, 정보 수정
+    ├─ member/                   회원가입, 아이디 중복확인, 로그인/로그아웃, 정보 수정, 회원 탈퇴
     ├─ room/                     객실 목록(검색·필터·정렬·페이징), 객실 상세
     ├─ reserve/                  결제 화면(payForm), 예약 처리, 예약 확인서(resDetail), 예약 취소
     ├─ mypage/                   마이페이지 (내 예약, 내 리뷰)
@@ -138,6 +138,7 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 | 인원별 요금 | Room.getNightPrice(), reserve/reserve.jsp, roomDetail.jsp 의 nightPrice() | 1박 요금 = 객실 할인가 + (인원 − 기준 인원, 0 미만이면 0) × 1인 추가 요금 |
 | 7) 리뷰 | review/reviewForm.jsp, reviewWrite.jsp | 체크아웃이 지난 '예약완료' 예약에만, 1건당 1번(reviewed 컬럼). 리뷰 저장 → reviewed=1 → 객실 평균 갱신 |
 | 예약 상태 표시 | Reservation.java 의 getStatusLabel(), isCancelable(), isReviewable() | 상태 계산은 Java if 문으로, JSP 에서는 `${res.statusLabel}`, `<c:if test="${res.cancelable}">` 만 씀 |
+| 회원 탈퇴 | member/withdrawForm.jsp → withdraw.jsp, MemberDao.delete(), ReservationDao.countActiveByUser() | 비밀번호 재확인 + 동의. 이용 예정 예약이 있으면 탈퇴 불가. 회원 정보만 삭제하고 예약·리뷰·문의 기록은 남김 |
 | 8) 마이페이지 | mypage/myPage.jsp, member/memberUpdateForm.jsp | 내 예약(상태별 버튼), 내 리뷰, 정보 수정 |
 | 9) 관리자 페이지 | admin/*/ (기능별 폴더) | 대시보드, 예약 현황, 쿠폰, 문의 답변, 리뷰 관리, 회원 목록 |
 | 추가) 교통편 | info/location.jsp, inc/kakaoMap.jsp | 카카오 지도에 호텔 위치 표시. 교통편을 누르면 브라우저 현재 위치(geolocation)를 출발지로 카카오맵 길찾기(`map.kakao.com/link/by/...`)를 새 창으로 엶 |

@@ -236,6 +236,9 @@ table.sum tr.minus td:last-child { color: var(--glass); }
 table.sum tr.total td { border-top: 1px solid var(--line); padding-top: 14px; font-size: 18px; font-weight: 600; }
 .coupon-row { display: flex; gap: 6px; margin-bottom: 8px; }
 .coupon-row input { flex: 1; min-width: 0; }
+/* 회원 탈퇴 안내 */
+ul.notice { margin: 0 0 20px 0; padding-left: 18px; color: var(--soft); font-size: 14px; }
+.warn { color: var(--danger); }
 /* 요청사항 빠른 선택 버튼 */
 .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
 .chips button { font: inherit; font-size: 13px; padding: 6px 12px; background: transparent; color: var(--soft); border: 1px solid var(--line); cursor: pointer; }

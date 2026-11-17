@@ -24,6 +24,7 @@
 			<p><label>이메일</label><input type="email" name="email" value="<c:out value='${member.email}'/>"></p>
 			<input type="submit" class="btn btn-gold btn-block" value="수정하기">
 		</form>
+		<p style="text-align:right; margin:16px 0 0 0;"><a class="muted" href="withdrawForm.jsp">회원 탈퇴</a></p>
 	</div>
 </div>
 <script>

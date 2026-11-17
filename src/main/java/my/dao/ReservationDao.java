@@ -235,6 +235,13 @@ public class ReservationDao {
 		}
 	}
 
+	// 회원 탈퇴 전에 확인 : 그 회원의 아직 끝나지 않은 예약이 몇 개인지
+	public int countActiveByUser(Connection conn, String userId) throws SQLException {
+		return selectList(conn,
+				"select * from reservation where userId = ? and status = '예약완료' and checkOut > curdate()",
+				userId, null).size();
+	}
+
 	// 예약 상태 변경 (취소 등)
 	public void updateStatus(Connection conn, int resId, String status) throws SQLException {
 		PreparedStatement pstmt = null;

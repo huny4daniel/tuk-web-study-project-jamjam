@@ -92,6 +92,18 @@ public class MemberDao {
 		return list;
 	}
 
+	// 회원 탈퇴 : 회원 정보만 지운다 (예약, 리뷰, 문의 기록은 남김)
+	public void delete(Connection conn, String userId) throws SQLException {
+		PreparedStatement pstmt = null;
+		try {
+			pstmt = conn.prepareStatement("delete from member where userId = ?");
+			pstmt.setString(1, userId);
+			pstmt.executeUpdate();
+		} finally {
+			JdbcUtil.close(pstmt);
+		}
+	}
+
 	public void update(Connection conn, Member member) throws SQLException {
 		PreparedStatement pstmt = null;
 		try {
