@@ -247,6 +247,11 @@ details.faq summary .cat { flex: 0 0 88px; font-size: 12px; color: var(--glass);
 details.faq > div { padding: 0 4px 22px 108px; color: var(--soft); font-size: 14px; }
 .faq-more { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
 @media (max-width: 640px) { details.faq > div { padding-left: 4px; } details.faq summary .cat { flex-basis: auto; } }
+/* 관리자 AI 도우미 (admin/ai/aiConsole.jsp) */
+textarea.sql, .ai-log code { font-family: Consolas, "D2Coding", monospace; font-size: 13px; }
+.table-scroll { overflow-x: auto; }
+.ai-log { display: flex; flex-direction: column; gap: 2px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.ai-log code { color: var(--glass); word-break: break-all; }
 /* AI 상담 (chat/chatbot.jsp) */
 .chat-wrap { max-width: 780px; margin: 0 auto; }
 .chat-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 18px; }

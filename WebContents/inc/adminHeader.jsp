@@ -32,6 +32,7 @@
 		<li><a href="<%= ctx %>/admin/faq/faqList.jsp">자주 묻는 질문</a></li>
 		<li><a href="<%= ctx %>/admin/review/reviewList.jsp">리뷰 관리</a></li>
 		<li><a href="<%= ctx %>/admin/member/memberList.jsp">회원 목록</a></li>
+		<li><a href="<%= ctx %>/admin/ai/aiConsole.jsp">AI 도우미</a></li>
 	</ul>
 	<div class="bottom">
 		<a href="<%= ctx %>/member/logout.jsp">로그아웃</a>
