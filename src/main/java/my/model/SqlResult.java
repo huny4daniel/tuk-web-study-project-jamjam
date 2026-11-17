@@ -6,7 +6,8 @@ import java.util.List;
 // 관리자 AI 화면에서 SQL 을 실행한 결과
 //   select 이면 columns(컬럼 이름)와 rows(행마다 글자 목록)
 //   insert / update / delete 이면 updateCount(바뀐 행 수)
-public class SqlResult {
+// Serializable : 세션(실행 기록)에 넣는 객체라서, 서버를 다시 켤 때 톰캣이 세션을 저장했다가 되살릴 수 있게 함
+public class SqlResult implements java.io.Serializable {
 	private String sql;
 	private boolean select;
 	private List<String> columns = new ArrayList<String>();
