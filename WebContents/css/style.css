@@ -236,6 +236,20 @@ table.sum tr.minus td:last-child { color: var(--glass); }
 table.sum tr.total td { border-top: 1px solid var(--line); padding-top: 14px; font-size: 18px; font-weight: 600; }
 .coupon-row { display: flex; gap: 6px; margin-bottom: 8px; }
 .coupon-row input { flex: 1; min-width: 0; }
+/* AI 상담 (chat/chatbot.jsp) */
+.chat-wrap { max-width: 780px; margin: 0 auto; }
+.chat-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 18px; }
+.chat-box { height: 460px; overflow-y: auto; border: 1px solid var(--line); background: var(--panel); padding: 24px; display: flex; flex-direction: column; gap: 14px; margin-bottom: 14px; }
+.chat-box .msg { display: flex; }
+.chat-box .msg.me { justify-content: flex-end; }
+.chat-box .bubble { max-width: 78%; padding: 12px 16px; font-size: 14px; line-height: 1.7; border: 1px solid var(--line); background: var(--panel-2); }
+.chat-box .msg.me .bubble { background: var(--glass); color: var(--bg); border-color: var(--glass); }
+.chat-form { display: flex; gap: 8px; margin-bottom: 8px; }
+.chat-form textarea { flex: 1; min-height: 0; resize: none; }
+.chat-fab { position: fixed; right: 24px; bottom: 24px; z-index: 20; display: flex; align-items: center; gap: 8px; padding: 12px 18px; background: var(--glass); color: var(--bg); font-size: 14px; font-weight: 600; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35); }
+.chat-fab svg { width: 20px; height: 20px; }
+.chat-fab:hover { background: var(--glass-hover); }
+@media print { .chat-fab { display: none; } }
 /* 회원 탈퇴 안내 */
 ul.notice { margin: 0 0 20px 0; padding-left: 18px; color: var(--soft); font-size: 14px; }
 .warn { color: var(--danger); }

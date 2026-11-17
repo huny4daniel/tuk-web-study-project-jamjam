@@ -36,6 +36,7 @@
 			<a href="<%= ctx %>/info/location.jsp">오시는 길</a>
 			<a href="<%= ctx %>/info/tour.jsp">주변 즐길거리</a>
 			<a href="<%= ctx %>/qna/qnaList.jsp">1:1 문의</a>
+			<a href="<%= ctx %>/chat/chatbot.jsp">AI 상담</a>
 		</nav>
 		<div class="util">
 			<% if (loginId == null) { %>

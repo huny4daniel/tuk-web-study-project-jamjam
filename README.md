@@ -48,6 +48,7 @@ hotel/
 │   └─ my/
 │       ├─ util/                 ConnectionProvider, DBCPInit, JdbcUtil  (수업 파일 그대로)
 │       ├─ model/                테이블 한 줄을 담는 클래스 (Member, Room, Reservation ...)
+│       ├─ ai/                   Ollama AI 연결 (수업 OllamaClient 와 같은 방식)
 │       └─ dao/                  SQL 을 실행하는 클래스 (MemberDao, RoomDao ...)
 └─ WebContents/
     ├─ css/style.css             전체 디자인 (파일 하나)
@@ -65,6 +66,7 @@ hotel/
     ├─ review/                   리뷰 쓰기 폼 / 등록 처리
     ├─ qna/                      1:1 문의 목록·작성 / 등록 처리
     ├─ info/                     오시는 길, 주변 즐길거리
+    ├─ chat/                     AI 상담 챗봇
     ├─ admin/                    관리자 화면 (기능별 하위 폴더)
     │   ├─ index.jsp             대시보드
     │   ├─ room/                 객실 등록·수정·삭제
@@ -139,6 +141,7 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 | 7) 리뷰 | review/reviewForm.jsp, reviewWrite.jsp | 체크아웃이 지난 '예약완료' 예약에만, 1건당 1번(reviewed 컬럼). 리뷰 저장 → reviewed=1 → 객실 평균 갱신 |
 | 예약 상태 표시 | Reservation.java 의 getStatusLabel(), isCancelable(), isReviewable() | 상태 계산은 Java if 문으로, JSP 에서는 `${res.statusLabel}`, `<c:if test="${res.cancelable}">` 만 씀 |
 | 회원 탈퇴 | member/withdrawForm.jsp → withdraw.jsp, MemberDao.delete(), ReservationDao.countActiveByUser() | 비밀번호 재확인 + 동의. 이용 예정 예약이 있으면 탈퇴 불가. 회원 정보만 삭제하고 예약·리뷰·문의 기록은 남김 |
+| AI 상담 챗봇 | chat/chatbot.jsp, my/ai/HotelChatbot.java, my/ai/OllamaClient.java | 수업 OllamaClient 그대로(gson, localhost:11435, gemma3:12b). 호텔 안내 + DB 객실 목록 + 최근 대화 6줄 + 질문을 프롬프트로 보냄. 대화는 세션(CHAT)에 저장, Ollama 가 꺼져 있으면 1:1 문의 안내 |
 | 8) 마이페이지 | mypage/myPage.jsp, member/memberUpdateForm.jsp | 내 예약(상태별 버튼), 내 리뷰, 정보 수정 |
 | 9) 관리자 페이지 | admin/*/ (기능별 폴더) | 대시보드, 예약 현황, 쿠폰, 문의 답변, 리뷰 관리, 회원 목록 |
 | 추가) 교통편 | info/location.jsp, inc/kakaoMap.jsp | 카카오 지도에 호텔 위치 표시. 교통편을 누르면 브라우저 현재 위치(geolocation)를 출발지로 카카오맵 길찾기(`map.kakao.com/link/by/...`)를 새 창으로 엶 |
@@ -158,4 +161,5 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 - **사진을 바꾼 뒤 팀원과 공유하려면** : HeidiSQL 에서 hotel DB 를 우클릭 → [데이터베이스를 SQL로 내보내기] 로 덤프해서 넘기면 됩니다.
 - **메인 배경** : `images/hero.svg` 를 원하는 사진으로 바꾸고 style.css 의 `.hero` 경로만 고치면 됩니다.
 - **디자인 수정** : 색과 글꼴은 `css/style.css` 맨 위 `:root` 변수만 바꾸면 전체에 적용됩니다. JSP 는 드림위버에서 열어 HTML 부분을 편집할 수 있습니다.
+- **AI 기능** : 수업과 같은 Ollama 서버(`http://localhost:11435`, 모델 `gemma3:12b`)가 켜져 있어야 답이 나옵니다. 주소·모델은 `my/ai/OllamaClient.java` 맨 위 두 줄만 바꾸면 됩니다. 꺼져 있으면 화면에 연결 실패 안내가 나옵니다.
 - 비밀번호를 평문으로 저장합니다. 수업 예제 수준이므로 실제 서비스라면 암호화가 필요합니다.
