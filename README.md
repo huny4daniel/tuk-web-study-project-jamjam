@@ -127,7 +127,7 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 | 8) 마이페이지 | mypage/myPage.jsp, member/memberUpdateForm.jsp | 내 예약(상태별 버튼), 내 리뷰, 정보 수정 |
 | 9) 관리자 페이지 | admin/*/ (기능별 폴더) | 대시보드, 예약 현황, 쿠폰, 문의 답변, 리뷰 관리, 회원 목록 |
 | 추가) 교통편 | info/location.jsp, inc/kakaoMap.jsp | 카카오 지도에 호텔 위치 표시. 교통편을 누르면 브라우저 현재 위치(geolocation)를 출발지로 카카오맵 길찾기(`map.kakao.com/link/by/...`)를 새 창으로 엶 |
-| 추가) 주변 체험 | info/tour.jsp | 관광지 / 체험 / 맛집 소개 |
+| 추가) 주변 체험 | info/tour.jsp | 관광지 / 체험 / 맛집 소개. 카드의 data-lat/data-lng 로 카카오 지도에 마커(수업 restaurant-map.jsp 방식), 카드를 누르면 그 위치로 이동, 탭으로 분류별 마커만 표시 |
 | 추가) 상세 필터 | room/roomList.jsp 왼쪽 | 조식, 반려동물, 침대 수, 편의시설, 결제 방법(예약할 때 선택) |
 
 ---
