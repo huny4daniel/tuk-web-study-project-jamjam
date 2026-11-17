@@ -33,7 +33,6 @@
 		<li><a href="<%= ctx %>/admin/member/memberList.jsp">회원 목록</a></li>
 	</ul>
 	<div class="bottom">
-		<a href="<%= ctx %>/index.jsp">← 홈페이지로</a><br>
 		<a href="<%= ctx %>/member/logout.jsp">로그아웃</a>
 	</div>
 </aside>

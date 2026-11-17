@@ -25,7 +25,7 @@
 
 | 테스트 계정 | 아이디 / 비밀번호 | 비고 |
 |---|---|---|
-| 관리자 | admin / 1234 | 로그인하면 관리자 화면으로 이동 |
+| 관리자 | admin / 1234 | 관리자 화면만 사용 (이용자 화면에 들어가면 관리자 대시보드로 이동) |
 | 이용자 | user1 / 1234 | 지난 숙박(리뷰 작성 가능), 앞으로의 예약이 들어 있음 |
 | 이용자 | user2 / 1234 | |
 
@@ -119,7 +119,7 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 
 | 계획서 항목 | 어디서 | 핵심 원리 |
 |---|---|---|
-| 1) 회원 관리 | member/*, inc/loginCheck.jsp, inc/adminCheck.jsp | 로그인 성공 시 `session.setAttribute("LOGIN", 아이디)`. 아이디가 admin 이면 관리자 |
+| 1) 회원 관리 | member/*, inc/loginCheck.jsp, inc/adminCheck.jsp | 로그인 성공 시 `session.setAttribute("LOGIN", 아이디)`. 아이디가 admin 이면 관리자. 관리자는 header.jsp·loginCheck.jsp 에서 관리자 대시보드로 보내서 이용자 화면을 쓰지 않음 |
 | 2) 객실 관리 | admin/room/roomList, roomForm, roomSave, roomDelete | 등록·수정 폼 하나를 같이 씀. 사진은 cos.jar 로 받아 byte 배열로 읽어서 **DB에 저장** |
 | 객실 사진 출력 | room/photo.jsp, RoomDao.selectPhoto() | `<img src=".../room/photo.jsp?roomId=3">` → DB 의 사진 바이트를 이미지로 그대로 내보냄 |
 | 3) 객실 조회·검색 | room/roomList.jsp, RoomDao.WHERE / setSearch() | ? 7개짜리 고정 SQL 하나. 조건을 안 고르면 항상 참이 되는 값을 넣음 (예: `breakfast >= 0`). 날짜를 넣으면 그 기간에 예약된 객실은 `not in` 으로 뺌 |

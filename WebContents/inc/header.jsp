@@ -12,6 +12,12 @@
 	String ctx = request.getContextPath();                       // 예) /hotel
 	String loginId = (String) session.getAttribute("LOGIN");     // 로그인 안 했으면 null
 	String loginName = (String) session.getAttribute("NAME");
+
+	// 관리자(admin)는 이용자 화면을 쓰지 않는다 → 어느 이용자 페이지로 들어와도 관리자 대시보드로 보냄
+	if ("admin".equals(loginId)) {
+		response.sendRedirect(ctx + "/admin/index.jsp");
+		return;
+	}
 %>
 <!DOCTYPE html>
 <html>
@@ -39,9 +45,6 @@
 				<span><b><%= loginName %></b>님</span>
 				<a href="<%= ctx %>/mypage/myPage.jsp">마이페이지</a>
 				<a href="<%= ctx %>/member/logout.jsp">로그아웃</a>
-				<% if (loginId.equals("admin")) { %>
-					<a class="btn-line" href="<%= ctx %>/admin/index.jsp">관리자 페이지</a>
-				<% } %>
 			<% } %>
 		</div>
 	</div>
