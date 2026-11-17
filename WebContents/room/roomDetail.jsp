@@ -146,6 +146,11 @@
 		return false;
 	}
 
+	// 달력 글자 (영어 화면이면 영어)
+	var isEn = ${sessionScope.LANG == 'en'};
+	var WEEK = isEn ? ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] : ["일", "월", "화", "수", "목", "금", "토"];
+	var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
 	// 숫자 -> 'yyyy-MM-dd' 문자열 (시간대 문제를 피하려고 직접 만든다)
 	function dateStr(y, m, d) {
 		return y + "-" + (m < 10 ? "0" + m : m) + "-" + (d < 10 ? "0" + d : d);
@@ -165,8 +170,10 @@
 	// 한 달짜리 달력(HTML 문자열) 만들기
 	function monthHtml(y, m) {
 		var f = document.rf;
-		var html = '<div class="cal-month"><div class="cal-title">' + y + '년 ' + m + '월</div>';
-		html += '<div class="cal-grid"><span class="wk">일</span><span class="wk">월</span><span class="wk">화</span><span class="wk">수</span><span class="wk">목</span><span class="wk">금</span><span class="wk">토</span>';
+		// 화면 언어가 영어면 달력 글자도 영어로 (달력은 날짜를 누를 때마다 다시 그려서 번역 스크립트가 못 바꿈)
+		var title = isEn ? MONTHS[m - 1] + " " + y : y + "년 " + m + "월";
+		var html = '<div class="cal-month"><div class="cal-title">' + title + '</div><div class="cal-grid">';
+		for (var w = 0; w < 7; w++) html += '<span class="wk">' + WEEK[w] + '</span>';
 		var firstDay = new Date(y, m - 1, 1).getDay();   // 1일이 무슨 요일인지 (0 = 일요일)
 		var lastDate = new Date(y, m, 0).getDate();       // 그 달의 마지막 날
 		for (var i = 0; i < firstDay; i++) html += '<span></span>';

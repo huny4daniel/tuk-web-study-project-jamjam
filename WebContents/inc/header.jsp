@@ -40,6 +40,11 @@
 			<a href="<%= ctx %>/chat/chatbot.jsp">AI 상담</a>
 		</nav>
 		<div class="util">
+			<%-- 언어 바꾸기 (영어는 AI 번역) --%>
+			<span class="lang">
+				<a href="<%= ctx %>/lang/setLang.jsp?lang=ko" class="${sessionScope.LANG != 'en' ? 'on' : ''}">KO</a>
+				<a href="<%= ctx %>/lang/setLang.jsp?lang=en" class="${sessionScope.LANG == 'en' ? 'on' : ''}">EN</a>
+			</span>
 			<% if (loginId == null) { %>
 				<a href="<%= ctx %>/member/loginForm.jsp">로그인</a>
 				<a class="btn-line" href="<%= ctx %>/member/joinForm.jsp">회원가입</a>

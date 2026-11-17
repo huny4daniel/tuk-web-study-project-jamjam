@@ -27,7 +27,8 @@
 		String role = "bot";
 		Connection conn = ConnectionProvider.getConnection();
 		try {
-			answer = new HotelChatbot().ask(conn, chat, question);
+			// 화면 언어가 영어면 영어로 답하게 한다
+			answer = new HotelChatbot().ask(conn, chat, question, "en".equals(session.getAttribute("LANG")));
 		} catch (Exception e) {
 			// Ollama 가 꺼져 있거나 응답이 없을 때
 			application.log("챗봇 응답 실패", e);

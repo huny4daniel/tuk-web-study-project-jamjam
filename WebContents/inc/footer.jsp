@@ -27,5 +27,9 @@
 	</div>
 	<div class="copy">© 2026 HOTEL JAMJAM. All rights reserved.</div>
 </footer>
+<%-- 영어를 골랐으면 화면의 한글을 영어로 바꾸는 스크립트 실행 --%>
+<c:if test="${sessionScope.LANG == 'en'}">
+	<%@ include file="/inc/translate.jsp" %>
+</c:if>
 </body>
 </html>

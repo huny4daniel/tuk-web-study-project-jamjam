@@ -60,6 +60,11 @@ h3 { font-size: 19px; font-weight: 600; }
 .site-header .util { font-size: 13px; display: flex; gap: 20px; align-items: center; color: var(--soft); }
 .site-header .util a:hover { color: var(--text); }
 .site-header .util b { color: var(--text); }
+.site-header .util .lang { display: flex; gap: 2px; font-size: 12px; letter-spacing: 0.08em; }
+.site-header .util .lang a { padding: 2px 6px; color: var(--soft); }
+.site-header .util .lang a.on { color: var(--bg); background: var(--glass); }
+/* 영어 번역 중일 때 오른쪽 위에 작은 안내 (inc/translate.jsp) */
+html.translating body::after { content: "Translating…"; position: fixed; top: 86px; right: 24px; z-index: 30; padding: 6px 12px; font-size: 12px; background: var(--panel-2); border: 1px solid var(--line); color: var(--soft); }
 .site-header .util .btn-line { padding: 8px 16px; border: 1px solid var(--line); color: var(--text); background: transparent; transition: border-color 0.2s; }
 .site-header .util .btn-line:hover { border-color: var(--glass); }
 

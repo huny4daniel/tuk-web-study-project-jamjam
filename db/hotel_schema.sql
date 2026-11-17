@@ -1,6 +1,6 @@
 -- =========================================================
 --  호텔 잠잠 DB 구조 (테이블만, 데이터 없음)
---  다른 서버에서 이 파일 하나만 실행하면 hotel 데이터베이스와 빈 테이블 7개가 만들어집니다.
+--  다른 서버에서 이 파일 하나만 실행하면 hotel 데이터베이스와 빈 테이블 8개가 만들어집니다.
 --  HeidiSQL : 파일 열기 → 전체 실행(F9)
 --  명령줄   : mysql -uroot -p < hotel_schema.sql
 --
@@ -45,6 +45,15 @@ CREATE TABLE `faq` (
   `question` varchar(200) NOT NULL,
   `answer` text NOT NULL,
   PRIMARY KEY (`faqId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `translation`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `translation` (
+  `ko` varchar(700) NOT NULL,
+  `en` text NOT NULL,
+  PRIMARY KEY (`ko`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `member`;

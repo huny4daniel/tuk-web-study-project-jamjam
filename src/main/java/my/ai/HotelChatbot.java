@@ -34,7 +34,13 @@ public class HotelChatbot {
 			+ "주변: 배곧한울공원(도보 5분), 오이도 빨강등대(차로 10분), 시흥갯골생태공원(차로 20분), 오이도 조개구이 거리, 월곶포구\n"
 			+ "반려동물: 반려동물 동반 가능 객실에서만 가능\n";
 
+	// 한국어로 답하는 기본 질문
 	public String ask(Connection conn, List<ChatMessage> history, String question) throws Exception {
+		return ask(conn, history, question, false);
+	}
+
+	// english 가 true 면 영어로 답한다 (화면 언어를 영어로 바꾼 손님)
+	public String ask(Connection conn, List<ChatMessage> history, String question, boolean english) throws Exception {
 		StringBuilder prompt = new StringBuilder();
 		prompt.append("당신은 '호텔 잠잠' 공식 홈페이지의 예약 상담 챗봇입니다.\n")
 			.append("규칙:\n")
@@ -125,6 +131,9 @@ public class HotelChatbot {
 			}
 		}
 
+		if (english) {
+			prompt.append("\n※ 이 손님은 영어 화면을 쓰고 있습니다. 반드시 자연스러운 영어로 답하세요. (Answer in English.)\n");
+		}
 		prompt.append("\n[손님 질문]\n").append(question).append("\n\n챗봇:");
 		return new OllamaClient().ask(prompt.toString()).trim();
 	}

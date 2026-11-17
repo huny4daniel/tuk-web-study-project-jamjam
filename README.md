@@ -10,7 +10,7 @@
 ## 1. 실행 방법
 
 1. **DB 만들기** : HeidiSQL로 접속(root / 12345)해서 아래 중 하나를 열고 전체 실행(F9)
-   - `db/hotel.sql` : 객실 50실(2~10층) + 테이블 7개 + 샘플 데이터(테스트 계정, 객실, 사진) → **개발·발표용은 이것**
+   - `db/hotel.sql` : 객실 50실(2~10층) + 테이블 8개 + 샘플 데이터(테스트 계정, 객실, 사진) → **개발·발표용은 이것**
    - `db/hotel_schema.sql` : 테이블 구조만 (데이터 없음) → 빈 DB가 필요한 다른 서버용
    - 둘 다 `hotel` 데이터베이스를 새로 만듭니다 (이미 있으면 지우고 다시 만듦)
 2. **이클립스로 가져오기** : File → Import → General → Existing Projects into Workspace → `hotel` 폴더 선택
@@ -57,7 +57,9 @@ hotel/
     │   ├─ adminHeader.jsp / adminFooter.jsp  관리자 화면 위/아래 (왼쪽 메뉴 레이아웃)
     │   ├─ loginCheck.jsp / adminCheck.jsp    로그인/관리자 검사
     │   ├─ roomCard.jsp                       객실 카드 한 장
-    │   └─ kakaoMap.jsp                       카카오 지도 SDK + 호텔 좌표 + 길찾기 함수
+    │   ├─ kakaoMap.jsp                       카카오 지도 SDK + 호텔 좌표 + 길찾기 함수
+    │   ├─ reserveCheck.jsp                   예약 검사 + 금액 계산 (결제 화면과 예약 처리가 같이 씀)
+    │   └─ translate.jsp                      영어 화면 번역 스크립트
     ├─ index.jsp                 메인
     ├─ member/                   회원가입, 아이디 중복확인, 로그인/로그아웃, 정보 수정, 회원 탈퇴
     ├─ room/                     객실 목록(검색·필터·정렬·페이징), 객실 상세
@@ -68,6 +70,7 @@ hotel/
     ├─ info/                     오시는 길, 주변 즐길거리
     ├─ chat/                     AI 상담 챗봇
     ├─ faq/                      자주 묻는 질문
+    ├─ lang/                     언어 바꾸기, 영어 번역 처리(JSON)
     ├─ admin/                    관리자 화면 (기능별 하위 폴더)
     │   ├─ index.jsp             대시보드
     │   ├─ room/                 객실 등록·수정·삭제
@@ -121,6 +124,7 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 | coupon | 쿠폰 | couponCode, discountRate, startDate ~ endDate |
 | qna | 1:1 문의 | title, content, answer(NULL 이면 답변 대기) |
 | faq | 자주 묻는 질문 | category(예약·결제/객실/시설·서비스/회원), question, answer |
+| translation | 영어 번역 캐시 | ko(화면 한글 문장, PK), en(영어). 메뉴·버튼 등 기본 문구는 미리 넣어 두고, 나머지는 처음 볼 때 Ollama 가 번역해서 추가 |
 
 ---
 
@@ -148,6 +152,7 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 | 자주 묻는 질문 | faq/faqList.jsp, admin/faq/*, FaqDao | 분류 탭(category like ?, 안 고르면 '%') + details/summary 로 펼치기. 관리자가 등록·수정·삭제, 챗봇 프롬프트에도 들어감 |
 | AI 상담 챗봇 | chat/chatbot.jsp, my/ai/HotelChatbot.java, my/ai/OllamaClient.java | 수업 OllamaClient 그대로(gson, localhost:11435, gemma3:12b). 호텔 안내 + DB 객실 목록 + 최근 대화 6줄 + 질문을 프롬프트로 보냄. 대화는 세션(CHAT)에 저장, Ollama 가 꺼져 있으면 1:1 문의 안내 |
 | 관리자 AI 도우미 | admin/ai/aiConsole.jsp, my/ai/AdminAi.java | 우리말 요청 → AI 가 테이블 구조를 보고 SQL 한 문장 + 설명 작성(실행 안 함) → 관리자가 확인·수정 후 [실행]. 실행 전 checkSql() 로 select/insert/update/delete 한 문장만, where 없는 update/delete·drop 등·password/photo 컬럼·select * 차단, 20행 넘게 바뀌면 rollback. 실행 기록은 세션(AI_LOG) |
+| 영어 화면 | header.jsp 의 KO/EN, lang/setLang.jsp, inc/translate.jsp, lang/translate.jsp, my/ai/Translator.java | 세션 LANG=en 이면 footer 에서 번역 스크립트 실행 → 화면의 한글을 모아 40개씩 서버로 → 번역 캐시(DB) 확인 → 없는 것만 Ollama 로 한 번에(JSON 배열) 번역해 저장. 가격·평수·호실 같은 숫자 문구는 스크립트 규칙으로 바로 변환. 챗봇은 영어로 답함. (자바스크립트 alert 문구와 관리자 화면은 번역하지 않음) |
 | 8) 마이페이지 | mypage/myPage.jsp, member/memberUpdateForm.jsp | 내 예약(상태별 버튼), 내 리뷰, 정보 수정 |
 | 9) 관리자 페이지 | admin/*/ (기능별 폴더) | 대시보드, 예약 현황, 쿠폰, 문의 답변, 리뷰 관리, 회원 목록 |
 | 추가) 교통편 | info/location.jsp, inc/kakaoMap.jsp | 카카오 지도에 호텔 위치 표시. 교통편을 누르면 브라우저 현재 위치(geolocation)를 출발지로 카카오맵 길찾기(`map.kakao.com/link/by/...`)를 새 창으로 엶 |
