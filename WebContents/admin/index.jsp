@@ -23,7 +23,7 @@
 	<div class="item">전체 객실<b><%= roomCount %>실</b></div>
 	<div class="item">투숙 예정 예약<b><%= upcomingCount %>건</b></div>
 	<div class="item">오늘 체크인<b>${todayList.size()}건</b></div>
-	<div class="item">답변 대기 문의<b><a href="qnaList.jsp"><%= unansweredCount %>건</a></b></div>
+	<div class="item">답변 대기 문의<b><a href="qna/qnaList.jsp"><%= unansweredCount %>건</a></b></div>
 </div>
 
 <div class="box">

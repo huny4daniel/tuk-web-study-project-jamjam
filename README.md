@@ -53,7 +53,14 @@ hotel/
     ├─ reserve/                  예약 처리, 예약 취소
     ├─ mypage/                   마이페이지, 리뷰 쓰기, 1:1 문의
     ├─ info/                     오시는 길, 주변 즐길거리
-    ├─ admin/                    관리자 화면 전부
+    ├─ admin/                    관리자 화면 (기능별 하위 폴더)
+    │   ├─ index.jsp             대시보드
+    │   ├─ room/                 객실 등록·수정·삭제
+    │   ├─ reservation/          예약 현황, 예약 취소
+    │   ├─ coupon/               할인 쿠폰
+    │   ├─ qna/                  1:1 문의 답변
+    │   ├─ review/               리뷰 관리
+    │   └─ member/               회원 목록
     └─ images/                   메인 배경, 기본 그림(사진 없는 객실용)
 ```
 
@@ -102,18 +109,18 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 | 계획서 항목 | 어디서 | 핵심 원리 |
 |---|---|---|
 | 1) 회원 관리 | member/*, inc/loginCheck.jsp, inc/adminCheck.jsp | 로그인 성공 시 `session.setAttribute("LOGIN", 아이디)`. 아이디가 admin 이면 관리자 |
-| 2) 객실 관리 | admin/roomList, roomForm, roomSave, roomDelete | 등록·수정 폼 하나를 같이 씀. 사진은 cos.jar 로 받아 byte 배열로 읽어서 **DB에 저장** |
+| 2) 객실 관리 | admin/room/roomList, roomForm, roomSave, roomDelete | 등록·수정 폼 하나를 같이 씀. 사진은 cos.jar 로 받아 byte 배열로 읽어서 **DB에 저장** |
 | 객실 사진 출력 | room/photo.jsp, RoomDao.selectPhoto() | `<img src=".../room/photo.jsp?roomId=3">` → DB 의 사진 바이트를 이미지로 그대로 내보냄 |
 | 3) 객실 조회·검색 | room/roomList.jsp, RoomDao.WHERE / setSearch() | ? 7개짜리 고정 SQL 하나. 조건을 안 고르면 항상 참이 되는 값을 넣음 (예: `breakfast >= 0`). 날짜를 넣으면 그 기간에 예약된 객실은 `not in` 으로 뺌 |
 | 페이징 | RoomDao.getRoomList(), RoomListView | 수업 catalogPaging 과 같은 `limit ?, ?` 방식 |
 | 4) 정렬 | RoomDao.makeOrderBy() | 가격 / 평점 / 인기(예약 수) 컬럼으로 order by. 예약 수는 `updateResCount()`(수업 updateFreq 와 같음), 평점은 `addRating()` 으로 갱신 |
 | 5) 예약 + 중복 방지 | reserve/reserve.jsp, ReservationDao.countOverlap() | 겹치는 조건 : `기존 체크인 < 새 체크아웃 AND 기존 체크아웃 > 새 체크인`. 같은 날 체크아웃·체크인은 허용 |
-| 예약 취소 | reserve/cancel.jsp (이용자), admin/resCancel.jsp (관리자) | 이용자는 체크인 전까지만 취소 가능 |
+| 예약 취소 | reserve/cancel.jsp (이용자), admin/reservation/resCancel.jsp (관리자) | 이용자는 체크인 전까지만 취소 가능 |
 | 6) 할인 | 객실 할인율(room.discountRate) + 기간 쿠폰(coupon) | 금액 = 객실 할인가 × 박 수 × (100 − 쿠폰 할인율) / 100 |
 | 7) 리뷰 | mypage/reviewForm.jsp, review.jsp | 체크아웃이 지난 '예약완료' 예약에만, 1건당 1번(reviewed 컬럼). 리뷰 저장 → reviewed=1 → 객실 평균 갱신 |
 | 예약 상태 표시 | Reservation.java 의 getStatusLabel(), isCancelable(), isReviewable() | 상태 계산은 Java if 문으로, JSP 에서는 `${res.statusLabel}`, `<c:if test="${res.cancelable}">` 만 씀 |
 | 8) 마이페이지 | mypage/myPage.jsp, member/memberUpdateForm.jsp | 내 예약(상태별 버튼), 내 리뷰, 정보 수정 |
-| 9) 관리자 페이지 | admin/* | 대시보드, 예약 현황, 쿠폰, 문의 답변, 리뷰 관리, 회원 목록 |
+| 9) 관리자 페이지 | admin/*/ (기능별 폴더) | 대시보드, 예약 현황, 쿠폰, 문의 답변, 리뷰 관리, 회원 목록 |
 | 추가) 교통편 | info/location.jsp | 구글 지도 iframe + 교통 안내 |
 | 추가) 주변 체험 | info/tour.jsp | 관광지 / 체험 / 맛집 소개 |
 | 추가) 상세 필터 | room/roomList.jsp 왼쪽 | 조식, 반려동물, 침대 수, 편의시설, 결제 방법(예약할 때 선택) |

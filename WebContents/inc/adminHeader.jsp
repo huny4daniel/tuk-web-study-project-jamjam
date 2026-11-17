@@ -25,12 +25,12 @@
 	<div class="logo">JAMJAM<br><small>ADMIN</small></div>
 	<ul>
 		<li><a href="<%= ctx %>/admin/index.jsp">대시보드</a></li>
-		<li><a href="<%= ctx %>/admin/roomList.jsp">객실 관리</a></li>
-		<li><a href="<%= ctx %>/admin/reservationList.jsp">예약 관리</a></li>
-		<li><a href="<%= ctx %>/admin/couponList.jsp">할인 쿠폰 관리</a></li>
-		<li><a href="<%= ctx %>/admin/qnaList.jsp">문의 답변</a></li>
-		<li><a href="<%= ctx %>/admin/reviewList.jsp">리뷰 관리</a></li>
-		<li><a href="<%= ctx %>/admin/memberList.jsp">회원 목록</a></li>
+		<li><a href="<%= ctx %>/admin/room/roomList.jsp">객실 관리</a></li>
+		<li><a href="<%= ctx %>/admin/reservation/reservationList.jsp">예약 관리</a></li>
+		<li><a href="<%= ctx %>/admin/coupon/couponList.jsp">할인 쿠폰 관리</a></li>
+		<li><a href="<%= ctx %>/admin/qna/qnaList.jsp">문의 답변</a></li>
+		<li><a href="<%= ctx %>/admin/review/reviewList.jsp">리뷰 관리</a></li>
+		<li><a href="<%= ctx %>/admin/member/memberList.jsp">회원 목록</a></li>
 	</ul>
 	<div class="bottom">
 		<a href="<%= ctx %>/index.jsp">← 홈페이지로</a><br>
