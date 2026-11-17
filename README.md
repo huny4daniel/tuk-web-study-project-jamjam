@@ -46,7 +46,8 @@ hotel/
     │   ├─ header.jsp / footer.jsp            이용자 화면 위/아래
     │   ├─ adminHeader.jsp / adminFooter.jsp  관리자 화면 위/아래 (왼쪽 메뉴 레이아웃)
     │   ├─ loginCheck.jsp / adminCheck.jsp    로그인/관리자 검사
-    │   └─ roomCard.jsp                       객실 카드 한 장
+    │   ├─ roomCard.jsp                       객실 카드 한 장
+    │   └─ kakaoMap.jsp                       카카오 지도 SDK + 호텔 좌표 + 길찾기 함수
     ├─ index.jsp                 메인
     ├─ member/                   회원가입, 아이디 중복확인, 로그인/로그아웃, 정보 수정
     ├─ room/                     객실 목록(검색·필터·정렬·페이징), 객실 상세
@@ -121,7 +122,7 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 | 예약 상태 표시 | Reservation.java 의 getStatusLabel(), isCancelable(), isReviewable() | 상태 계산은 Java if 문으로, JSP 에서는 `${res.statusLabel}`, `<c:if test="${res.cancelable}">` 만 씀 |
 | 8) 마이페이지 | mypage/myPage.jsp, member/memberUpdateForm.jsp | 내 예약(상태별 버튼), 내 리뷰, 정보 수정 |
 | 9) 관리자 페이지 | admin/*/ (기능별 폴더) | 대시보드, 예약 현황, 쿠폰, 문의 답변, 리뷰 관리, 회원 목록 |
-| 추가) 교통편 | info/location.jsp | 구글 지도 iframe + 교통 안내 |
+| 추가) 교통편 | info/location.jsp, inc/kakaoMap.jsp | 카카오 지도에 호텔 위치 표시. 교통편을 누르면 브라우저 현재 위치(geolocation)를 출발지로 카카오맵 길찾기(`map.kakao.com/link/by/...`)를 새 창으로 엶 |
 | 추가) 주변 체험 | info/tour.jsp | 관광지 / 체험 / 맛집 소개 |
 | 추가) 상세 필터 | room/roomList.jsp 왼쪽 | 조식, 반려동물, 침대 수, 편의시설, 결제 방법(예약할 때 선택) |
 
