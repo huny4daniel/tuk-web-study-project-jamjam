@@ -18,6 +18,8 @@ public class Reservation {
 	private String payMethod;
 	private String payDetail;   // 결제 상세 (예 : "신한카드 / 일시불")
 	private String requestNote; // 고객 요청사항 (없으면 null)
+	private String guestName;   // 실제 투숙객 이름 (예약자와 다를 수 있음)
+	private String guestPhone;
 	private String status;      // '예약완료' 또는 '취소'
 	private boolean reviewed;   // 리뷰를 썼으면 true
 	private Date resDate;
@@ -131,6 +133,18 @@ public class Reservation {
 	}
 	public void setRequestNote(String requestNote) {
 		this.requestNote = requestNote;
+	}
+	public String getGuestName() {
+		return guestName;
+	}
+	public void setGuestName(String guestName) {
+		this.guestName = guestName;
+	}
+	public String getGuestPhone() {
+		return guestPhone;
+	}
+	public void setGuestPhone(String guestPhone) {
+		this.guestPhone = guestPhone;
 	}
 	public String getStatus() {
 		return status;

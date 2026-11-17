@@ -32,7 +32,7 @@
 		<tr>
 			<td>${res.resId}</td>
 			<td><fmt:formatDate value="${res.resDate}" pattern="yyyy-MM-dd"/></td>
-			<td>${res.userId}</td>
+			<td>${res.userId}<c:if test="${not empty res.guestName}"><br><span class="muted">투숙 <c:out value="${res.guestName}"/></span></c:if></td>
 			<td>${res.roomType} ${res.roomNo}
 				<c:if test="${not empty res.requestNote}"><br><span class="badge badge-gold" title="<c:out value='${res.requestNote}'/>">요청사항</span></c:if>
 			</td>

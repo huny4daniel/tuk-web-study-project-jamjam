@@ -48,6 +48,7 @@
 			<table class="form">
 				<tr><th>예약번호</th><td><b>${res.resId}</b> <span class="muted">· 예약일 <fmt:formatDate value="${res.resDate}" pattern="yyyy-MM-dd HH:mm"/></span></td></tr>
 				<tr><th>예약자</th><td><c:out value="${member.name}"/> <span class="muted">· <c:out value="${member.phone}"/></span></td></tr>
+				<tr><th>투숙객</th><td><c:out value="${empty res.guestName ? member.name : res.guestName}"/> <span class="muted">· <c:out value="${empty res.guestPhone ? member.phone : res.guestPhone}"/></span></td></tr>
 				<tr><th>객실</th><td>${res.roomType} ${res.roomNo}</td></tr>
 				<tr><th>체크인</th><td>${res.checkIn} <span class="muted">15:00 부터</span></td></tr>
 				<tr><th>체크아웃</th><td>${res.checkOut} <span class="muted">11:00 까지</span></td></tr>

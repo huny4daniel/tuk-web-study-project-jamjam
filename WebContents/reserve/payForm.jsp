@@ -22,15 +22,18 @@
 
 	// 예약자 정보 (로그인한 회원)
 	Member member = null;
+	List<Guest> guestList = null;   // 마이페이지에 등록해 둔 투숙객
 	Connection conn = ConnectionProvider.getConnection();
 	try {
 		member = new MemberDao().selectById(conn, loginId);
+		guestList = new GuestDao().selectByUser(conn, loginId);
 	} finally {
 		JdbcUtil.close(conn);
 	}
 %>
 <c:set var="room" value="<%= room %>"/>
 <c:set var="member" value="<%= member %>"/>
+<c:set var="guestList" value="<%= guestList %>"/>
 <c:set var="coupon" value="<%= coupon %>"/>
 <c:set var="usableCoupons" value="<%= usableCoupons %>"/>
 <c:set var="nights" value="<%= nights %>"/>
@@ -82,6 +85,22 @@
 						<tr><th>이메일</th><td><c:out value="${member.email}"/></td></tr>
 					</table>
 					<p class="muted">정보가 다르면 <a href="<%= ctx %>/member/memberUpdateForm.jsp"><b>회원 정보 수정</b></a>에서 바꿀 수 있습니다.</p>
+				</div>
+
+				<!-- 투숙객 정보 : 본인 또는 마이페이지에 등록해 둔 투숙객을 고르면 이름·연락처가 채워진다 -->
+				<div class="box">
+					<h3>투숙객 정보</h3>
+					<div class="chips" id="guestPick">
+						<button type="button" class="on" data-name="<c:out value='${member.name}'/>" data-phone="<c:out value='${member.phone}'/>" onclick="pickGuest(this)">본인</button>
+						<c:forEach var="g" items="${guestList}">
+							<button type="button" data-name="<c:out value='${g.name}'/>" data-phone="<c:out value='${g.phone}'/>" onclick="pickGuest(this)"><c:out value="${g.name}"/> (${g.relation})</button>
+						</c:forEach>
+						<button type="button" data-name="" data-phone="" onclick="pickGuest(this)">직접 입력</button>
+					</div>
+					<p><label>투숙객 이름</label><input type="text" name="guestName" maxlength="50" value="<c:out value='${member.name}'/>"></p>
+					<p><label>투숙객 연락처</label><input type="text" name="guestPhone" maxlength="20" value="<c:out value='${member.phone}'/>"></p>
+					<p id="saveGuestRow" style="display:none;"><label><input type="checkbox" name="saveGuest" value="1"> 이 투숙객을 마이페이지에 저장해서 다음에도 불러오기</label></p>
+					<p class="muted">투숙객 목록은 <a href="<%= ctx %>/mypage/guest.jsp"><b>마이페이지 &gt; 투숙객</b></a>에서 관리합니다.</p>
 				</div>
 
 				<!-- 고객 요청사항 : 자주 쓰는 요청 버튼을 누르면 글이 덧붙고, 직접 써도 됨 -->
@@ -193,6 +212,18 @@
 				+ "&guests=" + f.guests.value + "&mcId=" + mcId;
 	}
 
+	// 투숙객 고르기 : 버튼에 담아 둔 이름·연락처를 입력칸에 채운다. [직접 입력]이면 비우고 저장 체크 칸을 보여줌
+	function pickGuest(btn) {
+		var f = document.pf;
+		var buttons = document.querySelectorAll("#guestPick button");
+		for (var i = 0; i < buttons.length; i++) buttons[i].className = "";
+		btn.className = "on";
+		f.guestName.value = btn.dataset.name;
+		f.guestPhone.value = btn.dataset.phone;
+		document.getElementById("saveGuestRow").style.display = (btn.dataset.name == "") ? "" : "none";
+		if (btn.dataset.name == "") f.guestName.focus();
+	}
+
 	// 요청사항 버튼 : 이미 들어 있지 않으면 글 끝에 덧붙인다
 	function addRequest(btn) {
 		var box = document.pf.requestNote;
@@ -205,6 +236,10 @@
 	function checkPay(f) {
 		if (!f.agree.checked) {
 			alert("취소 규정을 확인하고 결제에 동의해 주세요.");
+			return false;
+		}
+		if (f.guestName.value.trim() == "" || f.guestPhone.value.trim() == "") {
+			alert("투숙객 이름과 연락처를 입력해 주세요.");
 			return false;
 		}
 		if (f.payMethod.value == "계좌이체" && f.depositor.value.trim() == "") {

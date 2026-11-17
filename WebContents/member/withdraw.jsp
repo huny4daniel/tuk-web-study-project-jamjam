@@ -23,6 +23,7 @@
 			error = "이용 예정인 예약이 있어 탈퇴할 수 없습니다. 예약을 먼저 취소해 주세요.";
 		} else {
 			memberDao.delete(conn, loginId);
+			new GuestDao().deleteByUser(conn, loginId);   // 등록한 투숙객(개인정보)도 삭제
 		}
 	} finally {
 		JdbcUtil.close(conn);

@@ -37,7 +37,7 @@
 			<tr>
 				<td>${res.resId}</td>
 				<td>${res.roomType} ${res.roomNo}</td>
-				<td>${res.userId}</td>
+				<td>${res.userId}<c:if test="${not empty res.guestName}"><br><span class="muted">투숙 <c:out value="${res.guestName}"/> · <c:out value="${res.guestPhone}"/></span></c:if></td>
 				<td>${res.checkIn} ~ ${res.checkOut}</td>
 				<td>${res.guests}명</td>
 				<td><fmt:formatNumber value="${res.totalPrice}" pattern="#,###"/>원 · ${res.payMethod}</td>

@@ -26,6 +26,8 @@ public class ReservationDao {
 		res.setPayMethod(rs.getString("payMethod"));
 		res.setPayDetail(rs.getString("payDetail"));
 		res.setRequestNote(rs.getString("requestNote"));
+		res.setGuestName(rs.getString("guestName"));
+		res.setGuestPhone(rs.getString("guestPhone"));
 		res.setStatus(rs.getString("status"));
 		res.setReviewed(rs.getInt("reviewed") == 1);
 		res.setResDate(rs.getTimestamp("resDate"));
@@ -37,8 +39,8 @@ public class ReservationDao {
 		try {
 			pstmt = conn.prepareStatement(
 					"insert into reservation (userId, roomId, roomType, roomNo, checkIn, checkOut, guests,"
-					+ " totalPrice, couponCode, payMethod, payDetail, requestNote, status, reviewed, resDate)"
-					+ " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '예약완료', 0, now())");
+					+ " totalPrice, couponCode, payMethod, payDetail, requestNote, guestName, guestPhone, status, reviewed, resDate)"
+					+ " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '예약완료', 0, now())");
 			pstmt.setString(1, res.getUserId());
 			pstmt.setInt(2, res.getRoomId());
 			pstmt.setString(3, res.getRoomType());
@@ -51,6 +53,8 @@ public class ReservationDao {
 			pstmt.setString(10, res.getPayMethod());
 			pstmt.setString(11, res.getPayDetail());
 			pstmt.setString(12, res.getRequestNote());
+			pstmt.setString(13, res.getGuestName());
+			pstmt.setString(14, res.getGuestPhone());
 			pstmt.executeUpdate();
 		} finally {
 			JdbcUtil.close(pstmt);

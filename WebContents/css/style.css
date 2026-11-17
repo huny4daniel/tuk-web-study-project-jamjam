@@ -227,6 +227,8 @@ textarea { width: 100%; height: 130px; resize: vertical; }
 /* 결제 상세 화면 (reserve/payForm.jsp) : 왼쪽 입력, 오른쪽 금액 (스크롤해도 따라옴) */
 .pay-layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 28px; align-items: start; }
 .pay-sum { position: sticky; top: 100px; }
+.pay-layout .box p > label:first-child:not(:has(input)) { display: block; font-size: 13px; color: var(--soft); margin-bottom: 6px; }   /* 결제 화면 입력칸 이름은 위에 */
+.pay-layout .box p > input[type=text], .pay-layout .box p > select { width: 100%; }
 .pay-room { display: flex; gap: 18px; align-items: center; margin-bottom: 18px; }
 .pay-room img { width: 140px; aspect-ratio: 4 / 3; object-fit: cover; }
 .pay-room .name { font-size: 20px; font-weight: 600; }
@@ -280,6 +282,9 @@ textarea.sql, .ai-log code { font-family: Consolas, "D2Coding", monospace; font-
 .coupon.off { opacity: 0.45; border-left-color: var(--line); }
 .coupon-select { width: 100%; margin: 4px 0 0 0; }
 @media (max-width: 640px) { .coupons { grid-template-columns: 1fr; } }
+/* 투숙객 등록 폼 (mypage/guest.jsp) */
+.guest-form { display: flex; gap: 8px; flex-wrap: wrap; }
+.guest-form input[type=text] { flex: 1; min-width: 140px; }
 /* 회원 탈퇴 안내 */
 ul.notice { margin: 0 0 20px 0; padding-left: 18px; color: var(--soft); font-size: 14px; }
 .warn { color: var(--danger); }

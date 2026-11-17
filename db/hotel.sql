@@ -9,6 +9,7 @@
 CREATE DATABASE IF NOT EXISTS hotel DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE hotel;
 
+DROP TABLE IF EXISTS guest;
 DROP TABLE IF EXISTS member_coupon;
 DROP TABLE IF EXISTS translation;
 DROP TABLE IF EXISTS faq;
@@ -68,6 +69,16 @@ CREATE TABLE coupon (
 	PRIMARY KEY (couponCode)
 );
 
+-- 회원이 등록해 둔 투숙객 : 예약할 때 결제 화면에서 골라서 이름·연락처를 바로 채움
+CREATE TABLE guest (
+	guestId       INT          NOT NULL AUTO_INCREMENT,
+	userId        VARCHAR(50)  NOT NULL,          -- 등록한 회원
+	name          VARCHAR(50)  NOT NULL,
+	phone         VARCHAR(20)  NOT NULL,
+	relation      VARCHAR(10)  NOT NULL,          -- 가족 / 배우자 / 친구 / 동료 / 기타
+	PRIMARY KEY (guestId)
+);
+
 -- 회원 쿠폰함 : 회원이 받은 디지털 쿠폰 한 장 = 한 줄 (같은 쿠폰은 한 사람에 한 장)
 --   쿠폰 이름, 할인율, 기간은 받을 때 복사해 둔다 → join 없이 쿠폰함을 바로 보여줌
 CREATE TABLE member_coupon (
@@ -99,6 +110,8 @@ CREATE TABLE reservation (
 	payMethod     VARCHAR(20)  NOT NULL,          -- 현장결제 / 계좌이체 / 카드결제
 	payDetail     VARCHAR(100),                   -- 결제 상세 (카드사 / 할부, 입금자명 ...) 예약 확인서에 표시
 	requestNote   VARCHAR(500),                   -- 고객 요청사항 (없으면 NULL)
+	guestName     VARCHAR(50),                    -- 실제 투숙객 이름 (예약자와 다를 수 있음)
+	guestPhone    VARCHAR(20),                    -- 투숙객 연락처
 	status        VARCHAR(10)  NOT NULL DEFAULT '예약완료',
 	reviewed      TINYINT      NOT NULL DEFAULT 0,-- 리뷰를 썼으면 1
 	resDate       DATETIME     NOT NULL,
@@ -224,15 +237,20 @@ INSERT INTO member_coupon (userId, couponCode, couponName, discountRate, startDa
 
 -- user1 : 지난 숙박 2건(리뷰 작성 가능/작성 완료), 앞으로의 예약 1건
 -- user2 : 지난 숙박 1건(리뷰 작성 완료)
-INSERT INTO reservation (userId, roomId, roomType, roomNo, checkIn, checkOut, guests, totalPrice, couponCode, payMethod, requestNote, status, reviewed, resDate) VALUES
-('user1', 3, '디럭스', '501호', '2026-10-01', '2026-10-03', 2, 278000, NULL, '카드결제', NULL, '예약완료', 1, '2026-09-20 10:00:00'),
-('user1', 4, '디럭스 오션뷰', '502호', '2026-10-15', '2026-10-16', 2, 143650, NULL, '현장결제', '바다가 잘 보이는 높은 층으로 부탁드려요.', '예약완료', 0, '2026-10-01 12:00:00'),
-('user2', 3, '디럭스', '501호', '2026-09-10', '2026-09-12', 3, 318000, NULL, '계좌이체', NULL, '예약완료', 1, '2026-09-01 09:00:00'),
-('user1', 5, '패밀리', '601호', '2026-12-24', '2026-12-26', 4, 458000, NULL, '카드결제', '아이가 있어서 아기 침대가 필요합니다. 크리스마스 케이크 준비가 가능할까요?', '예약완료', 0, '2026-11-01 15:00:00');
+INSERT INTO reservation (userId, roomId, roomType, roomNo, checkIn, checkOut, guests, totalPrice, couponCode, payMethod, requestNote, guestName, guestPhone, status, reviewed, resDate) VALUES
+('user1', 3, '디럭스', '501호', '2026-10-01', '2026-10-03', 2, 278000, NULL, '카드결제', NULL, '홍길동', '010-1111-2222', '예약완료', 1, '2026-09-20 10:00:00'),
+('user1', 4, '디럭스 오션뷰', '502호', '2026-10-15', '2026-10-16', 2, 143650, NULL, '현장결제', '바다가 잘 보이는 높은 층으로 부탁드려요.', '홍길동', '010-1111-2222', '예약완료', 0, '2026-10-01 12:00:00'),
+('user2', 3, '디럭스', '501호', '2026-09-10', '2026-09-12', 3, 318000, NULL, '계좌이체', NULL, '김철수', '010-3333-4444', '예약완료', 1, '2026-09-01 09:00:00'),
+('user1', 5, '패밀리', '601호', '2026-12-24', '2026-12-26', 4, 458000, NULL, '카드결제', '아이가 있어서 아기 침대가 필요합니다. 크리스마스 케이크 준비가 가능할까요?', '홍어머니', '010-5555-6666', '예약완료', 0, '2026-11-01 15:00:00');
 
 INSERT INTO review (resId, userId, roomId, roomType, rating, content, regDate) VALUES
 (1, 'user1', 3, '디럭스', 5, '객실이 깨끗하고 조식이 맛있었어요. 다음에도 이용하겠습니다.', '2026-10-04 09:00:00'),
 (3, 'user2', 3, '디럭스', 4, '넓고 조용해서 좋았습니다. 욕조도 만족스러웠어요.', '2026-09-13 11:00:00');
+
+-- user1 이 등록해 둔 투숙객
+INSERT INTO guest (userId, name, phone, relation) VALUES
+('user1', '홍어머니', '010-5555-6666', '가족'),
+('user1', '이친구', '010-7777-8888', '친구');
 
 INSERT INTO qna (userId, title, content, answer, regDate, answerDate) VALUES
 ('user1', '주차 가능한가요?', '차를 가지고 가려고 하는데 주차가 가능한지 궁금합니다.', '네, 투숙객은 지하 주차장을 무료로 이용하실 수 있습니다.', '2026-10-20 10:00:00', '2026-10-20 14:00:00'),
@@ -614,6 +632,29 @@ INSERT INTO translation (ko, en) VALUES
 ('객실이 깨끗하고 조식이 맛있었어요. 다음에도 이용하겠습니다.', 'The room was clean and breakfast was delicious. I''ll stay again.'),
 ('넓고 조용해서 좋았습니다. 욕조도 만족스러웠어요.', 'Spacious and quiet. I loved the bathtub too.'),
 ('기준 객실', '· Rooms:'),
+('투숙객', 'Guests'),
+('투숙객 관리', 'Guest List'),
+('투숙객 등록', 'Add a Guest'),
+('투숙객 정보', 'Guest Details'),
+('본인', 'Myself'),
+('직접 입력', 'Enter manually'),
+('투숙객 이름', 'Guest name'),
+('투숙객 연락처', 'Guest phone'),
+('이 투숙객을 마이페이지에 저장해서 다음에도 불러오기', 'Save this guest to My Page for next time'),
+('투숙객 목록은', 'Manage your guest list in'),
+('마이페이지 > 투숙객', 'My Page > Guests'),
+('에서 관리합니다.', '.'),
+('자주 함께 묵는 분을 등록해 두면 예약할 때 골라서 바로 불러올 수 있습니다. (최대 10명)', 'Save people you often travel with and pick them when you book. (up to 10)'),
+('연락처 010-0000-0000', 'Phone 010-0000-0000'),
+('가족', 'Family'),
+('배우자', 'Spouse'),
+('친구', 'Friend'),
+('동료', 'Colleague'),
+('기타', 'Other'),
+('등록', 'Add'),
+('등록한 투숙객이 없습니다.', 'No saved guests.'),
+('삭제', 'Delete'),
+('관계', 'Relation'),
 ('쿠폰함', 'My Coupons'),
 ('내 쿠폰', 'My Coupons'),
 ('쿠폰 받기', 'Get Coupons'),

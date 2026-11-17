@@ -10,7 +10,7 @@
 ## 1. 실행 방법
 
 1. **DB 만들기** : HeidiSQL로 접속(root / 12345)해서 아래 중 하나를 열고 전체 실행(F9)
-   - `db/hotel.sql` : 객실 50실·15종(2~10층) + 테이블 9개 + 샘플 데이터(테스트 계정, 객실, 사진) → **개발·발표용은 이것**
+   - `db/hotel.sql` : 객실 50실·15종(2~10층) + 테이블 10개 + 샘플 데이터(테스트 계정, 객실, 사진) → **개발·발표용은 이것**
    - `db/hotel_schema.sql` : 테이블 구조만 (데이터 없음) → 빈 DB가 필요한 다른 서버용
    - 둘 다 `hotel` 데이터베이스를 새로 만듭니다 (이미 있으면 지우고 다시 만듦)
 2. **이클립스로 가져오기** : File → Import → General → Existing Projects into Workspace → `hotel` 폴더 선택
@@ -64,7 +64,7 @@ hotel/
     ├─ member/                   회원가입, 아이디 중복확인, 로그인/로그아웃, 정보 수정, 회원 탈퇴
     ├─ room/                     객실 목록(검색·필터·정렬·페이징), 객실 상세
     ├─ reserve/                  결제 화면(payForm), 예약 처리, 예약 확인서(resDetail), 예약 취소
-    ├─ mypage/                   마이페이지 (내 예약, 내 리뷰)
+    ├─ mypage/                   마이페이지 (내 예약, 내 리뷰, 쿠폰함, 투숙객)
     ├─ review/                   리뷰 쓰기 폼 / 등록 처리
     ├─ qna/                      1:1 문의 목록·작성 / 등록 처리
     ├─ info/                     오시는 길, 주변 즐길거리
@@ -119,10 +119,11 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 |---|---|---|
 | member | 회원 | userId (admin 이면 관리자) |
 | room | 객실 | roomType, roomNo, roomSize(평, 화면에는 ㎡ 도 같이 표시), viewType(전망 : 오션뷰/시티뷰/파크뷰), price, discountRate(객실 할인율), capacity(최대 인원), baseGuests(기준 인원), extraPrice(1인 추가 요금), bedCount, breakfast, pet, amenities, photo(LONGBLOB), photoType, **avgRating, reviewCount, resCount**(수업 freq 처럼 update 로 갱신) |
-| reservation | 예약 | roomId, **roomType, roomNo**(예약할 때 같이 저장 → join 불필요), userId, checkIn, checkOut, totalPrice, couponCode, payMethod, payDetail(카드사·할부, 입금자명 등), requestNote(고객 요청사항), status('예약완료'/'취소'), **reviewed**(리뷰 썼으면 1) |
+| reservation | 예약 | roomId, **roomType, roomNo**(예약할 때 같이 저장 → join 불필요), userId, checkIn, checkOut, totalPrice, couponCode, payMethod, payDetail(카드사·할부, 입금자명 등), requestNote(고객 요청사항), guestName·guestPhone(실제 투숙객), status('예약완료'/'취소'), **reviewed**(리뷰 썼으면 1) |
 | review | 리뷰 | resId(예약 1건당 1개), roomId, roomType, rating(1~5), content |
 | coupon | 쿠폰 종류 | couponCode, couponName, discountRate, startDate ~ endDate, issueType(가입축하/다운로드/관리자지급) |
 | member_coupon | 회원 쿠폰함 (디지털 쿠폰) | userId, couponCode + 받을 때 복사한 couponName·discountRate·기간(join 불필요), used, usedResId |
+| guest | 회원이 등록한 투숙객 | userId(등록한 회원), name, phone, relation(가족/배우자/친구/동료/기타) |
 | qna | 1:1 문의 | title, content, answer(NULL 이면 답변 대기) |
 | faq | 자주 묻는 질문 | category(예약·결제/객실/시설·서비스/회원), question, answer |
 | translation | 영어 번역 캐시 | ko(화면 한글 문장, PK), en(영어). 메뉴·버튼 등 기본 문구는 미리 넣어 두고, 나머지는 처음 볼 때 Ollama 가 번역해서 추가 |
@@ -145,6 +146,7 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 | 5) 예약 + 중복 방지 | reserve/payForm.jsp → reserve.jsp → resDetail.jsp, inc/reserveCheck.jsp, ReservationDao.countOverlap() | 결제 화면과 처리 페이지가 같은 검사·금액 계산 조각(reserveCheck)을 include → 화면 금액과 저장 금액이 항상 같고, 처리 페이지에서 한 번 더 검사. 모의 결제(카드사·할부 / 계좌이체 입금자 / 현장결제)와 취소 규정 동의.  겹치는 조건 : `기존 체크인 < 새 체크아웃 AND 기존 체크아웃 > 새 체크인`. 같은 날 체크아웃·체크인은 허용 |
 | 예약 취소 | reserve/cancel.jsp (이용자), admin/reservation/resCancel.jsp (관리자) | 이용자는 체크인 전까지만 취소 가능 |
 | 디지털 쿠폰 | mypage/coupon.jsp(쿠폰함·받기), couponDown.jsp, admin/coupon/couponIssue.jsp, MemberCouponDao, inc/reserveCheck.jsp | 쿠폰 번호 입력 대신 쿠폰함에서 고름. 가입 시 자동 지급 / 쿠폰함에서 다운로드 / 관리자 지급(개인·전체). 결제 시 본인·미사용·기간 재검사 → 예약하면 used=1, 예약 취소하면 쿠폰 반환 |
+| 투숙객 등록 | mypage/guest.jsp(+guestSave, guestDelete), reserve/payForm.jsp, GuestDao | 마이페이지에 투숙객을 등록(최대 10명) → 결제 화면에서 본인/등록 투숙객/직접 입력을 고르면 이름·연락처가 채워짐. 직접 입력한 투숙객은 [저장] 체크 시 목록에 추가. 예약에 투숙객 이름·연락처 저장, 확인서와 관리자 화면에 표시. 회원 탈퇴 시 함께 삭제 |
 | 고객 요청사항 | reserve/payForm.jsp, reserve.jsp, resDetail.jsp, admin/index.jsp, admin/reservation/reservationList.jsp | 결제 화면에서 자주 쓰는 요청 버튼 + 직접 입력 → reservation.requestNote 에 저장, 확인서와 관리자 화면(대시보드 오늘 체크인, 예약 관리)에 표시 |
 | 6) 할인 | 객실 할인율(room.discountRate) + 디지털 쿠폰(coupon → member_coupon) | 금액 = 1박 요금 × 박 수 × (100 − 쿠폰 할인율) / 100 |
 | 인원별 요금 | Room.getNightPrice(), reserve/reserve.jsp, roomDetail.jsp 의 nightPrice() | 1박 요금 = 객실 할인가 + (인원 − 기준 인원, 0 미만이면 0) × 1인 추가 요금 |

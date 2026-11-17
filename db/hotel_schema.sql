@@ -1,6 +1,6 @@
 -- =========================================================
 --  호텔 잠잠 DB 구조 (테이블만, 데이터 없음)
---  다른 서버에서 이 파일 하나만 실행하면 hotel 데이터베이스와 빈 테이블 9개가 만들어집니다.
+--  다른 서버에서 이 파일 하나만 실행하면 hotel 데이터베이스와 빈 테이블 10개가 만들어집니다.
 --  HeidiSQL : 파일 열기 → 전체 실행(F9)
 --  명령줄   : mysql -uroot -p < hotel_schema.sql
 --
@@ -74,6 +74,18 @@ CREATE TABLE `member_coupon` (
   PRIMARY KEY (`mcId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `guest`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `guest` (
+  `guestId` int(11) NOT NULL AUTO_INCREMENT,
+  `userId` varchar(50) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `phone` varchar(20) NOT NULL,
+  `relation` varchar(10) NOT NULL,
+  PRIMARY KEY (`guestId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `member`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -119,6 +131,8 @@ CREATE TABLE `reservation` (
   `payMethod` varchar(20) NOT NULL,
   `payDetail` varchar(100) DEFAULT NULL,
   `requestNote` varchar(500) DEFAULT NULL,
+  `guestName` varchar(50) DEFAULT NULL,
+  `guestPhone` varchar(20) DEFAULT NULL,
   `status` varchar(10) NOT NULL DEFAULT '예약완료',
   `reviewed` tinyint(4) NOT NULL DEFAULT 0,
   `resDate` datetime NOT NULL,

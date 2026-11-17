@@ -30,6 +30,15 @@
 		error = "결제 방법을 선택해 주세요.";
 	}
 
+	// 투숙객 이름·연락처 (비어 있으면 안 됨)
+	String guestName = request.getParameter("guestName") == null ? "" : request.getParameter("guestName").trim();
+	String guestPhone = request.getParameter("guestPhone") == null ? "" : request.getParameter("guestPhone").trim();
+	if (error == null && (guestName.equals("") || guestPhone.equals(""))) {
+		error = "투숙객 이름과 연락처를 입력해 주세요.";
+	}
+	if (guestName.length() > 50) guestName = guestName.substring(0, 50);
+	if (guestPhone.length() > 20) guestPhone = guestPhone.substring(0, 20);
+
 	int newResId = 0;
 	if (error == null) {
 		// ④ 저장
@@ -51,6 +60,8 @@
 			requestNote = requestNote.trim().substring(0, 500);
 		}
 		res.setRequestNote(requestNote == null || requestNote.trim().equals("") ? null : requestNote.trim());
+		res.setGuestName(guestName);
+		res.setGuestPhone(guestPhone);
 
 		Connection conn = ConnectionProvider.getConnection();
 		try {
@@ -60,6 +71,17 @@
 			newResId = resDao.selectLatestByUser(conn, loginId).getResId();   // 방금 저장한 예약 번호
 			if (coupon != null) {
 				new MemberCouponDao().markUsed(conn, coupon.getMcId(), newResId);   // 쿠폰함의 쿠폰을 사용 완료로
+			}
+			// [이 투숙객 저장] 을 체크했으면 마이페이지 투숙객 목록에 추가 (이미 있거나 10명이 차면 건너뜀)
+			GuestDao guestDao = new GuestDao();
+			if ("1".equals(request.getParameter("saveGuest")) && !guestDao.exists(conn, loginId, guestName, guestPhone)
+					&& guestDao.selectByUser(conn, loginId).size() < 10) {
+				Guest guest = new Guest();
+				guest.setUserId(loginId);
+				guest.setName(guestName);
+				guest.setPhone(guestPhone);
+				guest.setRelation("기타");
+				guestDao.insert(conn, guest);
 			}
 		} finally {
 			JdbcUtil.close(conn);
