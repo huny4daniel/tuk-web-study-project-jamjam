@@ -5,6 +5,7 @@ public class Room {
 	private int roomId;
 	private String roomType;
 	private String roomNo;
+	private int roomSize;       // 객실 크기 (평)
 	private int price;
 	private int discountRate;
 	private int capacity;
@@ -42,6 +43,16 @@ public class Room {
 	}
 	public void setRoomNo(String roomNo) {
 		this.roomNo = roomNo;
+	}
+	public int getRoomSize() {
+		return roomSize;
+	}
+	public void setRoomSize(int roomSize) {
+		this.roomSize = roomSize;
+	}
+	// 평 -> 제곱미터 (1평 = 약 3.3058㎡, 반올림) : JSP 에서 ${room.roomSizeM2}
+	public int getRoomSizeM2() {
+		return (int) Math.round(roomSize * 3.3058);
 	}
 	public int getPrice() {
 		return price;

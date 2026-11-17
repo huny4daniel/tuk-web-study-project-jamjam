@@ -19,6 +19,7 @@
 	room.setRoomId(Integer.parseInt(multi.getParameter("roomId")));
 	room.setRoomType(multi.getParameter("roomType"));
 	room.setRoomNo(multi.getParameter("roomNo"));
+	room.setRoomSize(Integer.parseInt(multi.getParameter("roomSize")));
 	room.setPrice(Integer.parseInt(multi.getParameter("price")));
 	room.setDiscountRate(Integer.parseInt(multi.getParameter("discountRate")));
 	room.setCapacity(Integer.parseInt(multi.getParameter("capacity")));

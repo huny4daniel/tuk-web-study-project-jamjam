@@ -38,7 +38,7 @@
 			<img class="main-photo" src="<%= ctx %>/room/photo.jsp?roomId=${room.roomId}" alt="${room.roomType}">
 			<div class="room-head">
 				<span class="eyebrow">ROOM ${room.roomNo}</span>
-				<h1>${room.roomType}</h1>
+				<h1>${room.roomType} <span class="size">${room.roomSize}평 · ${room.roomSizeM2}㎡</span></h1>
 				<c:if test="${room.reviewCount == 0}"><span class="new">NEW</span> <span class="muted">아직 리뷰가 없는 객실입니다</span></c:if>
 				<c:if test="${room.reviewCount > 0}"><span class="stars">★</span> <b><fmt:formatNumber value="${room.avgRating}" pattern="0.0"/></b> <span class="muted">· 리뷰 ${room.reviewCount}개 · 누적 예약 ${room.resCount}건</span></c:if>
 			</div>

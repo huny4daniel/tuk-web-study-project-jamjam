@@ -101,7 +101,7 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 | 테이블 | 내용 | 핵심 컬럼 |
 |---|---|---|
 | member | 회원 | userId (admin 이면 관리자) |
-| room | 객실 | roomType, roomNo, price, discountRate(객실 할인율), capacity(최대 인원), baseGuests(기준 인원), extraPrice(1인 추가 요금), bedCount, breakfast, pet, amenities, photo(LONGBLOB), photoType, **avgRating, reviewCount, resCount**(수업 freq 처럼 update 로 갱신) |
+| room | 객실 | roomType, roomNo, roomSize(평, 화면에는 ㎡ 도 같이 표시), price, discountRate(객실 할인율), capacity(최대 인원), baseGuests(기준 인원), extraPrice(1인 추가 요금), bedCount, breakfast, pet, amenities, photo(LONGBLOB), photoType, **avgRating, reviewCount, resCount**(수업 freq 처럼 update 로 갱신) |
 | reservation | 예약 | roomId, **roomType, roomNo**(예약할 때 같이 저장 → join 불필요), userId, checkIn, checkOut, totalPrice, couponCode, payMethod, status('예약완료'/'취소'), **reviewed**(리뷰 썼으면 1) |
 | review | 리뷰 | resId(예약 1건당 1개), roomId, roomType, rating(1~5), content |
 | coupon | 쿠폰 | couponCode, discountRate, startDate ~ endDate |

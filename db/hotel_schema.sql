@@ -72,6 +72,7 @@ CREATE TABLE `reservation` (
   `roomId` int(11) NOT NULL,
   `roomType` varchar(50) NOT NULL,
   `roomNo` varchar(10) NOT NULL,
+  `roomSize` int(11) NOT NULL DEFAULT 0,
   `checkIn` date NOT NULL,
   `checkOut` date NOT NULL,
   `guests` int(11) NOT NULL,

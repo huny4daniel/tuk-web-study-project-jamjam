@@ -18,7 +18,7 @@
 		</div>
 		<div class="body">
 			<div class="type">ROOM ${room.roomNo}</div>
-			<div class="name">${room.roomType}</div>
+			<div class="name">${room.roomType} <span class="size">${room.roomSize}평 (${room.roomSizeM2}㎡)</span></div>
 			<div class="info">
 				기준 ${room.baseGuests}인 (최대 ${room.capacity}인) · 침대 ${room.bedCount}개 ·
 				<c:if test="${room.reviewCount == 0}"><span class="new">NEW</span></c:if>

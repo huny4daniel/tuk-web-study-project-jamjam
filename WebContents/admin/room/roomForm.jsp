@@ -29,6 +29,7 @@
 		<table class="form">
 			<tr><th>객실 유형</th><td><input type="text" name="roomType" value="${room.roomType}" placeholder="예) 디럭스 오션뷰"></td></tr>
 			<tr><th>호실</th><td><input type="text" name="roomNo" value="${room.roomNo}" placeholder="예) 502호"></td></tr>
+			<tr><th>객실 크기 (평)</th><td><input type="number" name="roomSize" min="1" value="${isEdit ? room.roomSize : ''}" placeholder="예) 12"></td></tr>
 			<tr><th>1박 정가 (원)</th><td><input type="number" name="price" value="${isEdit ? room.price : ''}"></td></tr>
 			<tr><th>객실 할인율 (%)</th><td><input type="number" name="discountRate" min="0" max="90" value="${room.discountRate}"> <span class="muted">0이면 할인 없음</span></td></tr>
 			<tr><th>최대 인원</th><td><input type="number" name="capacity" min="1" value="${isEdit ? room.capacity : 2}"></td></tr>
@@ -61,8 +62,8 @@
 </div>
 <script>
 	function checkForm(f) {
-		if (f.roomType.value == "" || f.roomNo.value == "" || f.price.value == "") {
-			alert("객실 유형, 호실, 가격은 꼭 입력해야 합니다.");
+		if (f.roomType.value == "" || f.roomNo.value == "" || f.price.value == "" || f.roomSize.value == "") {
+			alert("객실 유형, 호실, 크기, 가격은 꼭 입력해야 합니다.");
 			return false;
 		}
 		return true;

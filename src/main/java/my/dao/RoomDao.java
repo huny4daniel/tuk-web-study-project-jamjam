@@ -17,7 +17,7 @@ public class RoomDao {
 
 	// 사진(photo)은 크기가 커서 목록에서는 빼고 가져온다. 사진은 selectPhoto() 로 따로.
 	private static final String COLUMNS =
-			"roomId, roomType, roomNo, price, discountRate, capacity, baseGuests, extraPrice, bedCount, breakfast, pet,"
+			"roomId, roomType, roomNo, roomSize, price, discountRate, capacity, baseGuests, extraPrice, bedCount, breakfast, pet,"
 			+ " amenities, description, avgRating, reviewCount, resCount";
 
 	// ResultSet 한 줄 -> Room 객체 (여러 메서드에서 같이 쓰려고 따로 뺌)
@@ -26,6 +26,7 @@ public class RoomDao {
 		room.setRoomId(rs.getInt("roomId"));
 		room.setRoomType(rs.getString("roomType"));
 		room.setRoomNo(rs.getString("roomNo"));
+		room.setRoomSize(rs.getInt("roomSize"));
 		room.setPrice(rs.getInt("price"));
 		room.setDiscountRate(rs.getInt("discountRate"));
 		room.setCapacity(rs.getInt("capacity"));
@@ -174,8 +175,8 @@ public class RoomDao {
 		try {
 			pstmt = conn.prepareStatement(
 					"insert into room (roomType, roomNo, price, discountRate, capacity, bedCount,"
-					+ " breakfast, pet, amenities, description, photo, photoType, baseGuests, extraPrice)"
-					+ " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+					+ " breakfast, pet, amenities, description, photo, photoType, baseGuests, extraPrice, roomSize)"
+					+ " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			pstmt.setString(1, room.getRoomType());
 			pstmt.setString(2, room.getRoomNo());
 			pstmt.setInt(3, room.getPrice());
@@ -190,6 +191,7 @@ public class RoomDao {
 			pstmt.setString(12, room.getPhotoType());
 			pstmt.setInt(13, room.getBaseGuests());
 			pstmt.setInt(14, room.getExtraPrice());
+			pstmt.setInt(15, room.getRoomSize());
 			pstmt.executeUpdate();
 		} finally {
 			JdbcUtil.close(pstmt);
@@ -202,7 +204,7 @@ public class RoomDao {
 		try {
 			pstmt = conn.prepareStatement(
 					"update room set roomType=?, roomNo=?, price=?, discountRate=?, capacity=?, bedCount=?,"
-					+ " breakfast=?, pet=?, amenities=?, description=?, baseGuests=?, extraPrice=? where roomId=?");
+					+ " breakfast=?, pet=?, amenities=?, description=?, baseGuests=?, extraPrice=?, roomSize=? where roomId=?");
 			pstmt.setString(1, room.getRoomType());
 			pstmt.setString(2, room.getRoomNo());
 			pstmt.setInt(3, room.getPrice());
@@ -215,7 +217,8 @@ public class RoomDao {
 			pstmt.setString(10, room.getDescription());
 			pstmt.setInt(11, room.getBaseGuests());
 			pstmt.setInt(12, room.getExtraPrice());
-			pstmt.setInt(13, room.getRoomId());
+			pstmt.setInt(13, room.getRoomSize());
+			pstmt.setInt(14, room.getRoomId());
 			pstmt.executeUpdate();
 		} finally {
 			JdbcUtil.close(pstmt);
