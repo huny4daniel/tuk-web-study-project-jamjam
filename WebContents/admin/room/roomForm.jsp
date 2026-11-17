@@ -32,6 +32,8 @@
 			<tr><th>1박 정가 (원)</th><td><input type="number" name="price" value="${isEdit ? room.price : ''}"></td></tr>
 			<tr><th>객실 할인율 (%)</th><td><input type="number" name="discountRate" min="0" max="90" value="${room.discountRate}"> <span class="muted">0이면 할인 없음</span></td></tr>
 			<tr><th>최대 인원</th><td><input type="number" name="capacity" min="1" value="${isEdit ? room.capacity : 2}"></td></tr>
+			<tr><th>기준 인원</th><td><input type="number" name="baseGuests" min="1" value="${isEdit ? room.baseGuests : 2}"> <span class="muted">이 인원까지는 기본 요금</span></td></tr>
+			<tr><th>1인 추가 요금 (원)</th><td><input type="number" name="extraPrice" min="0" step="1000" value="${isEdit ? room.extraPrice : 20000}"> <span class="muted">기준 인원을 넘는 1명당 1박 요금, 0이면 추가 요금 없음</span></td></tr>
 			<tr><th>침대 수</th><td><input type="number" name="bedCount" min="1" value="${isEdit ? room.bedCount : 1}"></td></tr>
 			<tr><th>옵션</th>
 				<td>

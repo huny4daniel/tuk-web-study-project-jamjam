@@ -28,7 +28,7 @@
 			<td><fmt:formatNumber value="${room.price}" pattern="#,###"/></td>
 			<td>${room.discountRate}%</td>
 			<td><fmt:formatNumber value="${room.salePrice}" pattern="#,###"/></td>
-			<td>${room.capacity}명</td>
+			<td>기준 ${room.baseGuests} / 최대 ${room.capacity}명<c:if test="${room.extraPrice > 0}"><br><span class="muted">1인 +<fmt:formatNumber value="${room.extraPrice}" pattern="#,###"/></span></c:if></td>
 			<td>${room.bedCount}</td>
 			<td>${room.breakfast == 1 ? 'O' : '-'}</td>
 			<td>${room.pet == 1 ? 'O' : '-'}</td>

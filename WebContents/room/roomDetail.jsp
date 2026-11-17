@@ -43,7 +43,7 @@
 				<c:if test="${room.reviewCount > 0}"><span class="stars">★</span> <b><fmt:formatNumber value="${room.avgRating}" pattern="0.0"/></b> <span class="muted">· 리뷰 ${room.reviewCount}개 · 누적 예약 ${room.resCount}건</span></c:if>
 			</div>
 			<div class="spec">
-				<div>GUESTS<b>최대 ${room.capacity}인</b></div>
+				<div>GUESTS<b>기준 ${room.baseGuests}인 / 최대 ${room.capacity}인</b></div>
 				<div>BEDS<b>${room.bedCount}개</b></div>
 				<div>BREAKFAST<b>${room.breakfast == 1 ? '포함' : '미포함'}</b></div>
 				<div>PET<b>${room.pet == 1 ? '동반 가능' : '불가'}</b></div>
@@ -94,7 +94,10 @@
 						<span class="origin"><fmt:formatNumber value="${room.price}" pattern="#,###"/>원</span>
 						<span class="rate">${room.discountRate}%</span><br>
 					</c:if>
-					<span class="sale"><fmt:formatNumber value="${room.salePrice}" pattern="#,###"/>원</span> <span class="unit">/ 1박</span>
+					<span class="sale"><fmt:formatNumber value="${room.salePrice}" pattern="#,###"/>원</span> <span class="unit">/ 1박 (기준 ${room.baseGuests}인)</span>
+					<c:if test="${room.extraPrice > 0 and room.capacity > room.baseGuests}">
+						<div class="muted">기준 인원 초과 시 1인당 1박 +<fmt:formatNumber value="${room.extraPrice}" pattern="#,###"/>원</div>
+					</c:if>
 				</div>
 
 				<form name="rf" action="../reserve/reserve.jsp" method="post" onsubmit="return checkForm(this)">
@@ -104,7 +107,7 @@
 						<p><label>체크아웃</label><input type="date" name="checkOut" value="${param.checkOut}" onchange="calc(); drawCalendar();"></p>
 					</div>
 					<p><label>인원 (최대 ${room.capacity}명)</label>
-						<input type="number" name="guests" min="1" max="${room.capacity}" value="${empty param.guests ? 1 : param.guests}">
+						<input type="number" name="guests" min="1" max="${room.capacity}" value="${empty param.guests ? 1 : param.guests}" onchange="calc()">
 					</p>
 					<p><label>쿠폰 번호 (선택)</label><input type="text" name="couponCode" placeholder="예) WELCOME10"></p>
 					<p><label>결제 방법</label>
@@ -224,6 +227,15 @@
 
 	var salePrice = ${room.salePrice};   // 할인 적용된 1박 가격 (서버에서 받아 둔 값)
 	var capacity = ${room.capacity};
+	var baseGuests = ${room.baseGuests};  // 기준 인원
+	var extraPrice = ${room.extraPrice};  // 기준 인원을 넘는 1명당 1박 추가 요금
+
+	// 인원에 따른 1박 요금 (Room.java 의 getNightPrice 와 같은 계산)
+	function nightPrice(guests) {
+		var extraGuests = guests - baseGuests;
+		if (extraGuests < 0) extraGuests = 0;
+		return salePrice + extraGuests * extraPrice;
+	}
 
 	// 날짜를 고르면 "몇 박 x 가격" 예상 금액을 보여준다 (쿠폰 할인은 예약할 때 서버에서 계산)
 	function calc() {
@@ -239,8 +251,14 @@
 			box.innerHTML = "<b>SOLD OUT</b><br>선택한 기간에 이미 예약이 있습니다. 달력에서 다른 날짜를 골라 주세요.";
 			return;
 		}
-		box.innerHTML = nights + "박 × " + salePrice.toLocaleString() + "원<br>예상 금액 <b>"
-				+ (nights * salePrice).toLocaleString() + "원</b>";
+		var guests = Number(f.guests.value);
+		var price = nightPrice(guests);
+		var text = nights + "박 × " + price.toLocaleString() + "원";
+		if (price > salePrice) {
+			text += "<br><span class='muted'>(기본 " + salePrice.toLocaleString() + "원 + 추가 " + (guests - baseGuests)
+					+ "명 × " + extraPrice.toLocaleString() + "원)</span>";
+		}
+		box.innerHTML = text + "<br>예상 금액 <b>" + (nights * price).toLocaleString() + "원</b>";
 	}
 
 	function checkForm(f) {

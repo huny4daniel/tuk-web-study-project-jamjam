@@ -8,6 +8,8 @@ public class Room {
 	private int price;
 	private int discountRate;
 	private int capacity;
+	private int baseGuests;     // 기준 인원 (이 인원까지는 기본 요금)
+	private int extraPrice;     // 기준 인원을 넘는 1명당 1박 추가 요금
 	private int bedCount;
 	private int breakfast;
 	private int pet;
@@ -58,6 +60,18 @@ public class Room {
 	}
 	public void setCapacity(int capacity) {
 		this.capacity = capacity;
+	}
+	public int getBaseGuests() {
+		return baseGuests;
+	}
+	public void setBaseGuests(int baseGuests) {
+		this.baseGuests = baseGuests;
+	}
+	public int getExtraPrice() {
+		return extraPrice;
+	}
+	public void setExtraPrice(int extraPrice) {
+		this.extraPrice = extraPrice;
 	}
 	public int getBedCount() {
 		return bedCount;
@@ -138,5 +152,15 @@ public class Room {
 	// 할인이 적용된 1박 가격 (JSP에서 ${room.salePrice} 로 사용)
 	public int getSalePrice() {
 		return price * (100 - discountRate) / 100;
+	}
+
+	// ★ 인원에 따른 1박 요금 = 할인가 + (기준 인원을 넘는 사람 수 x 1인 추가 요금)
+	//   예) 할인가 100,000원, 기준 2명, 추가 20,000원 -> 3명이면 120,000원, 2명 이하면 100,000원
+	public int getNightPrice(int guests) {
+		int extraGuests = guests - baseGuests;
+		if (extraGuests < 0) {
+			extraGuests = 0;
+		}
+		return getSalePrice() + extraGuests * extraPrice;
 	}
 }

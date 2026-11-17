@@ -22,6 +22,8 @@
 	room.setPrice(Integer.parseInt(multi.getParameter("price")));
 	room.setDiscountRate(Integer.parseInt(multi.getParameter("discountRate")));
 	room.setCapacity(Integer.parseInt(multi.getParameter("capacity")));
+	room.setBaseGuests(Integer.parseInt(multi.getParameter("baseGuests")));
+	room.setExtraPrice(Integer.parseInt(multi.getParameter("extraPrice")));
 	room.setBedCount(Integer.parseInt(multi.getParameter("bedCount")));
 	// 체크박스는 체크하지 않으면 값이 아예 안 넘어온다(null)
 	room.setBreakfast(multi.getParameter("breakfast") == null ? 0 : 1);

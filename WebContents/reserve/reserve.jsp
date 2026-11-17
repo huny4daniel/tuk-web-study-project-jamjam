@@ -54,8 +54,9 @@
 		}
 
 		if (error == null) {
-			// ⑤ 금액 계산 : (객실 할인가 x 박 수) 에서 쿠폰 할인율만큼 빼기
-			int total = room.getSalePrice() * (int) nights;
+			// ⑤ 금액 계산 : (인원에 따른 1박 요금 x 박 수) 에서 쿠폰 할인율만큼 빼기
+			//    1박 요금 = 객실 할인가 + 기준 인원을 넘는 사람 수 x 1인 추가 요금 (Room.getNightPrice)
+			int total = room.getNightPrice(guests) * (int) nights;
 			if (coupon != null) {
 				total = total * (100 - coupon.getDiscountRate()) / 100;
 			}

@@ -109,6 +109,8 @@ CREATE TABLE `room` (
   `price` int(11) NOT NULL,
   `discountRate` int(11) NOT NULL DEFAULT 0,
   `capacity` int(11) NOT NULL,
+  `baseGuests` int(11) NOT NULL DEFAULT 2,
+  `extraPrice` int(11) NOT NULL DEFAULT 0,
   `bedCount` int(11) NOT NULL DEFAULT 1,
   `breakfast` tinyint(4) NOT NULL DEFAULT 0,
   `pet` tinyint(4) NOT NULL DEFAULT 0,
