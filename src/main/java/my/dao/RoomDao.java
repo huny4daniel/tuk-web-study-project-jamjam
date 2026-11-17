@@ -13,7 +13,7 @@ import my.util.JdbcUtil;
 public class RoomDao {
 
 	// 한 페이지에 보여줄 객실 수
-	private static final int ROOM_COUNT_PER_PAGE = 6;
+	private static final int ROOM_COUNT_PER_PAGE = 9;   // 3줄 x 3개
 
 	// 사진(photo)은 크기가 커서 목록에서는 빼고 가져온다. 사진은 selectPhoto() 로 따로.
 	private static final String COLUMNS =

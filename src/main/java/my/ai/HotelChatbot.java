@@ -47,15 +47,45 @@ public class HotelChatbot {
 
 		prompt.append("[호텔 정보]\n").append(HOTEL_INFO).append("\n");
 
-		prompt.append("[객실 목록]\n");
+		// 객실이 많아서(50실) 한 줄씩 다 넣으면 너무 길다 → 객실 종류별로 묶어서 요약
+		//   같은 종류의 객실 수, 최저~최고 1박 요금, 전망 종류, 평점을 모은다
+		prompt.append("[객실 목록] (객실 종류별 요약)\n");
 		List<Room> rooms = new RoomDao().selectAll(conn);
+		String doneTypes = ",";   // 이미 요약한 객실 종류 (",스탠다드,디럭스," 처럼 이어 붙임)
 		for (Room room : rooms) {
-			prompt.append("- ").append(room.getRoomType()).append(" (").append(room.getRoomNo()).append(")")
+			if (doneTypes.indexOf("," + room.getRoomType() + ",") >= 0) {
+				continue;
+			}
+			doneTypes += room.getRoomType() + ",";
+
+			// 같은 종류의 객실들을 한 번 더 돌면서 개수, 요금 범위, 전망, 평점 모으기
+			int count = 0, minPrice = 0, maxPrice = 0, reviewCount = 0;
+			double ratingSum = 0;
+			String views = "";
+			for (Room r : rooms) {
+				if (!r.getRoomType().equals(room.getRoomType())) {
+					continue;
+				}
+				count++;
+				if (minPrice == 0 || r.getSalePrice() < minPrice) {
+					minPrice = r.getSalePrice();
+				}
+				if (r.getSalePrice() > maxPrice) {
+					maxPrice = r.getSalePrice();
+				}
+				if (views.indexOf(r.getViewType()) < 0) {
+					views += (views.equals("") ? "" : "/") + r.getViewType();
+				}
+				ratingSum += r.getAvgRating() * r.getReviewCount();
+				reviewCount += r.getReviewCount();
+			}
+
+			prompt.append("- ").append(room.getRoomType()).append(" : ").append(count).append("실")
 				.append(", ").append(room.getRoomSize()).append("평")
-				.append(", 전망 ").append(room.getViewType())
-				.append(", 1박 ").append(room.getSalePrice()).append("원");
-			if (room.getDiscountRate() > 0) {
-				prompt.append("(정가 ").append(room.getPrice()).append("원에서 ").append(room.getDiscountRate()).append("% 할인)");
+				.append(", 전망 ").append(views)
+				.append(", 1박 ").append(minPrice).append("원");
+			if (maxPrice > minPrice) {
+				prompt.append(" ~ ").append(maxPrice).append("원 (층과 할인에 따라 다름)");
 			}
 			prompt.append(", 기준 ").append(room.getBaseGuests()).append("명 / 최대 ").append(room.getCapacity()).append("명");
 			if (room.getExtraPrice() > 0 && room.getCapacity() > room.getBaseGuests()) {
@@ -65,9 +95,9 @@ public class HotelChatbot {
 				.append(", 조식 ").append(room.getBreakfast() == 1 ? "포함" : "미포함")
 				.append(", 반려동물 ").append(room.getPet() == 1 ? "가능" : "불가")
 				.append(", 편의시설 ").append(room.getAmenities());
-			if (room.getReviewCount() > 0) {
-				prompt.append(", 평점 ").append(String.format("%.1f", room.getAvgRating()))
-					.append("(리뷰 ").append(room.getReviewCount()).append("개)");
+			if (reviewCount > 0) {
+				prompt.append(", 평점 ").append(String.format("%.1f", ratingSum / reviewCount))
+					.append("(리뷰 ").append(reviewCount).append("개)");
 			}
 			prompt.append("\n");
 		}
