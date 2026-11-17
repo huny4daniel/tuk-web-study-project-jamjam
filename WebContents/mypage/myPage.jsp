@@ -24,7 +24,7 @@
 	<h2 class="page-title">마이페이지</h2>
 	<div class="tabs">
 		<a class="on" href="myPage.jsp">예약 · 리뷰</a>
-		<a href="qna.jsp">1:1 문의</a>
+		<a href="../qna/qnaList.jsp">1:1 문의</a>
 		<a href="../member/memberUpdateForm.jsp">회원 정보 수정</a>
 	</div>
 
@@ -61,7 +61,7 @@
 							   onclick="return confirm('예약을 취소하시겠습니까?')">예약 취소</a>
 						</c:if>
 						<c:if test="${res.reviewable}">
-							<a class="btn btn-small btn-gold" href="reviewForm.jsp?resId=${res.resId}">리뷰 쓰기</a>
+							<a class="btn btn-small btn-gold" href="../review/reviewForm.jsp?resId=${res.resId}">리뷰 쓰기</a>
 						</c:if>
 						<c:if test="${res.reviewed}"><span class="muted">리뷰 작성 완료</span></c:if>
 					</td>

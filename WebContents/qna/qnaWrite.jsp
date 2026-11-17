@@ -16,5 +16,5 @@
 %>
 <script>
 	alert("문의가 등록되었습니다. 답변은 이 화면에서 확인할 수 있습니다.");
-	location.href = "qna.jsp";
+	location.href = "qnaList.jsp";
 </script>

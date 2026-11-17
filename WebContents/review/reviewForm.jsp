@@ -13,7 +13,7 @@
 	}
 	// 남의 예약이거나 아직 숙박이 끝나지 않았으면 마이페이지로 돌려보낸다
 	if (res == null || !res.getUserId().equals(loginId) || !res.isReviewable()) {
-		response.sendRedirect("myPage.jsp");
+		response.sendRedirect("../mypage/myPage.jsp");
 		return;
 	}
 %>
@@ -22,7 +22,7 @@
 	<div class="box form-box" style="width:600px;">
 		<h2 class="page-title">리뷰 쓰기</h2>
 		<p><b>${res.roomType} ${res.roomNo}</b><br><span class="muted">${res.checkIn} ~ ${res.checkOut} 숙박</span></p>
-		<form action="review.jsp" method="post" onsubmit="return checkForm(this)">
+		<form action="reviewWrite.jsp" method="post" onsubmit="return checkForm(this)">
 			<input type="hidden" name="resId" value="${res.resId}">
 			<p>
 				<label>평점</label>

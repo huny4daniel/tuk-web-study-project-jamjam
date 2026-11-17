@@ -29,7 +29,7 @@
 			<a href="<%= ctx %>/room/roomList.jsp">객실 예약</a>
 			<a href="<%= ctx %>/info/location.jsp">오시는 길</a>
 			<a href="<%= ctx %>/info/tour.jsp">주변 즐길거리</a>
-			<a href="<%= ctx %>/mypage/qna.jsp">1:1 문의</a>
+			<a href="<%= ctx %>/qna/qnaList.jsp">1:1 문의</a>
 		</nav>
 		<div class="util">
 			<% if (loginId == null) { %>

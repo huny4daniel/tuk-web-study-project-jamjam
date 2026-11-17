@@ -52,7 +52,9 @@ hotel/
     ├─ member/                   회원가입, 아이디 중복확인, 로그인/로그아웃, 정보 수정
     ├─ room/                     객실 목록(검색·필터·정렬·페이징), 객실 상세
     ├─ reserve/                  예약 처리, 예약 취소
-    ├─ mypage/                   마이페이지, 리뷰 쓰기, 1:1 문의
+    ├─ mypage/                   마이페이지 (내 예약, 내 리뷰)
+    ├─ review/                   리뷰 쓰기 폼 / 등록 처리
+    ├─ qna/                      1:1 문의 목록·작성 / 등록 처리
     ├─ info/                     오시는 길, 주변 즐길거리
     ├─ admin/                    관리자 화면 (기능별 하위 폴더)
     │   ├─ index.jsp             대시보드
@@ -64,6 +66,8 @@ hotel/
     │   └─ member/               회원 목록
     └─ images/                   메인 배경, 기본 그림(사진 없는 객실용)
 ```
+
+이용자 폴더(room, reserve, review, qna, member)와 관리자 폴더(admin/room, admin/reservation, admin/review, admin/qna, admin/member)는 같은 기능끼리 이름을 맞춰 두었습니다.
 
 **모든 페이지는 같은 흐름**으로 되어 있습니다 (Model 1 방식, 수업과 동일).
 
@@ -118,7 +122,7 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 | 5) 예약 + 중복 방지 | reserve/reserve.jsp, ReservationDao.countOverlap() | 겹치는 조건 : `기존 체크인 < 새 체크아웃 AND 기존 체크아웃 > 새 체크인`. 같은 날 체크아웃·체크인은 허용 |
 | 예약 취소 | reserve/cancel.jsp (이용자), admin/reservation/resCancel.jsp (관리자) | 이용자는 체크인 전까지만 취소 가능 |
 | 6) 할인 | 객실 할인율(room.discountRate) + 기간 쿠폰(coupon) | 금액 = 객실 할인가 × 박 수 × (100 − 쿠폰 할인율) / 100 |
-| 7) 리뷰 | mypage/reviewForm.jsp, review.jsp | 체크아웃이 지난 '예약완료' 예약에만, 1건당 1번(reviewed 컬럼). 리뷰 저장 → reviewed=1 → 객실 평균 갱신 |
+| 7) 리뷰 | review/reviewForm.jsp, reviewWrite.jsp | 체크아웃이 지난 '예약완료' 예약에만, 1건당 1번(reviewed 컬럼). 리뷰 저장 → reviewed=1 → 객실 평균 갱신 |
 | 예약 상태 표시 | Reservation.java 의 getStatusLabel(), isCancelable(), isReviewable() | 상태 계산은 Java if 문으로, JSP 에서는 `${res.statusLabel}`, `<c:if test="${res.cancelable}">` 만 씀 |
 | 8) 마이페이지 | mypage/myPage.jsp, member/memberUpdateForm.jsp | 내 예약(상태별 버튼), 내 리뷰, 정보 수정 |
 | 9) 관리자 페이지 | admin/*/ (기능별 폴더) | 대시보드, 예약 현황, 쿠폰, 문의 답변, 리뷰 관리, 회원 목록 |

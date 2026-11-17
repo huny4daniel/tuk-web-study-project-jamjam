@@ -17,8 +17,8 @@
 <div class="container">
 	<h2 class="page-title">1:1 문의</h2>
 	<div class="tabs">
-		<a href="myPage.jsp">예약 · 리뷰</a>
-		<a class="on" href="qna.jsp">1:1 문의</a>
+		<a href="../mypage/myPage.jsp">예약 · 리뷰</a>
+		<a class="on" href="qnaList.jsp">1:1 문의</a>
 		<a href="../member/memberUpdateForm.jsp">회원 정보 수정</a>
 	</div>
 

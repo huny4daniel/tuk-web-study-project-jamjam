@@ -45,5 +45,5 @@
 %>
 <script>
 	alert("<%= error == null ? "리뷰가 등록되었습니다. 감사합니다." : error %>");
-	location.href = "myPage.jsp";
+	location.href = "../mypage/myPage.jsp";
 </script>
