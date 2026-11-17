@@ -167,6 +167,14 @@ public class Room {
 		return !bookedText.equals("");
 	}
 
+	// 침대 표시 글자 : 한실 온돌처럼 침대가 없으면(0개) "온돌 (요)" (JSP 에서 ${room.bedLabel})
+	public String getBedLabel() {
+		if (bedCount == 0) {
+			return "온돌 (요)";
+		}
+		return "침대 " + bedCount + "개";
+	}
+
 	// 할인이 적용된 1박 가격 (JSP에서 ${room.salePrice} 로 사용)
 	public int getSalePrice() {
 		return price * (100 - discountRate) / 100;

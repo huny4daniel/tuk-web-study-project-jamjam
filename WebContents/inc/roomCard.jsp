@@ -20,7 +20,7 @@
 			<div class="type">ROOM ${room.roomNo}</div>
 			<div class="name">${room.roomType} <span class="size">${room.roomSize}평 (${room.roomSizeM2}㎡)</span></div>
 			<div class="info">
-				기준 ${room.baseGuests}인 (최대 ${room.capacity}인) · 침대 ${room.bedCount}개 ·
+				기준 ${room.baseGuests}인 (최대 ${room.capacity}인) · ${room.bedLabel} ·
 				<c:if test="${room.reviewCount == 0}"><span class="new">NEW</span></c:if>
 				<c:if test="${room.reviewCount > 0}"><span class="stars">★</span> <fmt:formatNumber value="${room.avgRating}" pattern="0.0"/> <span class="muted">(${room.reviewCount})</span></c:if>
 			</div>

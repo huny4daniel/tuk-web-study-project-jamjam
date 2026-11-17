@@ -45,7 +45,7 @@
 			<div class="spec">
 				<div>GUESTS<b>기준 ${room.baseGuests}인 / 최대 ${room.capacity}인</b></div>
 				<div>VIEW<b>${room.viewType}</b></div>
-				<div>BEDS<b>${room.bedCount}개</b></div>
+				<div>BEDS<b>${room.bedLabel}</b></div>
 				<div>BREAKFAST<b>${room.breakfast == 1 ? '포함' : '미포함'}</b></div>
 				<div>PET<b>${room.pet == 1 ? '동반 가능' : '불가'}</b></div>
 			</div>

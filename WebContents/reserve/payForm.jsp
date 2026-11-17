@@ -62,7 +62,7 @@
 						<div>
 							<span class="eyebrow">ROOM ${room.roomNo}</span>
 							<div class="name">${room.roomType} <span class="size">${room.roomSize}평</span></div>
-							<div class="muted">${room.breakfast == 1 ? '조식 포함' : '조식 미포함'} · 침대 ${room.bedCount}개</div>
+							<div class="muted">${room.breakfast == 1 ? '조식 포함' : '조식 미포함'} · ${room.bedLabel}</div>
 						</div>
 					</div>
 					<table class="form">

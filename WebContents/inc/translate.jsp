@@ -83,7 +83,11 @@
 		[/^· 쿠폰 (\S+) 적용$/, "· Coupon $1 applied"],
 		[/^쿠폰 (\S+)$/, "Coupon $1"],
 		[/^(\S+) (\d+)호$/, "$1 Room $2"],
-		[/^(.+) 예약 마감$/, "Booked $1"]
+		[/^(.+) 예약 마감$/, "Booked $1"],
+		[/^기준 (\d+)인 \(최대 (\d+)인\) · 침대 (\d+)개 ·$/, "Standard $1 · Max $2 guests · $3 bed(s) ·"],
+		[/^기준 (\d+)인 \(최대 (\d+)인\) · 온돌 \(요\) ·$/, "Standard $1 · Max $2 guests · Ondol floor bedding ·"],
+		[/^침대 (\d+)개$/, "$1 bed(s)"],
+		[/^(.+) · 침대 (\d+)개$/, "$1 · $2 bed(s)"]
 	];
 	for (var i = 0; i < items.length; i++) {
 		var key = items[i].key;

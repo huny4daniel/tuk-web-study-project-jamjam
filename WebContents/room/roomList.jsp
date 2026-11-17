@@ -84,6 +84,12 @@
 					<option value="거실" ${search.amenity == '거실' ? 'selected' : ''}>거실</option>
 					<option value="세탁기" ${search.amenity == '세탁기' ? 'selected' : ''}>세탁기</option>
 					<option value="펫침대" ${search.amenity == '펫침대' ? 'selected' : ''}>펫침대</option>
+					<option value="테라스" ${search.amenity == '테라스' ? 'selected' : ''}>테라스</option>
+					<option value="스파욕조" ${search.amenity == '스파욕조' ? 'selected' : ''}>스파욕조</option>
+					<option value="온돌" ${search.amenity == '온돌' ? 'selected' : ''}>온돌</option>
+					<option value="복층" ${search.amenity == '복층' ? 'selected' : ''}>복층</option>
+					<option value="안마의자" ${search.amenity == '안마의자' ? 'selected' : ''}>안마의자</option>
+					<option value="빔프로젝터" ${search.amenity == '빔프로젝터' ? 'selected' : ''}>빔프로젝터</option>
 				</select>
 			</p>
 
