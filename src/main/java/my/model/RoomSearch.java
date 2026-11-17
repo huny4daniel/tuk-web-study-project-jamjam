@@ -13,7 +13,8 @@ public class RoomSearch {
 	private String breakfast; // "1" 이면 조식 포함 객실만
 	private String pet;       // "1" 이면 반려동물 동반 가능 객실만
 	private String bedCount;  // 최소 침대 수
-	private String amenity;   // 편의시설 키워드 (욕조, 오션뷰 ...)
+	private String amenity;   // 편의시설 키워드 (욕조, 주방 ...)
+	private String viewType;  // 전망 (오션뷰 / 시티뷰 / 파크뷰), 비어 있으면 상관없음
 	private String sort;      // 정렬 기준 (price, rating, popular)
 	private String available; // "1" 이면 예약 가능한 객실만 (아니면 마감 객실도 SOLD OUT 으로 보여줌)
 
@@ -33,6 +34,7 @@ public class RoomSearch {
 		q += param("pet", pet);
 		q += param("bedCount", bedCount);
 		q += param("amenity", amenity);
+		q += param("viewType", viewType);
 		q += param("sort", sort);
 		q += param("available", available);
 		return q;
@@ -98,6 +100,12 @@ public class RoomSearch {
 	// 날짜(체크인, 체크아웃)를 둘 다 넣었나?
 	public boolean isDateSelected() {
 		return has(checkIn) && has(checkOut);
+	}
+	public String getViewType() {
+		return viewType;
+	}
+	public void setViewType(String viewType) {
+		this.viewType = viewType;
 	}
 	public String getSort() {
 		return sort;

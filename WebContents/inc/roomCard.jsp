@@ -25,6 +25,7 @@
 				<c:if test="${room.reviewCount > 0}"><span class="stars">★</span> <fmt:formatNumber value="${room.avgRating}" pattern="0.0"/> <span class="muted">(${room.reviewCount})</span></c:if>
 			</div>
 			<div class="tags">
+				<span class="badge badge-blue">${room.viewType}</span>
 				<c:if test="${room.breakfast == 1}"><span class="badge badge-gold">조식 포함</span></c:if>
 				<c:if test="${room.pet == 1}"><span class="badge badge-green">반려동물</span></c:if>
 				<c:if test="${room.resCount >= 2}"><span class="badge badge-red">인기</span></c:if>

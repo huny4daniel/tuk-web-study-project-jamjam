@@ -117,6 +117,7 @@ CREATE TABLE `room` (
   `bedCount` int(11) NOT NULL DEFAULT 1,
   `breakfast` tinyint(4) NOT NULL DEFAULT 0,
   `pet` tinyint(4) NOT NULL DEFAULT 0,
+  `viewType` varchar(20) NOT NULL DEFAULT '시티뷰',
   `amenities` varchar(200) NOT NULL DEFAULT '',
   `description` text DEFAULT NULL,
   `photo` longblob DEFAULT NULL,

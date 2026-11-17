@@ -29,6 +29,7 @@
 	// 체크박스는 체크하지 않으면 값이 아예 안 넘어온다(null)
 	room.setBreakfast(multi.getParameter("breakfast") == null ? 0 : 1);
 	room.setPet(multi.getParameter("pet") == null ? 0 : 1);
+	room.setViewType(multi.getParameter("viewType"));
 	room.setAmenities(multi.getParameter("amenities"));
 	room.setDescription(multi.getParameter("description"));
 

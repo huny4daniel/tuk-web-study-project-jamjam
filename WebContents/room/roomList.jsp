@@ -67,11 +67,18 @@
 				</select>
 			</p>
 			<p>
+				<label class="title">전망</label>
+				<select name="viewType">
+					<option value="">상관없음</option>
+					<option value="오션뷰" ${search.viewType == '오션뷰' ? 'selected' : ''}>오션뷰</option>
+					<option value="시티뷰" ${search.viewType == '시티뷰' ? 'selected' : ''}>시티뷰</option>
+					<option value="파크뷰" ${search.viewType == '파크뷰' ? 'selected' : ''}>파크뷰</option>
+				</select>
+			</p>
+			<p>
 				<label class="title">편의시설</label>
 				<select name="amenity">
 					<option value="">상관없음</option>
-					<option value="오션뷰" ${search.amenity == '오션뷰' ? 'selected' : ''}>오션뷰</option>
-					<option value="시티뷰" ${search.amenity == '시티뷰' ? 'selected' : ''}>시티뷰</option>
 					<option value="욕조" ${search.amenity == '욕조' ? 'selected' : ''}>욕조</option>
 					<option value="주방" ${search.amenity == '주방' ? 'selected' : ''}>주방</option>
 					<option value="거실" ${search.amenity == '거실' ? 'selected' : ''}>거실</option>

@@ -5,9 +5,14 @@
 	// 메인 화면 : 예약이 많은 인기 객실 3개를 가져온다
 	Connection conn = ConnectionProvider.getConnection();
 	List<Room> popularList = null;
+	Room bestOcean = null, bestCity = null, bestPark = null;
 	try {
 		RoomDao roomDao = new RoomDao();
 		popularList = roomDao.selectPopular(conn, 3);
+		// 뷰 추천 : 전망마다 평점이 가장 높은 객실 1개씩
+		bestOcean = roomDao.selectBestByView(conn, "오션뷰");
+		bestCity = roomDao.selectBestByView(conn, "시티뷰");
+		bestPark = roomDao.selectBestByView(conn, "파크뷰");
 	} finally {
 		JdbcUtil.close(conn);
 	}
@@ -17,6 +22,9 @@
 	String tomorrow = java.time.LocalDate.now().plusDays(1).toString();
 %>
 <c:set var="popularList" value="<%= popularList %>"/>
+<c:set var="bestOcean" value="<%= bestOcean %>"/>
+<c:set var="bestCity" value="<%= bestCity %>"/>
+<c:set var="bestPark" value="<%= bestPark %>"/>
 
 <!-- 가로로 긴 바다 사진 + 바로 아래 붙은 빠른 검색 -->
 <section class="hero">
@@ -73,6 +81,46 @@
 		</div>
 	</section>
 
+	<!-- 뷰 추천 : 전망별 설명 + 그 전망에서 평점이 가장 높은 객실 -->
+	<section class="section">
+		<div class="section-head">
+			<div><span class="eyebrow">VIEW GUIDE</span><h2>창밖 풍경으로 고르는 객실</h2></div>
+			<a href="<%= ctx %>/room/roomList.jsp">전체 객실 보기 →</a>
+		</div>
+		<div class="views">
+			<div class="view-item">
+				<span class="tag">OCEAN</span>
+				<h3>오션뷰</h3>
+				<p>서해 바다가 창 가득 펼쳐집니다. 해 질 무렵 붉게 물드는 노을이 가장 아름답습니다.</p>
+				<p class="best-time">추천 시간 · 17:00 ~ 18:30 노을</p>
+				<c:if test="${bestOcean != null}">
+					<a class="pick" href="<%= ctx %>/room/roomDetail.jsp?roomId=${bestOcean.roomId}"><small>추천 객실</small><b>${bestOcean.roomType}</b> <span><fmt:formatNumber value="${bestOcean.salePrice}" pattern="#,###"/>원~</span></a>
+				</c:if>
+				<a class="more" href="<%= ctx %>/room/roomList.jsp?viewType=%EC%98%A4%EC%85%98%EB%B7%B0">오션뷰 객실 모두 보기 →</a>
+			</div>
+			<div class="view-item">
+				<span class="tag">PARK</span>
+				<h3>파크뷰</h3>
+				<p>배곧한울공원의 초록 산책로가 내려다보입니다. 아이, 반려동물과 함께라면 추천합니다.</p>
+				<p class="best-time">추천 시간 · 07:00 ~ 09:00 아침 산책</p>
+				<c:if test="${bestPark != null}">
+					<a class="pick" href="<%= ctx %>/room/roomDetail.jsp?roomId=${bestPark.roomId}"><small>추천 객실</small><b>${bestPark.roomType}</b> <span><fmt:formatNumber value="${bestPark.salePrice}" pattern="#,###"/>원~</span></a>
+				</c:if>
+				<a class="more" href="<%= ctx %>/room/roomList.jsp?viewType=%ED%8C%8C%ED%81%AC%EB%B7%B0">파크뷰 객실 모두 보기 →</a>
+			</div>
+			<div class="view-item">
+				<span class="tag">CITY</span>
+				<h3>시티뷰</h3>
+				<p>배곧 신도시의 불빛이 반짝이는 야경 객실입니다. 합리적인 가격으로 머물기 좋습니다.</p>
+				<p class="best-time">추천 시간 · 20:00 이후 야경</p>
+				<c:if test="${bestCity != null}">
+					<a class="pick" href="<%= ctx %>/room/roomDetail.jsp?roomId=${bestCity.roomId}"><small>추천 객실</small><b>${bestCity.roomType}</b> <span><fmt:formatNumber value="${bestCity.salePrice}" pattern="#,###"/>원~</span></a>
+				</c:if>
+				<a class="more" href="<%= ctx %>/room/roomList.jsp?viewType=%EC%8B%9C%ED%8B%B0%EB%B7%B0">시티뷰 객실 모두 보기 →</a>
+			</div>
+		</div>
+	</section>
+
 	<section class="section">
 		<div class="section-head no-line">
 			<div><span class="eyebrow">WHY JAMJAM</span><h2>잠잠에서만 누리는 것</h2></div>
@@ -81,7 +129,7 @@
 			<div class="item">
 				<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 17c3 0 3-2.5 6-2.5s3 2.5 6 2.5 3-2.5 6-2.5 3 2.5 6 2.5M2 22c3 0 3-2.5 6-2.5s3 2.5 6 2.5 3-2.5 6-2.5 3 2.5 6 2.5"/><path d="M8 11a6 6 0 0 1 12 0"/></svg>
 				<h3>오션뷰 객실</h3>
-				<p>서해 바다와 노을이 보이는 객실을 운영합니다. 객실 검색의 편의시설 필터에서 '오션뷰'를 선택해 보세요.</p>
+				<p>서해 바다와 노을이 보이는 객실을 운영합니다. 객실 검색의 전망 필터에서 '오션뷰'를 선택해 보세요.</p>
 			</div>
 			<div class="item">
 				<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="8" cy="11" r="2.2"/><circle cx="14" cy="7.5" r="2.2"/><circle cx="20" cy="11" r="2.2"/><path d="M14 14.5c-4 0-6.5 4-6.5 6.5 0 1.6 1.4 2.4 3 2.4h7c1.6 0 3-.8 3-2.4 0-2.5-2.5-6.5-6.5-6.5z"/></svg>

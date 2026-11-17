@@ -14,6 +14,7 @@ public class Room {
 	private int bedCount;
 	private int breakfast;
 	private int pet;
+	private String viewType;    // 전망 (오션뷰 / 시티뷰 / 파크뷰)
 	private String amenities;
 	private String description;
 	private byte[] photoData;   // 사진 파일 내용 그대로 (DB 의 LONGBLOB)
@@ -101,6 +102,12 @@ public class Room {
 	}
 	public void setPet(int pet) {
 		this.pet = pet;
+	}
+	public String getViewType() {
+		return viewType;
+	}
+	public void setViewType(String viewType) {
+		this.viewType = viewType;
 	}
 	public String getAmenities() {
 		return amenities;

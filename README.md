@@ -18,9 +18,12 @@
 4. 브라우저 주소 : `http://localhost:8080/hotel/`
 
 **이클립스 없이 배포 (`deploy.bat`)** : 프로젝트 폴더의 `deploy.bat` 을 더블클릭하면
-자바 컴파일 → `hotel.war` 생성 → 실행 중인 Tomcat 종료 → `webapps` 에 war 복사 → Tomcat 시작 까지 한 번에 합니다.
-- JDK(`javac`, `jar`)와 독립 Tomcat 9 가 필요합니다. 경로는 환경 변수 `JAVA_HOME`, `CATALINA_HOME` 을 쓰고, `CATALINA_HOME` 이 없으면 bat 위쪽의 기본 경로를 씁니다.
-- 이클립스에서 같은 8080 포트로 서버를 띄워 놓았다면 먼저 끄고 실행하세요.
+Tomcat 경로 입력 → 자바 컴파일 → `hotel.war` 생성 → 실행 중인 Tomcat 종료 → `webapps` 에 war 복사 → Tomcat 시작 까지 한 번에 합니다.
+- 필요한 것 : Tomcat 9 (zip 을 푼 폴더), Java 17 이상. JDK 는 없어도 됩니다 (Tomcat 에 들어 있는 컴파일러 `lib/ecj-*.jar` 로 컴파일).
+- 처음 실행하면 Tomcat 폴더 경로를 묻습니다 (창에 폴더를 끌어다 놓아도 됨). 입력한 경로는 `deploy.local.txt` 에 저장돼 다음부터는 Enter 만 누르면 됩니다 (git 에 안 올라감).
+- Java 는 `JAVA_HOME` → `JRE_HOME` → PATH 의 `java` 순서로 자동으로 찾습니다.
+- 실제 작업은 `deploy.ps1` 이 하고, `deploy.bat` 은 그것을 실행하는 껍데기입니다 (한글이 든 bat 파일은 cmd 가 잘못 읽는 문제가 있어서).
+- 이클립스에서 같은 8080 포트로 서버를 띄워 놓았다면 먼저 끄고 실행하세요. MySQL(hotel DB)도 켜져 있어야 합니다.
 - 작업 파일은 `build/deploy/` 에 생깁니다 (git 에 올라가지 않음).
 
 | 테스트 계정 | 아이디 / 비밀번호 | 비고 |
@@ -107,7 +110,7 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 | 테이블 | 내용 | 핵심 컬럼 |
 |---|---|---|
 | member | 회원 | userId (admin 이면 관리자) |
-| room | 객실 | roomType, roomNo, roomSize(평, 화면에는 ㎡ 도 같이 표시), price, discountRate(객실 할인율), capacity(최대 인원), baseGuests(기준 인원), extraPrice(1인 추가 요금), bedCount, breakfast, pet, amenities, photo(LONGBLOB), photoType, **avgRating, reviewCount, resCount**(수업 freq 처럼 update 로 갱신) |
+| room | 객실 | roomType, roomNo, roomSize(평, 화면에는 ㎡ 도 같이 표시), viewType(전망 : 오션뷰/시티뷰/파크뷰), price, discountRate(객실 할인율), capacity(최대 인원), baseGuests(기준 인원), extraPrice(1인 추가 요금), bedCount, breakfast, pet, amenities, photo(LONGBLOB), photoType, **avgRating, reviewCount, resCount**(수업 freq 처럼 update 로 갱신) |
 | reservation | 예약 | roomId, **roomType, roomNo**(예약할 때 같이 저장 → join 불필요), userId, checkIn, checkOut, totalPrice, couponCode, payMethod, payDetail(카드사·할부, 입금자명 등), requestNote(고객 요청사항), status('예약완료'/'취소'), **reviewed**(리뷰 썼으면 1) |
 | review | 리뷰 | resId(예약 1건당 1개), roomId, roomType, rating(1~5), content |
 | coupon | 쿠폰 | couponCode, discountRate, startDate ~ endDate |
@@ -122,10 +125,11 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 | 1) 회원 관리 | member/*, inc/loginCheck.jsp, inc/adminCheck.jsp | 로그인 성공 시 `session.setAttribute("LOGIN", 아이디)`. 아이디가 admin 이면 관리자. 관리자는 header.jsp·loginCheck.jsp 에서 관리자 대시보드로 보내서 이용자 화면을 쓰지 않음 |
 | 2) 객실 관리 | admin/room/roomList, roomForm, roomSave, roomDelete | 등록·수정 폼 하나를 같이 씀. 사진은 cos.jar 로 받아 byte 배열로 읽어서 **DB에 저장** |
 | 객실 사진 출력 | room/photo.jsp, RoomDao.selectPhoto() | `<img src=".../room/photo.jsp?roomId=3">` → DB 의 사진 바이트를 이미지로 그대로 내보냄 |
-| 3) 객실 조회·검색 | room/roomList.jsp, RoomDao.WHERE / setSearch() | ? 7개짜리 고정 SQL 하나. 조건을 안 고르면 항상 참이 되는 값을 넣음 (예: `breakfast >= 0`). 날짜를 넣으면 그 기간에 예약된 객실은 `not in` 으로 뺌 |
+| 3) 객실 조회·검색 | room/roomList.jsp, RoomDao.WHERE / setSearch() | ? 8개짜리 고정 SQL 하나. 조건을 안 고르면 항상 참이 되는 값을 넣음 (예: `breakfast >= 0`). 날짜를 넣으면 그 기간에 예약된 객실은 `not in` 으로 뺌 |
 | SOLD OUT 표시 | room/roomList.jsp, inc/roomCard.jsp, ReservationDao.selectOverlap(), Room.addBooked() | 날짜를 넣으면 그 기간과 겹치는 예약을 읽어 JSP for 문으로 같은 객실에 예약 기간을 붙임 → 카드에 SOLD OUT + 마감 기간. [예약 가능한 객실만] 을 체크하면 기존처럼 `not in` 으로 숨김 |
 | 예약 현황 달력 | room/roomDetail.jsp, ReservationDao.selectBookedByRoom() | 객실의 앞으로의 예약을 JS 배열로 넘겨 두 달 달력을 그림. 예약된 밤은 줄 긋기, 날짜를 누르면 체크인 → 체크아웃 순서로 예약 폼에 들어감 |
 | 페이징 | RoomDao.getRoomList(), RoomListView | 수업 catalogPaging 과 같은 `limit ?, ?` 방식 |
+| 뷰(전망) 추천 | index.jsp 의 VIEW GUIDE, RoomDao.selectBestByView() | 전망별 설명·추천 시간대와 그 전망에서 평점이 가장 높은 객실을 추천. 객실 목록 필터에 전망(viewType like ?, 안 고르면 '%') 추가 |
 | 4) 정렬 | RoomDao.makeOrderBy() | 가격 / 평점 / 인기(예약 수) 컬럼으로 order by. 예약 수는 `updateResCount()`(수업 updateFreq 와 같음), 평점은 `addRating()` 으로 갱신 |
 | 5) 예약 + 중복 방지 | reserve/payForm.jsp → reserve.jsp → resDetail.jsp, inc/reserveCheck.jsp, ReservationDao.countOverlap() | 결제 화면과 처리 페이지가 같은 검사·금액 계산 조각(reserveCheck)을 include → 화면 금액과 저장 금액이 항상 같고, 처리 페이지에서 한 번 더 검사. 모의 결제(카드사·할부 / 계좌이체 입금자 / 현장결제)와 취소 규정 동의.  겹치는 조건 : `기존 체크인 < 새 체크아웃 AND 기존 체크아웃 > 새 체크인`. 같은 날 체크아웃·체크인은 허용 |
 | 예약 취소 | reserve/cancel.jsp (이용자), admin/reservation/resCancel.jsp (관리자) | 이용자는 체크인 전까지만 취소 가능 |

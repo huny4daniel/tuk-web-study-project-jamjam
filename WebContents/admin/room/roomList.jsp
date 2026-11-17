@@ -23,7 +23,7 @@
 		<tr>
 			<td>${room.roomId}</td>
 			<td><img src="<%= ctx %>/room/photo.jsp?roomId=${room.roomId}" width="80" height="55" style="object-fit:cover; border-radius:3px;"></td>
-			<td><b>${room.roomType}</b><br><span class="muted">${room.roomSize}평</span></td>
+			<td><b>${room.roomType}</b><br><span class="muted">${room.roomSize}평 · ${room.viewType}</span></td>
 			<td>${room.roomNo}</td>
 			<td><fmt:formatNumber value="${room.price}" pattern="#,###"/></td>
 			<td>${room.discountRate}%</td>

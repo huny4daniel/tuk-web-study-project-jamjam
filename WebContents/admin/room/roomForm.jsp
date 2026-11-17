@@ -42,7 +42,16 @@
 					<label><input type="checkbox" name="pet" value="1" ${room.pet == 1 ? 'checked' : ''}> 반려동물 동반 가능</label>
 				</td>
 			</tr>
-			<tr><th>편의시설</th><td><input type="text" name="amenities" class="full" value="${room.amenities}" placeholder="쉼표로 구분 예) WiFi,TV,욕조,오션뷰"></td></tr>
+			<tr><th>전망</th>
+				<td>
+					<select name="viewType">
+						<option ${room.viewType == '오션뷰' ? 'selected' : ''}>오션뷰</option>
+						<option ${room.viewType == '시티뷰' ? 'selected' : ''}>시티뷰</option>
+						<option ${room.viewType == '파크뷰' ? 'selected' : ''}>파크뷰</option>
+					</select>
+				</td>
+			</tr>
+			<tr><th>편의시설</th><td><input type="text" name="amenities" class="full" value="${room.amenities}" placeholder="쉼표로 구분 예) WiFi,TV,욕조,거실"></td></tr>
 			<tr><th>객실 설명</th><td><textarea name="description"><c:out value="${room.description}"/></textarea></td></tr>
 			<tr><th>사진</th>
 				<td>

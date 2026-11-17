@@ -18,7 +18,7 @@ public class RoomDao {
 	// 사진(photo)은 크기가 커서 목록에서는 빼고 가져온다. 사진은 selectPhoto() 로 따로.
 	private static final String COLUMNS =
 			"roomId, roomType, roomNo, roomSize, price, discountRate, capacity, baseGuests, extraPrice, bedCount, breakfast, pet,"
-			+ " amenities, description, avgRating, reviewCount, resCount";
+			+ " viewType, amenities, description, avgRating, reviewCount, resCount";
 
 	// ResultSet 한 줄 -> Room 객체 (여러 메서드에서 같이 쓰려고 따로 뺌)
 	private Room makeRoom(ResultSet rs) throws SQLException {
@@ -35,6 +35,7 @@ public class RoomDao {
 		room.setBedCount(rs.getInt("bedCount"));
 		room.setBreakfast(rs.getInt("breakfast"));
 		room.setPet(rs.getInt("pet"));
+		room.setViewType(rs.getString("viewType"));
 		room.setAmenities(rs.getString("amenities"));
 		room.setDescription(rs.getString("description"));
 		room.setAvgRating(rs.getDouble("avgRating"));
@@ -44,36 +45,38 @@ public class RoomDao {
 	}
 
 	// ------------------------------------------------------------
-	// ★ 검색 조건 where 절 (? 7개, 순서 고정)
+	// ★ 검색 조건 where 절 (? 8개, 순서 고정)
 	//   조건을 안 골랐을 때도 항상 참이 되는 값을 넣어서 SQL 하나로 처리한다.
 	//     인원      capacity  >= ?   (안 고르면 1)
 	//     침대 수   bedCount  >= ?   (안 고르면 0 -> 항상 참)
 	//     조식      breakfast >= ?   (체크하면 1 -> 조식 있는 객실만, 안 하면 0 -> 전부)
 	//     반려동물  pet       >= ?   (위와 같음)
 	//     편의시설  amenities like ? ('%욕조%', 안 고르면 '%%' -> 전부)
+	//     전망      viewType  like ? ('오션뷰', 안 고르면 '%' -> 전부)
 	//     날짜      [예약 가능한 객실만] 을 체크했을 때만 그 기간에 예약이 있는 객실을 not in 으로 제외
 	//               (체크 안 하면 예약된 객실도 목록에 나오고 화면에서 SOLD OUT 으로 표시)
 	//               겹치는 조건 : 기존 체크인 < 새 체크아웃 그리고 기존 체크아웃 > 새 체크인
 	// ------------------------------------------------------------
 	private static final String WHERE =
-			" where capacity >= ? and bedCount >= ? and breakfast >= ? and pet >= ? and amenities like ?"
+			" where capacity >= ? and bedCount >= ? and breakfast >= ? and pet >= ? and amenities like ? and viewType like ?"
 			+ " and roomId not in (select roomId from reservation"
 			+ " where status = '예약완료' and checkIn < ? and checkOut > ?)";
 
-	// 위 WHERE 의 ? 7개에 순서대로 값 넣기
+	// 위 WHERE 의 ? 8개에 순서대로 값 넣기
 	private void setSearch(PreparedStatement pstmt, RoomSearch search) throws SQLException {
 		pstmt.setInt(1, RoomSearch.has(search.getGuests()) ? Integer.parseInt(search.getGuests()) : 1);
 		pstmt.setInt(2, RoomSearch.has(search.getBedCount()) ? Integer.parseInt(search.getBedCount()) : 0);
 		pstmt.setInt(3, "1".equals(search.getBreakfast()) ? 1 : 0);
 		pstmt.setInt(4, "1".equals(search.getPet()) ? 1 : 0);
 		pstmt.setString(5, "%" + (search.getAmenity() == null ? "" : search.getAmenity()) + "%");
+		pstmt.setString(6, RoomSearch.has(search.getViewType()) ? search.getViewType() : "%");
 		if (search.isDateSelected() && "1".equals(search.getAvailable())) {
-			pstmt.setString(6, search.getCheckOut());
-			pstmt.setString(7, search.getCheckIn());
+			pstmt.setString(7, search.getCheckOut());
+			pstmt.setString(8, search.getCheckIn());
 		} else {
 			// 날짜를 안 넣었으면 절대 겹칠 수 없는 날짜를 넣어서 제외되는 객실이 없게 함
-			pstmt.setString(6, "1000-01-01");
-			pstmt.setString(7, "9999-12-31");
+			pstmt.setString(7, "1000-01-01");
+			pstmt.setString(8, "9999-12-31");
 		}
 	}
 
@@ -112,8 +115,8 @@ public class RoomDao {
 			pstmt = conn.prepareStatement("select " + COLUMNS + " from room" + WHERE
 					+ makeOrderBy(search.getSort()) + " limit ?, ?");
 			setSearch(pstmt, search);
-			pstmt.setInt(8, offset);
-			pstmt.setInt(9, count);
+			pstmt.setInt(9, offset);
+			pstmt.setInt(10, count);
 			rs = pstmt.executeQuery();
 			while (rs.next()) {
 				roomList.add(makeRoom(rs));
@@ -147,6 +150,15 @@ public class RoomDao {
 		return selectList(conn, search, 0, n);
 	}
 
+	// ★ 뷰 추천 : 그 전망의 객실 중 평점이 가장 높은 객실 1개 (없으면 null)
+	public Room selectBestByView(Connection conn, String viewType) throws SQLException {
+		RoomSearch search = new RoomSearch();
+		search.setViewType(viewType);
+		search.setSort("rating");
+		List<Room> list = selectList(conn, search, 0, 1);
+		return list.size() == 0 ? null : list.get(0);
+	}
+
 	// 관리자 객실 목록용 (조건 없이 전부)
 	public List<Room> selectAll(Connection conn) throws SQLException {
 		return selectList(conn, new RoomSearch(), 0, 1000);
@@ -175,8 +187,8 @@ public class RoomDao {
 		try {
 			pstmt = conn.prepareStatement(
 					"insert into room (roomType, roomNo, price, discountRate, capacity, bedCount,"
-					+ " breakfast, pet, amenities, description, photo, photoType, baseGuests, extraPrice, roomSize)"
-					+ " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+					+ " breakfast, pet, amenities, description, photo, photoType, baseGuests, extraPrice, roomSize, viewType)"
+					+ " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			pstmt.setString(1, room.getRoomType());
 			pstmt.setString(2, room.getRoomNo());
 			pstmt.setInt(3, room.getPrice());
@@ -192,6 +204,7 @@ public class RoomDao {
 			pstmt.setInt(13, room.getBaseGuests());
 			pstmt.setInt(14, room.getExtraPrice());
 			pstmt.setInt(15, room.getRoomSize());
+			pstmt.setString(16, room.getViewType());
 			pstmt.executeUpdate();
 		} finally {
 			JdbcUtil.close(pstmt);
@@ -204,7 +217,7 @@ public class RoomDao {
 		try {
 			pstmt = conn.prepareStatement(
 					"update room set roomType=?, roomNo=?, price=?, discountRate=?, capacity=?, bedCount=?,"
-					+ " breakfast=?, pet=?, amenities=?, description=?, baseGuests=?, extraPrice=?, roomSize=? where roomId=?");
+					+ " breakfast=?, pet=?, amenities=?, description=?, baseGuests=?, extraPrice=?, roomSize=?, viewType=? where roomId=?");
 			pstmt.setString(1, room.getRoomType());
 			pstmt.setString(2, room.getRoomNo());
 			pstmt.setInt(3, room.getPrice());
@@ -218,7 +231,8 @@ public class RoomDao {
 			pstmt.setInt(11, room.getBaseGuests());
 			pstmt.setInt(12, room.getExtraPrice());
 			pstmt.setInt(13, room.getRoomSize());
-			pstmt.setInt(14, room.getRoomId());
+			pstmt.setString(14, room.getViewType());
+			pstmt.setInt(15, room.getRoomId());
 			pstmt.executeUpdate();
 		} finally {
 			JdbcUtil.close(pstmt);
