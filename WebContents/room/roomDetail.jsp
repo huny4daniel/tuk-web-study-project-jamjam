@@ -100,7 +100,7 @@
 					</c:if>
 				</div>
 
-				<form name="rf" action="../reserve/reserve.jsp" method="post" onsubmit="return checkForm(this)">
+				<form name="rf" action="../reserve/payForm.jsp" method="get" onsubmit="return checkForm(this)">
 					<input type="hidden" name="roomId" value="${room.roomId}">
 					<div class="dates">
 						<p><label>체크인</label><input type="date" name="checkIn" value="${param.checkIn}" onchange="calc(); drawCalendar();"></p>
@@ -109,19 +109,12 @@
 					<p><label>인원 (최대 ${room.capacity}명)</label>
 						<input type="number" name="guests" min="1" max="${room.capacity}" value="${empty param.guests ? 1 : param.guests}" onchange="calc()">
 					</p>
-					<p><label>쿠폰 번호 (선택)</label><input type="text" name="couponCode" placeholder="예) WELCOME10"></p>
-					<p><label>결제 방법</label>
-						<select name="payMethod">
-							<option>현장결제</option>
-							<option>계좌이체</option>
-							<option>카드결제</option>
-						</select>
-					</p>
 					<div class="estimate" id="estimate">날짜를 선택하면 예상 금액이 표시됩니다.</div>
 					<% if (loginId == null) { %>
 						<a class="btn btn-gold btn-block" href="<%= ctx %>/member/loginForm.jsp">로그인 후 예약하기</a>
 					<% } else { %>
 						<input type="submit" class="btn btn-gold btn-block" value="예약하기">
+						<p class="muted" style="text-align:center; margin:10px 0 0 0;">다음 화면에서 쿠폰과 결제 방법을 선택합니다</p>
 					<% } %>
 				</form>
 			</div>
@@ -278,7 +271,7 @@
 			alert("인원은 1명 ~ " + capacity + "명까지 가능합니다.");
 			return false;
 		}
-		return confirm("예약하시겠습니까?");
+		return true;
 	}
 	calc();   // 목록에서 날짜를 가지고 왔으면 바로 계산
 	drawCalendar();

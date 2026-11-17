@@ -45,7 +45,7 @@
 			</c:if>
 			<c:forEach var="res" items="${resList}">
 				<tr>
-					<td>${res.resId}</td>
+					<td><a href="../reserve/resDetail.jsp?resId=${res.resId}" title="예약 확인서 보기"><b>${res.resId}</b> <span class="muted">확인서</span></a></td>
 					<td><a href="../room/roomDetail.jsp?roomId=${res.roomId}"><b>${res.roomType}</b> ${res.roomNo}</a></td>
 					<td>${res.checkIn} ~ ${res.checkOut}</td>
 					<td>${res.guests}명</td>

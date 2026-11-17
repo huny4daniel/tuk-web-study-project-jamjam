@@ -17,6 +17,12 @@
 3. **실행** : 프로젝트 우클릭 → Run As → Run on Server (Tomcat v9.0)
 4. 브라우저 주소 : `http://localhost:8080/hotel/`
 
+**이클립스 없이 배포 (`deploy.bat`)** : 프로젝트 폴더의 `deploy.bat` 을 더블클릭하면
+자바 컴파일 → `hotel.war` 생성 → 실행 중인 Tomcat 종료 → `webapps` 에 war 복사 → Tomcat 시작 까지 한 번에 합니다.
+- JDK(`javac`, `jar`)와 독립 Tomcat 9 가 필요합니다. 경로는 환경 변수 `JAVA_HOME`, `CATALINA_HOME` 을 쓰고, `CATALINA_HOME` 이 없으면 bat 위쪽의 기본 경로를 씁니다.
+- 이클립스에서 같은 8080 포트로 서버를 띄워 놓았다면 먼저 끄고 실행하세요.
+- 작업 파일은 `build/deploy/` 에 생깁니다 (git 에 올라가지 않음).
+
 | 테스트 계정 | 아이디 / 비밀번호 | 비고 |
 |---|---|---|
 | 관리자 | admin / 1234 | 로그인하면 관리자 화면으로 이동 |
@@ -51,7 +57,7 @@ hotel/
     ├─ index.jsp                 메인
     ├─ member/                   회원가입, 아이디 중복확인, 로그인/로그아웃, 정보 수정
     ├─ room/                     객실 목록(검색·필터·정렬·페이징), 객실 상세
-    ├─ reserve/                  예약 처리, 예약 취소
+    ├─ reserve/                  결제 화면(payForm), 예약 처리, 예약 확인서(resDetail), 예약 취소
     ├─ mypage/                   마이페이지 (내 예약, 내 리뷰)
     ├─ review/                   리뷰 쓰기 폼 / 등록 처리
     ├─ qna/                      1:1 문의 목록·작성 / 등록 처리
@@ -102,7 +108,7 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 |---|---|---|
 | member | 회원 | userId (admin 이면 관리자) |
 | room | 객실 | roomType, roomNo, roomSize(평, 화면에는 ㎡ 도 같이 표시), price, discountRate(객실 할인율), capacity(최대 인원), baseGuests(기준 인원), extraPrice(1인 추가 요금), bedCount, breakfast, pet, amenities, photo(LONGBLOB), photoType, **avgRating, reviewCount, resCount**(수업 freq 처럼 update 로 갱신) |
-| reservation | 예약 | roomId, **roomType, roomNo**(예약할 때 같이 저장 → join 불필요), userId, checkIn, checkOut, totalPrice, couponCode, payMethod, status('예약완료'/'취소'), **reviewed**(리뷰 썼으면 1) |
+| reservation | 예약 | roomId, **roomType, roomNo**(예약할 때 같이 저장 → join 불필요), userId, checkIn, checkOut, totalPrice, couponCode, payMethod, payDetail(카드사·할부, 입금자명 등), status('예약완료'/'취소'), **reviewed**(리뷰 썼으면 1) |
 | review | 리뷰 | resId(예약 1건당 1개), roomId, roomType, rating(1~5), content |
 | coupon | 쿠폰 | couponCode, discountRate, startDate ~ endDate |
 | qna | 1:1 문의 | title, content, answer(NULL 이면 답변 대기) |
@@ -121,7 +127,7 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 | 예약 현황 달력 | room/roomDetail.jsp, ReservationDao.selectBookedByRoom() | 객실의 앞으로의 예약을 JS 배열로 넘겨 두 달 달력을 그림. 예약된 밤은 줄 긋기, 날짜를 누르면 체크인 → 체크아웃 순서로 예약 폼에 들어감 |
 | 페이징 | RoomDao.getRoomList(), RoomListView | 수업 catalogPaging 과 같은 `limit ?, ?` 방식 |
 | 4) 정렬 | RoomDao.makeOrderBy() | 가격 / 평점 / 인기(예약 수) 컬럼으로 order by. 예약 수는 `updateResCount()`(수업 updateFreq 와 같음), 평점은 `addRating()` 으로 갱신 |
-| 5) 예약 + 중복 방지 | reserve/reserve.jsp, ReservationDao.countOverlap() | 겹치는 조건 : `기존 체크인 < 새 체크아웃 AND 기존 체크아웃 > 새 체크인`. 같은 날 체크아웃·체크인은 허용 |
+| 5) 예약 + 중복 방지 | reserve/payForm.jsp → reserve.jsp → resDetail.jsp, inc/reserveCheck.jsp, ReservationDao.countOverlap() | 결제 화면과 처리 페이지가 같은 검사·금액 계산 조각(reserveCheck)을 include → 화면 금액과 저장 금액이 항상 같고, 처리 페이지에서 한 번 더 검사. 모의 결제(카드사·할부 / 계좌이체 입금자 / 현장결제)와 취소 규정 동의.  겹치는 조건 : `기존 체크인 < 새 체크아웃 AND 기존 체크아웃 > 새 체크인`. 같은 날 체크아웃·체크인은 허용 |
 | 예약 취소 | reserve/cancel.jsp (이용자), admin/reservation/resCancel.jsp (관리자) | 이용자는 체크인 전까지만 취소 가능 |
 | 6) 할인 | 객실 할인율(room.discountRate) + 기간 쿠폰(coupon) | 금액 = 1박 요금 × 박 수 × (100 − 쿠폰 할인율) / 100 |
 | 인원별 요금 | Room.getNightPrice(), reserve/reserve.jsp, roomDetail.jsp 의 nightPrice() | 1박 요금 = 객실 할인가 + (인원 − 기준 인원, 0 미만이면 0) × 1인 추가 요금 |

@@ -75,6 +75,7 @@ CREATE TABLE reservation (
 	totalPrice    INT          NOT NULL,
 	couponCode    VARCHAR(30),
 	payMethod     VARCHAR(20)  NOT NULL,          -- 현장결제 / 계좌이체 / 카드결제
+	payDetail     VARCHAR(100),                   -- 결제 상세 (카드사 / 할부, 입금자명 ...) 예약 확인서에 표시
 	status        VARCHAR(10)  NOT NULL DEFAULT '예약완료',
 	reviewed      TINYINT      NOT NULL DEFAULT 0,-- 리뷰를 썼으면 1
 	resDate       DATETIME     NOT NULL,

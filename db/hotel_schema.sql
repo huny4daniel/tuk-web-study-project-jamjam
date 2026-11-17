@@ -79,6 +79,7 @@ CREATE TABLE `reservation` (
   `totalPrice` int(11) NOT NULL,
   `couponCode` varchar(30) DEFAULT NULL,
   `payMethod` varchar(20) NOT NULL,
+  `payDetail` varchar(100) DEFAULT NULL,
   `status` varchar(10) NOT NULL DEFAULT '예약완료',
   `reviewed` tinyint(4) NOT NULL DEFAULT 0,
   `resDate` datetime NOT NULL,

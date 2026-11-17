@@ -24,6 +24,7 @@ public class ReservationDao {
 		res.setTotalPrice(rs.getInt("totalPrice"));
 		res.setCouponCode(rs.getString("couponCode"));
 		res.setPayMethod(rs.getString("payMethod"));
+		res.setPayDetail(rs.getString("payDetail"));
 		res.setStatus(rs.getString("status"));
 		res.setReviewed(rs.getInt("reviewed") == 1);
 		res.setResDate(rs.getTimestamp("resDate"));
@@ -35,8 +36,8 @@ public class ReservationDao {
 		try {
 			pstmt = conn.prepareStatement(
 					"insert into reservation (userId, roomId, roomType, roomNo, checkIn, checkOut, guests,"
-					+ " totalPrice, couponCode, payMethod, status, reviewed, resDate)"
-					+ " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '예약완료', 0, now())");
+					+ " totalPrice, couponCode, payMethod, payDetail, status, reviewed, resDate)"
+					+ " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '예약완료', 0, now())");
 			pstmt.setString(1, res.getUserId());
 			pstmt.setInt(2, res.getRoomId());
 			pstmt.setString(3, res.getRoomType());
@@ -47,6 +48,7 @@ public class ReservationDao {
 			pstmt.setInt(8, res.getTotalPrice());
 			pstmt.setString(9, res.getCouponCode());
 			pstmt.setString(10, res.getPayMethod());
+			pstmt.setString(11, res.getPayDetail());
 			pstmt.executeUpdate();
 		} finally {
 			JdbcUtil.close(pstmt);
@@ -129,6 +131,13 @@ public class ReservationDao {
 			JdbcUtil.close(pstmt);
 		}
 		return res;
+	}
+
+	// 방금 예약한 건 : 그 회원의 예약 중 예약번호가 가장 큰 것 (예약 직후 확인서로 보내려고)
+	public Reservation selectLatestByUser(Connection conn, String userId) throws SQLException {
+		List<Reservation> list = selectList(conn,
+				"select * from reservation where userId = ? order by resId desc limit 1", userId, null);
+		return list.size() == 0 ? null : list.get(0);
 	}
 
 	// 마이페이지 : 내 예약 목록 (최근 체크인 순)

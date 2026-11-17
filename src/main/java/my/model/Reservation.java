@@ -16,6 +16,7 @@ public class Reservation {
 	private int totalPrice;
 	private String couponCode;
 	private String payMethod;
+	private String payDetail;   // 결제 상세 (예 : "신한카드 / 일시불")
 	private String status;      // '예약완료' 또는 '취소'
 	private boolean reviewed;   // 리뷰를 썼으면 true
 	private Date resDate;
@@ -117,6 +118,12 @@ public class Reservation {
 	}
 	public void setPayMethod(String payMethod) {
 		this.payMethod = payMethod;
+	}
+	public String getPayDetail() {
+		return payDetail;
+	}
+	public void setPayDetail(String payDetail) {
+		this.payDetail = payDetail;
 	}
 	public String getStatus() {
 		return status;
