@@ -58,6 +58,9 @@
 			resDao.insert(conn, res);
 			new RoomDao().updateResCount(conn, roomId, 1);   // 객실 예약 수 +1 (인기순 정렬용)
 			newResId = resDao.selectLatestByUser(conn, loginId).getResId();   // 방금 저장한 예약 번호
+			if (coupon != null) {
+				new MemberCouponDao().markUsed(conn, coupon.getMcId(), newResId);   // 쿠폰함의 쿠폰을 사용 완료로
+			}
 		} finally {
 			JdbcUtil.close(conn);
 		}

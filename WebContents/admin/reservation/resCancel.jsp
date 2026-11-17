@@ -11,6 +11,7 @@
 		if (res != null && res.getStatus().equals("예약완료")) {
 			dao.updateStatus(conn, resId, "취소");
 			new RoomDao().updateResCount(conn, res.getRoomId(), -1);   // 객실 예약 수 -1
+			new MemberCouponDao().restoreByRes(conn, resId);            // 이 예약에 쓴 쿠폰 돌려주기
 		}
 	} finally {
 		JdbcUtil.close(conn);

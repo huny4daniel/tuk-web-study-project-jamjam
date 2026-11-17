@@ -18,6 +18,7 @@
 	<h2 class="page-title">1:1 문의</h2>
 	<div class="tabs">
 		<a href="../mypage/myPage.jsp">예약 · 리뷰</a>
+		<a href="../mypage/coupon.jsp">쿠폰함</a>
 		<a class="on" href="qnaList.jsp">1:1 문의</a>
 		<a href="../member/memberUpdateForm.jsp">회원 정보 수정</a>
 	</div>

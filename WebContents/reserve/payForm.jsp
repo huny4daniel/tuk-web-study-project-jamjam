@@ -6,7 +6,7 @@
 <%--
 	결제 상세 화면 (객실 상세의 [예약하기] → 여기 → [결제하기] → reserve.jsp)
 	검사와 금액 계산은 inc/reserveCheck.jsp 에서 하고, 여기서는 결과를 보여주기만 한다.
-	쿠폰 [적용] 은 같은 주소에 couponCode 만 붙여서 다시 여는 방식 (GET)
+	쿠폰은 쿠폰함(디지털 쿠폰)에서 고른다 : 고르면 같은 주소에 mcId 를 붙여서 다시 여는 방식 (GET) → 금액은 서버에서 다시 계산
 	※ 실제 결제사(PG) 연동이 없는 모의 결제 : 카드번호 같은 정보는 받지 않는다.
 --%>
 <%
@@ -32,6 +32,7 @@
 <c:set var="room" value="<%= room %>"/>
 <c:set var="member" value="<%= member %>"/>
 <c:set var="coupon" value="<%= coupon %>"/>
+<c:set var="usableCoupons" value="<%= usableCoupons %>"/>
 <c:set var="nights" value="<%= nights %>"/>
 <c:set var="nightPrice" value="<%= nightPrice %>"/>
 <c:set var="roomTotal" value="<%= roomTotal %>"/>
@@ -50,7 +51,7 @@
 		<input type="hidden" name="checkIn" value="${param.checkIn}">
 		<input type="hidden" name="checkOut" value="${param.checkOut}">
 		<input type="hidden" name="guests" value="${param.guests}">
-		<input type="hidden" name="couponCode" value="${coupon.couponCode}">
+		<input type="hidden" name="mcId" value="${coupon.mcId}">
 
 		<div class="pay-layout">
 			<!-- 왼쪽 : 예약 내용, 예약자, 결제 수단, 동의 -->
@@ -159,14 +160,15 @@
 						<tr class="total"><td>총 결제 금액</td><td><fmt:formatNumber value="${payTotal}" pattern="#,###"/>원</td></tr>
 					</table>
 
-					<!-- 쿠폰 적용 : 같은 화면을 쿠폰 번호를 붙여서 다시 연다 -->
-					<div class="coupon-row">
-						<input type="text" id="couponInput" placeholder="쿠폰 번호" value="${coupon.couponCode}">
-						<button type="button" class="btn btn-line" onclick="applyCoupon()">적용</button>
-					</div>
-					<c:if test="${coupon != null}">
-						<p class="muted"><a href="javascript:applyCouponCode('')">쿠폰 적용 취소</a></p>
-					</c:if>
+					<!-- 쿠폰 고르기 : 내 쿠폰함에서 지금 쓸 수 있는 쿠폰만 나온다. 고르면 같은 화면을 다시 열어 금액 계산 -->
+					<label class="muted">쿠폰 (내 쿠폰함 ${usableCoupons.size()}장)</label>
+					<select id="couponSelect" class="coupon-select" onchange="applyCoupon(this.value)">
+						<option value="">쿠폰 사용 안 함</option>
+						<c:forEach var="mc" items="${usableCoupons}">
+							<option value="${mc.mcId}" ${mc.mcId == coupon.mcId ? 'selected' : ''}><c:out value="${mc.couponName}"/> (${mc.discountRate}%, ~${mc.endDate})</option>
+						</c:forEach>
+					</select>
+					<p class="muted" style="margin-top:6px;"><a href="<%= ctx %>/mypage/coupon.jsp">쿠폰함에서 쿠폰 받기 →</a></p>
 
 					<input type="submit" class="btn btn-gold btn-block" value="<fmt:formatNumber value='${payTotal}' pattern='#,###'/>원 결제하기">
 				</div>
@@ -184,14 +186,11 @@
 		}
 	}
 
-	// 쿠폰 번호를 붙여서 이 화면을 다시 연다 (금액은 서버에서 다시 계산)
-	function applyCouponCode(code) {
+	// 고른 쿠폰 번호(mcId)를 붙여서 이 화면을 다시 연다 (금액은 서버에서 다시 계산)
+	function applyCoupon(mcId) {
 		var f = document.pf;
 		location.href = "payForm.jsp?roomId=" + f.roomId.value + "&checkIn=" + f.checkIn.value + "&checkOut=" + f.checkOut.value
-				+ "&guests=" + f.guests.value + "&couponCode=" + encodeURIComponent(code);
-	}
-	function applyCoupon() {
-		applyCouponCode(document.getElementById("couponInput").value.trim());
+				+ "&guests=" + f.guests.value + "&mcId=" + mcId;
 	}
 
 	// 요청사항 버튼 : 이미 들어 있지 않으면 글 끝에 덧붙인다

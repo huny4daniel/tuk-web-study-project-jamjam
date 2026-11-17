@@ -17,6 +17,7 @@ public class CouponDao {
 		coupon.setDiscountRate(rs.getInt("discountRate"));
 		coupon.setStartDate(rs.getString("startDate"));
 		coupon.setEndDate(rs.getString("endDate"));
+		coupon.setIssueType(rs.getString("issueType"));
 		return coupon;
 	}
 
@@ -26,6 +27,25 @@ public class CouponDao {
 		List<Coupon> list = new ArrayList<Coupon>();
 		try {
 			pstmt = conn.prepareStatement("select * from coupon order by endDate desc");
+			rs = pstmt.executeQuery();
+			while (rs.next()) {
+				list.add(makeCoupon(rs));
+			}
+		} finally {
+			JdbcUtil.close(rs);
+			JdbcUtil.close(pstmt);
+		}
+		return list;
+	}
+
+	// 받는 방법별 쿠폰 중 기간이 끝나지 않은 것 (회원가입 자동 지급, 쿠폰함 다운로드 목록)
+	public List<Coupon> selectByIssueType(Connection conn, String issueType) throws SQLException {
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		List<Coupon> list = new ArrayList<Coupon>();
+		try {
+			pstmt = conn.prepareStatement("select * from coupon where issueType = ? and endDate >= curdate() order by endDate");
+			pstmt.setString(1, issueType);
 			rs = pstmt.executeQuery();
 			while (rs.next()) {
 				list.add(makeCoupon(rs));
@@ -60,12 +80,14 @@ public class CouponDao {
 	public void insert(Connection conn, Coupon coupon) throws SQLException {
 		PreparedStatement pstmt = null;
 		try {
-			pstmt = conn.prepareStatement("insert into coupon values (?, ?, ?, ?, ?)");
+			pstmt = conn.prepareStatement(
+					"insert into coupon (couponCode, couponName, discountRate, startDate, endDate, issueType) values (?, ?, ?, ?, ?, ?)");
 			pstmt.setString(1, coupon.getCouponCode());
 			pstmt.setString(2, coupon.getCouponName());
 			pstmt.setInt(3, coupon.getDiscountRate());
 			pstmt.setString(4, coupon.getStartDate());
 			pstmt.setString(5, coupon.getEndDate());
+			pstmt.setString(6, coupon.getIssueType());
 			pstmt.executeUpdate();
 		} finally {
 			JdbcUtil.close(pstmt);

@@ -8,6 +8,10 @@ public class Coupon {
 	// 날짜는 'yyyy-MM-dd' 문자열로 다룸
 	private String startDate;
 	private String endDate;
+	// 받는 방법 : '가입축하'(회원가입 때 자동 지급) / '다운로드'(쿠폰함에서 직접 받기) / '관리자지급'
+	private String issueType;
+	// 관리자 화면용 : 이 쿠폰을 받은 회원 수 (테이블 컬럼 아님)
+	private int issuedCount;
 
 	public String getCouponCode() {
 		return couponCode;
@@ -38,5 +42,17 @@ public class Coupon {
 	}
 	public void setEndDate(String endDate) {
 		this.endDate = endDate;
+	}
+	public String getIssueType() {
+		return issueType;
+	}
+	public void setIssueType(String issueType) {
+		this.issueType = issueType;
+	}
+	public int getIssuedCount() {
+		return issuedCount;
+	}
+	public void setIssuedCount(int issuedCount) {
+		this.issuedCount = issuedCount;
 	}
 }

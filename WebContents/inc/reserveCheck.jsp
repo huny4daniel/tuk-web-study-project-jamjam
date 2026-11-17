@@ -6,12 +6,13 @@
 	화면에서 이미 검사했어도 처리 페이지에서 한 번 더 검사하기 위해 두 곳 모두에서 include 한다.
 
 	이 조각이 만드는 변수 (include 한 페이지에서 바로 쓸 수 있음, 같은 이름의 변수를 또 만들면 안 됨)
-	  roomId, checkIn, checkOut, guests, couponCode  : 폼에서 받은 값
+	  roomId, checkIn, checkOut, guests, mcId  : 폼에서 받은 값 (mcId : 고른 쿠폰함 쿠폰 번호, 안 골랐으면 0)
 	  room        : 객실 정보
 	  nights      : 몇 박
 	  nightPrice  : 인원에 따른 1박 요금 (Room.getNightPrice)
 	  roomTotal   : 1박 요금 x 박 수 (쿠폰 적용 전)
-	  coupon      : 적용한 쿠폰 (없으면 null)
+	  coupon      : 적용한 쿠폰함 쿠폰 MemberCoupon (없으면 null)
+	  usableCoupons : 이 회원이 지금 쓸 수 있는 쿠폰 목록 (결제 화면 선택 칸용)
 	  payTotal    : 최종 결제 금액 = roomTotal x (100 - 쿠폰 할인율) / 100
 	  couponDiscount : 쿠폰으로 깎인 금액 (roomTotal - payTotal)
 	  checkError  : 문제가 있으면 오류 메시지, 없으면 null
@@ -21,12 +22,14 @@
 	String checkIn = request.getParameter("checkIn");
 	String checkOut = request.getParameter("checkOut");
 	int guests = Integer.parseInt(request.getParameter("guests"));
-	String couponCode = request.getParameter("couponCode") == null ? "" : request.getParameter("couponCode").trim().toUpperCase();
+	String mcIdStr = request.getParameter("mcId");
+	int mcId = (mcIdStr == null || mcIdStr.equals("")) ? 0 : Integer.parseInt(mcIdStr);
 
 	Room room = null;
 	long nights = 0;
 	int nightPrice = 0, roomTotal = 0, payTotal = 0, couponDiscount = 0;
-	Coupon coupon = null;
+	MemberCoupon coupon = null;
+	java.util.List<MemberCoupon> usableCoupons = null;
 	String checkError = null;
 
 	Connection checkConn = ConnectionProvider.getConnection();
@@ -52,11 +55,14 @@
 			checkError = "선택한 기간에 이미 예약이 있습니다. 다른 날짜를 선택해 주세요.";
 		}
 
-		// ③ 쿠폰 확인 (입력한 경우에만)
-		if (checkError == null && !couponCode.equals("")) {
-			coupon = new CouponDao().selectValid(checkConn, couponCode);
-			if (coupon == null) {
-				checkError = "사용할 수 없는 쿠폰입니다. (번호 오류 또는 사용 기간 아님)";
+		// ③ 쿠폰 확인 (고른 경우에만) : 내 쿠폰함의 쿠폰이고, 안 썼고, 오늘이 사용 기간 안이어야 함
+		MemberCouponDao mcDao = new MemberCouponDao();
+		usableCoupons = mcDao.selectUsable(checkConn, (String) session.getAttribute("LOGIN"));
+		if (checkError == null && mcId != 0) {
+			coupon = mcDao.selectById(checkConn, mcId);
+			if (coupon == null || !coupon.getUserId().equals(session.getAttribute("LOGIN")) || !coupon.isUsable()) {
+				checkError = "사용할 수 없는 쿠폰입니다. (이미 썼거나 사용 기간이 아님)";
+				coupon = null;
 			}
 		}
 

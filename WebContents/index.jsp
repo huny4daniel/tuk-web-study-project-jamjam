@@ -139,7 +139,7 @@
 			<div class="item">
 				<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="8" width="22" height="13"/><path d="M3 13h22M9 8v13"/></svg>
 				<h3>회원 전용 혜택</h3>
-				<p>신규 회원은 <b>WELCOME10</b> 쿠폰으로 10% 할인을 받을 수 있습니다. 예약할 때 쿠폰 번호를 입력하세요.</p>
+				<p>회원가입하면 10% 할인 쿠폰이 쿠폰함에 바로 들어옵니다. 쿠폰 번호 입력 없이 결제 화면에서 골라 쓰세요.</p>
 			</div>
 		</div>
 		<p class="links">

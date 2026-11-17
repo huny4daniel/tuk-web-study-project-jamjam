@@ -271,6 +271,15 @@ textarea.sql, .ai-log code { font-family: Consolas, "D2Coding", monospace; font-
 .chat-fab svg { width: 20px; height: 20px; }
 .chat-fab:hover { background: var(--glass-hover); }
 @media print { .chat-fab { display: none; } }
+/* 쿠폰함 (mypage/coupon.jsp) : 쿠폰 한 장을 티켓처럼 */
+.coupons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.coupon { display: flex; align-items: center; gap: 18px; border: 1px solid var(--line); border-left: 3px solid var(--glass); padding: 16px 18px; background: var(--panel-2); }
+.coupon .rate { font-size: 28px; font-weight: 700; color: var(--glass); min-width: 64px; }
+.coupon .rate small { font-size: 14px; }
+.coupon .info { flex: 1; display: flex; flex-direction: column; }
+.coupon.off { opacity: 0.45; border-left-color: var(--line); }
+.coupon-select { width: 100%; margin: 4px 0 0 0; }
+@media (max-width: 640px) { .coupons { grid-template-columns: 1fr; } }
 /* 회원 탈퇴 안내 */
 ul.notice { margin: 0 0 20px 0; padding-left: 18px; color: var(--soft); font-size: 14px; }
 .warn { color: var(--danger); }

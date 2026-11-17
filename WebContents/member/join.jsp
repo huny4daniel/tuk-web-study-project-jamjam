@@ -18,9 +18,14 @@
 <%
 		} else {
 			dao.insert(conn, member);
+			// 가입축하 쿠폰을 쿠폰함에 자동으로 넣어 준다
+			MemberCouponDao mcDao = new MemberCouponDao();
+			for (Coupon c : new CouponDao().selectByIssueType(conn, "가입축하")) {
+				mcDao.issue(conn, member.getUserId(), c);
+			}
 %>
 			<script>
-				alert("회원가입이 완료되었습니다. 로그인해 주세요.");
+				alert("회원가입이 완료되었습니다. 가입 축하 쿠폰이 쿠폰함에 들어 있습니다. 로그인해 주세요.");
 				location.href = "loginForm.jsp";
 			</script>
 <%

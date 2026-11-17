@@ -1,6 +1,6 @@
 -- =========================================================
 --  호텔 잠잠 DB 구조 (테이블만, 데이터 없음)
---  다른 서버에서 이 파일 하나만 실행하면 hotel 데이터베이스와 빈 테이블 8개가 만들어집니다.
+--  다른 서버에서 이 파일 하나만 실행하면 hotel 데이터베이스와 빈 테이블 9개가 만들어집니다.
 --  HeidiSQL : 파일 열기 → 전체 실행(F9)
 --  명령줄   : mysql -uroot -p < hotel_schema.sql
 --
@@ -33,6 +33,7 @@ CREATE TABLE `coupon` (
   `discountRate` int(11) NOT NULL,
   `startDate` date NOT NULL,
   `endDate` date NOT NULL,
+  `issueType` varchar(10) NOT NULL DEFAULT '다운로드',
   PRIMARY KEY (`couponCode`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -54,6 +55,23 @@ CREATE TABLE `translation` (
   `ko` varchar(700) NOT NULL,
   `en` text NOT NULL,
   PRIMARY KEY (`ko`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `member_coupon`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `member_coupon` (
+  `mcId` int(11) NOT NULL AUTO_INCREMENT,
+  `userId` varchar(50) NOT NULL,
+  `couponCode` varchar(30) NOT NULL,
+  `couponName` varchar(100) NOT NULL,
+  `discountRate` int(11) NOT NULL,
+  `startDate` date NOT NULL,
+  `endDate` date NOT NULL,
+  `used` tinyint(4) NOT NULL DEFAULT 0,
+  `usedResId` int(11) NOT NULL DEFAULT 0,
+  `issueDate` datetime NOT NULL,
+  PRIMARY KEY (`mcId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `member`;
