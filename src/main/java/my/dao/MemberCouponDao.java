@@ -45,10 +45,10 @@ public class MemberCouponDao {
 		return list;
 	}
 
-	// 쿠폰함 : 내 쿠폰 전부 (안 쓴 것 → 기간이 남은 것 → 기간 끝나는 순)
-	//   (endDate < curdate()) 는 기간이 지났으면 1, 아니면 0 이라서 지난 쿠폰이 뒤로 간다
+	// 쿠폰함 : 내 쿠폰 전부 (안 쓴 것 → 지금 쓸 수 있는 것 → 기간 끝나는 순)
+	//   (endDate < curdate()) 는 기간이 지났으면 1 → 뒤로, (startDate > curdate()) 는 아직 시작 전이면 1 → 지금 쓸 수 있는 쿠폰 뒤로
 	public List<MemberCoupon> selectByUser(Connection conn, String userId) throws SQLException {
-		return selectList(conn, "select * from member_coupon where userId = ? order by used, (endDate < curdate()), endDate", userId);
+		return selectList(conn, "select * from member_coupon where userId = ? order by used, (endDate < curdate()), (startDate > curdate()), endDate", userId);
 	}
 
 	// 결제 화면 : 지금 쓸 수 있는 내 쿠폰 (안 썼고 오늘이 사용 기간 안)
