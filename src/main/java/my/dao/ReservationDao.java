@@ -75,6 +75,44 @@ public class ReservationDao {
 		}
 	}
 
+	// 예약 목록 조회 공통 : SQL 과 ? 에 넣을 값 2개(두 번째가 필요 없으면 null)를 받아서 리스트로
+	//   (QnaDao.selectBySql 과 같은 방식)
+	private List<Reservation> selectList(Connection conn, String sql, String param1, String param2) throws SQLException {
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		List<Reservation> list = new ArrayList<Reservation>();
+		try {
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, param1);
+			if (param2 != null) {
+				pstmt.setString(2, param2);
+			}
+			rs = pstmt.executeQuery();
+			while (rs.next()) {
+				list.add(makeReservation(rs));
+			}
+		} finally {
+			JdbcUtil.close(rs);
+			JdbcUtil.close(pstmt);
+		}
+		return list;
+	}
+
+	// ★ SOLD OUT 표시용 : 검색한 기간과 겹치는 '예약완료' 예약 전부 (모든 객실)
+	//   겹치는 조건은 countOverlap 과 같다. roomList.jsp 에서 객실마다 마감 기간을 붙이는 데 쓴다.
+	public List<Reservation> selectOverlap(Connection conn, String checkIn, String checkOut) throws SQLException {
+		return selectList(conn,
+				"select * from reservation where status = '예약완료' and checkIn < ? and checkOut > ? order by checkIn",
+				checkOut, checkIn);
+	}
+
+	// ★ 달력 표시용 : 한 객실의 앞으로 남은 '예약완료' 예약 (체크아웃이 오늘 이후)
+	public List<Reservation> selectBookedByRoom(Connection conn, int roomId) throws SQLException {
+		return selectList(conn,
+				"select * from reservation where roomId = ? and status = '예약완료' and checkOut > curdate() order by checkIn",
+				String.valueOf(roomId), null);
+	}
+
 	public Reservation selectById(Connection conn, int resId) throws SQLException {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;

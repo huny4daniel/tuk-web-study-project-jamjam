@@ -48,7 +48,8 @@ public class RoomDao {
 	//     조식      breakfast >= ?   (체크하면 1 -> 조식 있는 객실만, 안 하면 0 -> 전부)
 	//     반려동물  pet       >= ?   (위와 같음)
 	//     편의시설  amenities like ? ('%욕조%', 안 고르면 '%%' -> 전부)
-	//     날짜      그 기간에 예약이 있는 객실은 not in 으로 제외
+	//     날짜      [예약 가능한 객실만] 을 체크했을 때만 그 기간에 예약이 있는 객실을 not in 으로 제외
+	//               (체크 안 하면 예약된 객실도 목록에 나오고 화면에서 SOLD OUT 으로 표시)
 	//               겹치는 조건 : 기존 체크인 < 새 체크아웃 그리고 기존 체크아웃 > 새 체크인
 	// ------------------------------------------------------------
 	private static final String WHERE =
@@ -63,7 +64,7 @@ public class RoomDao {
 		pstmt.setInt(3, "1".equals(search.getBreakfast()) ? 1 : 0);
 		pstmt.setInt(4, "1".equals(search.getPet()) ? 1 : 0);
 		pstmt.setString(5, "%" + (search.getAmenity() == null ? "" : search.getAmenity()) + "%");
-		if (RoomSearch.has(search.getCheckIn()) && RoomSearch.has(search.getCheckOut())) {
+		if (search.isDateSelected() && "1".equals(search.getAvailable())) {
 			pstmt.setString(6, search.getCheckOut());
 			pstmt.setString(7, search.getCheckIn());
 		} else {

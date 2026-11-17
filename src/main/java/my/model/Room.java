@@ -19,6 +19,9 @@ public class Room {
 	private double avgRating;
 	private int reviewCount;
 	private int resCount;
+	// 검색한 기간에 이미 예약된 기간들 (예 : "11-20 ~ 11-22") : 비어 있으면 예약 가능
+	// 테이블 컬럼이 아니라 roomList.jsp 에서 addBooked() 로 채우는 화면용 값
+	private String bookedText = "";
 
 	public int getRoomId() {
 		return roomId;
@@ -115,6 +118,21 @@ public class Room {
 	}
 	public void setResCount(int resCount) {
 		this.resCount = resCount;
+	}
+
+	// 검색 기간과 겹치는 예약 기간 하나 추가 ('yyyy-MM-dd' 에서 앞의 연도는 빼고 'MM-dd' 만)
+	public void addBooked(String checkIn, String checkOut) {
+		if (!bookedText.equals("")) {
+			bookedText += ", ";
+		}
+		bookedText += checkIn.substring(5) + " ~ " + checkOut.substring(5);
+	}
+	public String getBookedText() {
+		return bookedText;
+	}
+	// 검색 기간에 예약이 있어서 예약할 수 없나? (JSP 에서 ${room.soldOut})
+	public boolean isSoldOut() {
+		return !bookedText.equals("");
 	}
 
 	// 할인이 적용된 1박 가격 (JSP에서 ${room.salePrice} 로 사용)

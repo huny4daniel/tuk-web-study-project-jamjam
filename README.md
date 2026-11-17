@@ -117,6 +117,8 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 | 2) 객실 관리 | admin/room/roomList, roomForm, roomSave, roomDelete | 등록·수정 폼 하나를 같이 씀. 사진은 cos.jar 로 받아 byte 배열로 읽어서 **DB에 저장** |
 | 객실 사진 출력 | room/photo.jsp, RoomDao.selectPhoto() | `<img src=".../room/photo.jsp?roomId=3">` → DB 의 사진 바이트를 이미지로 그대로 내보냄 |
 | 3) 객실 조회·검색 | room/roomList.jsp, RoomDao.WHERE / setSearch() | ? 7개짜리 고정 SQL 하나. 조건을 안 고르면 항상 참이 되는 값을 넣음 (예: `breakfast >= 0`). 날짜를 넣으면 그 기간에 예약된 객실은 `not in` 으로 뺌 |
+| SOLD OUT 표시 | room/roomList.jsp, inc/roomCard.jsp, ReservationDao.selectOverlap(), Room.addBooked() | 날짜를 넣으면 그 기간과 겹치는 예약을 읽어 JSP for 문으로 같은 객실에 예약 기간을 붙임 → 카드에 SOLD OUT + 마감 기간. [예약 가능한 객실만] 을 체크하면 기존처럼 `not in` 으로 숨김 |
+| 예약 현황 달력 | room/roomDetail.jsp, ReservationDao.selectBookedByRoom() | 객실의 앞으로의 예약을 JS 배열로 넘겨 두 달 달력을 그림. 예약된 밤은 줄 긋기, 날짜를 누르면 체크인 → 체크아웃 순서로 예약 폼에 들어감 |
 | 페이징 | RoomDao.getRoomList(), RoomListView | 수업 catalogPaging 과 같은 `limit ?, ?` 방식 |
 | 4) 정렬 | RoomDao.makeOrderBy() | 가격 / 평점 / 인기(예약 수) 컬럼으로 order by. 예약 수는 `updateResCount()`(수업 updateFreq 와 같음), 평점은 `addRating()` 으로 갱신 |
 | 5) 예약 + 중복 방지 | reserve/reserve.jsp, ReservationDao.countOverlap() | 겹치는 조건 : `기존 체크인 < 새 체크아웃 AND 기존 체크아웃 > 새 체크인`. 같은 날 체크아웃·체크인은 허용 |

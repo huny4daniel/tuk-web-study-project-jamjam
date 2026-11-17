@@ -15,6 +15,7 @@ public class RoomSearch {
 	private String bedCount;  // 최소 침대 수
 	private String amenity;   // 편의시설 키워드 (욕조, 오션뷰 ...)
 	private String sort;      // 정렬 기준 (price, rating, popular)
+	private String available; // "1" 이면 예약 가능한 객실만 (아니면 마감 객실도 SOLD OUT 으로 보여줌)
 
 	// 값이 들어 있는지 확인하는 도우미
 	public static boolean has(String s) {
@@ -33,6 +34,7 @@ public class RoomSearch {
 		q += param("bedCount", bedCount);
 		q += param("amenity", amenity);
 		q += param("sort", sort);
+		q += param("available", available);
 		return q;
 	}
 
@@ -86,6 +88,16 @@ public class RoomSearch {
 	}
 	public void setAmenity(String amenity) {
 		this.amenity = amenity;
+	}
+	public String getAvailable() {
+		return available;
+	}
+	public void setAvailable(String available) {
+		this.available = available;
+	}
+	// 날짜(체크인, 체크아웃)를 둘 다 넣었나?
+	public boolean isDateSelected() {
+		return has(checkIn) && has(checkOut);
 	}
 	public String getSort() {
 		return sort;

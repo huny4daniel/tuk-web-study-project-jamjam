@@ -6,10 +6,16 @@
 	<c:forEach var="room" ...> 안에서 include 하면 ${room} 을 그대로 쓸 수 있다.
 	(조각 파일이라 ctx 변수 대신 ${pageContext.request.contextPath} 로 /hotel 같은 주소 앞부분을 씀)
 	상세 페이지로 갈 때 검색한 날짜/인원(param)도 같이 넘겨서 예약 폼에 미리 채워지게 함
+	검색 기간에 예약이 있는 객실(room.soldOut)은 사진 위에 SOLD OUT 과 예약된 기간을 표시
 --%>
-<div class="card">
+<div class="card ${room.soldOut ? 'sold' : ''}">
 	<a href="${pageContext.request.contextPath}/room/roomDetail.jsp?roomId=${room.roomId}&checkIn=${param.checkIn}&checkOut=${param.checkOut}&guests=${param.guests}">
-		<div class="photo"><img src="${pageContext.request.contextPath}/room/photo.jsp?roomId=${room.roomId}" alt="${room.roomType}"></div>
+		<div class="photo">
+			<img src="${pageContext.request.contextPath}/room/photo.jsp?roomId=${room.roomId}" alt="${room.roomType}">
+			<c:if test="${room.soldOut}">
+				<div class="sold-out"><b>SOLD OUT</b><span>${room.bookedText} 예약 마감</span></div>
+			</c:if>
+		</div>
 		<div class="body">
 			<div class="type">ROOM ${room.roomNo}</div>
 			<div class="name">${room.roomType}</div>

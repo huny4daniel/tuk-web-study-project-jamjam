@@ -18,6 +18,19 @@
 	try {
 		RoomDao dao = new RoomDao();
 		viewData = dao.getRoomList(conn, search, pageNumber);
+
+		// ★ SOLD OUT 표시 : 날짜를 골랐으면 그 기간과 겹치는 예약을 읽어서
+		//   이번 페이지 객실 중 같은 객실(roomId)에 예약 기간을 붙여 준다 → room.soldOut 이 true 가 됨
+		if (search.isDateSelected()) {
+			List<Reservation> overlapList = new ReservationDao().selectOverlap(conn, search.getCheckIn(), search.getCheckOut());
+			for (Room room : viewData.getRoomList()) {
+				for (Reservation res : overlapList) {
+					if (res.getRoomId() == room.getRoomId()) {
+						room.addBooked(res.getCheckIn(), res.getCheckOut());
+					}
+				}
+			}
+		}
 	} finally {
 		JdbcUtil.close(conn);
 	}
@@ -37,6 +50,7 @@
 			<p><label class="title">체크인</label><input type="date" name="checkIn" value="${search.checkIn}"></p>
 			<p><label class="title">체크아웃</label><input type="date" name="checkOut" value="${search.checkOut}"></p>
 			<p><label class="title">인원</label><input type="number" name="guests" min="1" max="10" value="${search.guests}"></p>
+			<p><label><input type="checkbox" name="available" value="1" ${search.available == '1' ? 'checked' : ''}> 예약 가능한 객실만 보기</label></p>
 
 			<h3>필터</h3>
 			<p>
@@ -84,10 +98,13 @@
 		<div class="room-area">
 			<div class="top">
 				<span>
-					<c:if test="${not empty search.checkIn and not empty search.checkOut}">
-						<b>${search.checkIn} ~ ${search.checkOut}</b> 예약 가능한
+					<c:if test="${search.dateSelected}">
+						<b>${search.checkIn} ~ ${search.checkOut}</b> ${search.available == '1' ? '예약 가능한' : '기준'}
 					</c:if>
 					객실 <b>${viewData.roomTotalCount}</b>개
+					<c:if test="${search.dateSelected and search.available != '1'}">
+						<span class="muted"> · 이미 예약된 객실은 SOLD OUT 으로 표시됩니다</span>
+					</c:if>
 				</span>
 			</div>
 

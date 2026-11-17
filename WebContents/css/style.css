@@ -199,6 +199,29 @@ textarea { width: 100%; height: 130px; resize: vertical; }
 .card .info { font-size: 13px; color: var(--soft); margin-bottom: 10px; }
 .card .tags { min-height: 26px; margin-bottom: 14px; }
 .card .price { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); text-align: right; }
+/* 검색 기간에 이미 예약된 객실 (SOLD OUT) : 사진을 어둡게 덮고 예약된 기간 표시 */
+.card .sold-out { position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; background: rgba(15, 26, 36, 0.72); text-align: center; padding: 16px; }
+.card .sold-out b { font-size: 20px; letter-spacing: 0.3em; color: var(--text); font-weight: 600; }
+.card .sold-out span { font-size: 12px; color: var(--soft); }
+.card.sold .body { opacity: 0.55; }
+/* 객실 상세의 예약 현황 달력 (두 달을 나란히) */
+.cal-nav { display: flex; justify-content: space-between; margin: 12px 0; }
+.calendar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+.cal-title { text-align: center; font-weight: 600; margin-bottom: 8px; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; }
+.cal-grid .wk { font-size: 11px; color: var(--soft); padding: 4px 0; }
+.cal-grid .day { font: inherit; font-size: 13px; padding: 7px 0; border: 1px solid transparent; background: transparent; color: var(--text); cursor: pointer; }
+.cal-grid .day:hover { border-color: var(--glass); }
+.cal-grid .day.past { color: var(--line); cursor: default; border-color: transparent; }
+.cal-grid .day.booked { color: var(--soft); text-decoration: line-through; background: rgba(227, 161, 154, 0.12); }
+.cal-grid .day.sel { background: var(--glass-soft); }
+.cal-grid .day.pick { background: var(--glass); color: var(--bg); font-weight: 600; }
+.cal-legend { margin-top: 14px; font-size: 12px; color: var(--soft); display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.cal-legend span { display: inline-block; width: 12px; height: 12px; border: 1px solid var(--line); margin-left: 10px; }
+.cal-legend span:first-child { margin-left: 0; }
+.cal-legend .c-booked { background: rgba(227, 161, 154, 0.3); }
+.cal-legend .c-sel { background: var(--glass); }
+@media (max-width: 640px) { .calendar { grid-template-columns: 1fr; } }
 .price .origin { text-decoration: line-through; color: var(--soft); font-size: 12px; margin-right: 6px; }
 .price .rate { color: var(--glass); font-size: 12px; letter-spacing: 0.06em; margin-right: 6px; }
 .price .rate::after { content: " 할인"; }
