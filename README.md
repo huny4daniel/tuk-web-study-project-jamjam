@@ -10,7 +10,7 @@
 ## 1. 실행 방법
 
 1. **DB 만들기** : HeidiSQL로 접속(root / 12345)해서 아래 중 하나를 열고 전체 실행(F9)
-   - `db/hotel.sql` : 테이블 6개 + 샘플 데이터(테스트 계정, 객실, 사진) → **개발·발표용은 이것**
+   - `db/hotel.sql` : 테이블 7개 + 샘플 데이터(테스트 계정, 객실, 사진) → **개발·발표용은 이것**
    - `db/hotel_schema.sql` : 테이블 구조만 (데이터 없음) → 빈 DB가 필요한 다른 서버용
    - 둘 다 `hotel` 데이터베이스를 새로 만듭니다 (이미 있으면 지우고 다시 만듦)
 2. **이클립스로 가져오기** : File → Import → General → Existing Projects into Workspace → `hotel` 폴더 선택
@@ -67,12 +67,14 @@ hotel/
     ├─ qna/                      1:1 문의 목록·작성 / 등록 처리
     ├─ info/                     오시는 길, 주변 즐길거리
     ├─ chat/                     AI 상담 챗봇
+    ├─ faq/                      자주 묻는 질문
     ├─ admin/                    관리자 화면 (기능별 하위 폴더)
     │   ├─ index.jsp             대시보드
     │   ├─ room/                 객실 등록·수정·삭제
     │   ├─ reservation/          예약 현황, 예약 취소
     │   ├─ coupon/               할인 쿠폰
     │   ├─ qna/                  1:1 문의 답변
+    │   ├─ faq/                  자주 묻는 질문 등록·수정·삭제
     │   ├─ review/               리뷰 관리
     │   └─ member/               회원 목록
     └─ images/                   메인 배경, 기본 그림(사진 없는 객실용)
@@ -117,6 +119,7 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 | review | 리뷰 | resId(예약 1건당 1개), roomId, roomType, rating(1~5), content |
 | coupon | 쿠폰 | couponCode, discountRate, startDate ~ endDate |
 | qna | 1:1 문의 | title, content, answer(NULL 이면 답변 대기) |
+| faq | 자주 묻는 질문 | category(예약·결제/객실/시설·서비스/회원), question, answer |
 
 ---
 
@@ -141,6 +144,7 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 | 7) 리뷰 | review/reviewForm.jsp, reviewWrite.jsp | 체크아웃이 지난 '예약완료' 예약에만, 1건당 1번(reviewed 컬럼). 리뷰 저장 → reviewed=1 → 객실 평균 갱신 |
 | 예약 상태 표시 | Reservation.java 의 getStatusLabel(), isCancelable(), isReviewable() | 상태 계산은 Java if 문으로, JSP 에서는 `${res.statusLabel}`, `<c:if test="${res.cancelable}">` 만 씀 |
 | 회원 탈퇴 | member/withdrawForm.jsp → withdraw.jsp, MemberDao.delete(), ReservationDao.countActiveByUser() | 비밀번호 재확인 + 동의. 이용 예정 예약이 있으면 탈퇴 불가. 회원 정보만 삭제하고 예약·리뷰·문의 기록은 남김 |
+| 자주 묻는 질문 | faq/faqList.jsp, admin/faq/*, FaqDao | 분류 탭(category like ?, 안 고르면 '%') + details/summary 로 펼치기. 관리자가 등록·수정·삭제, 챗봇 프롬프트에도 들어감 |
 | AI 상담 챗봇 | chat/chatbot.jsp, my/ai/HotelChatbot.java, my/ai/OllamaClient.java | 수업 OllamaClient 그대로(gson, localhost:11435, gemma3:12b). 호텔 안내 + DB 객실 목록 + 최근 대화 6줄 + 질문을 프롬프트로 보냄. 대화는 세션(CHAT)에 저장, Ollama 가 꺼져 있으면 1:1 문의 안내 |
 | 8) 마이페이지 | mypage/myPage.jsp, member/memberUpdateForm.jsp | 내 예약(상태별 버튼), 내 리뷰, 정보 수정 |
 | 9) 관리자 페이지 | admin/*/ (기능별 폴더) | 대시보드, 예약 현황, 쿠폰, 문의 답변, 리뷰 관리, 회원 목록 |

@@ -29,6 +29,7 @@
 		<li><a href="<%= ctx %>/admin/reservation/reservationList.jsp">예약 관리</a></li>
 		<li><a href="<%= ctx %>/admin/coupon/couponList.jsp">할인 쿠폰 관리</a></li>
 		<li><a href="<%= ctx %>/admin/qna/qnaList.jsp">문의 답변</a></li>
+		<li><a href="<%= ctx %>/admin/faq/faqList.jsp">자주 묻는 질문</a></li>
 		<li><a href="<%= ctx %>/admin/review/reviewList.jsp">리뷰 관리</a></li>
 		<li><a href="<%= ctx %>/admin/member/memberList.jsp">회원 목록</a></li>
 	</ul>

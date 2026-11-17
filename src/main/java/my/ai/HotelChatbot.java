@@ -3,14 +3,17 @@ package my.ai;
 import java.sql.Connection;
 import java.util.List;
 
+import my.dao.FaqDao;
 import my.dao.RoomDao;
 import my.model.ChatMessage;
+import my.model.Faq;
 import my.model.Room;
 
 // 호텔 상담 챗봇
 // 수업 MovieOllama 처럼 "DB 데이터 + 규칙 + 질문" 을 글(프롬프트) 하나로 묶어서 Ollama 에 보낸다.
 //   ① 호텔 기본 안내 (체크인 시간, 주소, 주차, 취소 규정 ...)
 //   ② DB 의 객실 목록 (가격, 인원, 전망 ...)  → 객실 정보가 바뀌면 답도 자동으로 바뀜
+//   ②-1 관리자가 등록한 자주 묻는 질문 (faq 테이블)
 //   ③ 최근 대화 몇 줄  → 앞에서 한 이야기를 이어서 답할 수 있게
 //   ④ 손님 질문
 // Connection 은 JSP 에서 받아서 쓰고 닫지 않는다 (DAO 와 같은 규칙)
@@ -36,7 +39,7 @@ public class HotelChatbot {
 		prompt.append("당신은 '호텔 잠잠' 공식 홈페이지의 예약 상담 챗봇입니다.\n")
 			.append("규칙:\n")
 			.append("- 한국어로 친절하고 간결하게(5문장 이내) 답하세요.\n")
-			.append("- 아래 [호텔 정보]와 [객실 목록]에 있는 내용만 근거로 답하고, 없는 내용은 지어내지 마세요.\n")
+			.append("- 아래 [호텔 정보], [객실 목록], [자주 묻는 질문]에 있는 내용만 근거로 답하고, 없는 내용은 지어내지 마세요.\n")
 			.append("- 모르는 내용이면 '1:1 문의' 메뉴나 대표전화 031-000-0000 으로 문의하라고 안내하세요.\n")
 			.append("- 챗봇은 예약, 취소, 결제를 직접 처리할 수 없습니다. 방법만 안내하세요.\n")
 			.append("- 날짜별 빈 객실은 알 수 없으니 [객실 예약] 화면에서 날짜를 넣어 확인하라고 안내하세요.\n")
@@ -67,6 +70,13 @@ public class HotelChatbot {
 					.append("(리뷰 ").append(room.getReviewCount()).append("개)");
 			}
 			prompt.append("\n");
+		}
+
+		prompt.append("\n[자주 묻는 질문]\n");
+		List<Faq> faqs = new FaqDao().selectList(conn, null);
+		for (Faq faq : faqs) {
+			prompt.append("Q. ").append(faq.getQuestion()).append(" / A. ")
+				.append(faq.getAnswer().replace("\n", " ")).append("\n");
 		}
 
 		// 최근 대화 (마지막 질문은 아래에 따로 넣으므로 그 앞까지)
