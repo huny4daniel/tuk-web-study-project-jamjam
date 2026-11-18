@@ -33,8 +33,9 @@
 		</form>
 	</div>
 
-	<div class="box">
-		<h3>내 문의 내역</h3>
+	<section class="group" style="margin-top:56px;">
+		<div class="group-head"><h3>내 문의 내역<span class="count">${qnaList.size()}건</span></h3></div>
+		<div class="qna-list">
 		<c:if test="${empty qnaList}">
 			<p class="muted">문의 내역이 없습니다.</p>
 		</c:if>
@@ -53,7 +54,8 @@
 				</c:if>
 			</div>
 		</c:forEach>
-	</div>
+		</div>
+	</section>
 </div>
 <script>
 	function checkForm(f) {

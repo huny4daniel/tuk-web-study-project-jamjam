@@ -23,9 +23,10 @@
 	회원은 쿠폰 번호를 입력하지 않고 쿠폰함에 받은 쿠폰을 결제 화면에서 고릅니다.<br>
 	받는 방법 : <b>가입축하</b> 회원가입 때 자동 지급 · <b>다운로드</b> 회원이 쿠폰함에서 직접 받기 · <b>관리자지급</b> 아래 [쿠폰 지급]으로만</p>
 
-<div class="box">
-	<h3>새 쿠폰 등록</h3>
-	<form action="couponAdd.jsp" method="post">
+<div class="box" style="margin-top:24px;">
+	<div class="part">
+	<h4 class="sub-title">새 쿠폰 등록</h4>
+	<form action="couponAdd.jsp" method="post" class="inline-form">
 		<input type="text" name="couponCode" placeholder="쿠폰 번호 (예: SPRING15)" required>
 		<input type="text" name="couponName" placeholder="쿠폰 이름" required>
 		<input type="number" name="discountRate" placeholder="할인율 %" min="1" max="90" required style="width:110px;">
@@ -37,11 +38,10 @@
 		</select>
 		<input type="submit" class="btn btn-gold" value="등록">
 	</form>
-</div>
-
-<div class="box">
-	<h3>쿠폰 지급</h3>
-	<form action="couponIssue.jsp" method="post" onsubmit="return confirm(this.userId.value == '' ? '모든 회원에게 지급하시겠습니까?' : this.userId.value + ' 님에게 지급하시겠습니까?')">
+	</div>
+	<div class="part">
+	<h4 class="sub-title">쿠폰 지급</h4>
+	<form action="couponIssue.jsp" method="post" class="inline-form" onsubmit="return confirm(this.userId.value == '' ? '모든 회원에게 지급하시겠습니까?' : this.userId.value + ' 님에게 지급하시겠습니까?')">
 		<select name="couponCode">
 			<c:forEach var="coupon" items="${couponList}">
 				<c:if test="${coupon.endDate >= today}"><option value="${coupon.couponCode}">${coupon.couponCode} · <c:out value="${coupon.couponName}"/></option></c:if>
@@ -50,8 +50,11 @@
 		<input type="text" name="userId" placeholder="회원 아이디 (비우면 전체 회원)">
 		<input type="submit" class="btn btn-gold" value="지급">
 	</form>
+	</div>
 </div>
 
+<section class="group" style="margin-top:56px;">
+<div class="group-head"><h3>쿠폰 목록<span class="count">${couponList.size()}개</span></h3></div>
 <table class="list">
 	<tr><th>쿠폰 번호</th><th>쿠폰 이름</th><th>할인율</th><th>사용 기간</th><th>받는 방법</th><th>받은 회원</th><th>상태</th><th>관리</th></tr>
 	<c:forEach var="coupon" items="${couponList}">
@@ -75,4 +78,5 @@
 		</tr>
 	</c:forEach>
 </table>
+</section>
 <%@ include file="/inc/adminFooter.jsp" %>

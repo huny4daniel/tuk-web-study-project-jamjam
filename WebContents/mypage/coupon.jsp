@@ -36,9 +36,11 @@
 		<a href="../member/memberUpdateForm.jsp">회원 정보 수정</a>
 	</div>
 
-	<div class="box">
-		<h3>내 쿠폰</h3>
-		<p class="muted" style="margin-top:-6px;">결제 화면에서 쓸 쿠폰을 고르면 할인됩니다. 예약을 취소하면 쓴 쿠폰은 다시 돌아옵니다.</p>
+	<section class="group">
+		<div class="group-head">
+			<h3>내 쿠폰<span class="count">${myList.size()}장</span></h3>
+			<span class="desc">결제 화면에서 쓸 쿠폰을 고르면 할인됩니다. 예약을 취소하면 쓴 쿠폰은 다시 돌아옵니다.</span>
+		</div>
 		<c:if test="${empty myList}"><p class="muted">가진 쿠폰이 없습니다.</p></c:if>
 		<div class="coupons">
 			<c:forEach var="mc" items="${myList}">
@@ -52,10 +54,10 @@
 				</div>
 			</c:forEach>
 		</div>
-	</div>
+	</section>
 
-	<div class="box">
-		<h3>쿠폰 받기</h3>
+	<section class="group">
+		<div class="group-head"><h3>쿠폰 받기</h3></div>
 		<c:if test="${empty downList}"><p class="muted">지금 받을 수 있는 쿠폰이 없습니다.</p></c:if>
 		<div class="coupons">
 			<c:forEach var="c" items="${downList}">
@@ -69,6 +71,6 @@
 				</div>
 			</c:forEach>
 		</div>
-	</div>
+	</section>
 </div>
 <%@ include file="/inc/footer.jsp" %>

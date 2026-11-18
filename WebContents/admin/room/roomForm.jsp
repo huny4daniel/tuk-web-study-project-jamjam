@@ -22,7 +22,7 @@
 <c:set var="isEdit" value="<%= roomIdStr != null %>"/>
 
 <h2 class="page-title">${isEdit ? '객실 수정' : '새 객실 등록'}</h2>
-<div class="box" style="max-width:800px;">
+<div style="max-width:800px;">   <%-- 화면 전체가 폼이라 카드로 감싸지 않음 --%>
 	<%-- 사진 파일을 보내려면 enctype="multipart/form-data" 가 꼭 필요 (수업 movieuploadform 과 같음) --%>
 	<form action="roomSave.jsp" method="post" enctype="multipart/form-data" onsubmit="return checkForm(this)">
 		<input type="hidden" name="roomId" value="${room.roomId}">

@@ -25,7 +25,7 @@
 <meta charset="UTF-8">
 <title>호텔 잠잠 - Hotel JAMJAM</title>
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
-<link href="<%= ctx %>/css/style.css" rel="stylesheet" type="text/css">
+<link href="<%= ctx %>/css/style.css?v=2" rel="stylesheet" type="text/css">
 </head>
 <body>
 <header class="site-header">

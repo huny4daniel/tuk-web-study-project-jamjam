@@ -59,8 +59,9 @@
 		<div class="pay-layout">
 			<!-- 왼쪽 : 예약 내용, 예약자, 결제 수단, 동의 -->
 			<div>
-				<div class="box">
-					<h3>예약 내용</h3>
+				<!-- 카드 없이 묶음(group)으로 나눈다 : ① 예약 내용 ② 투숙 정보(예약자·투숙객·요청사항) ③ 결제 방법 + 동의 -->
+				<section class="group">
+					<div class="group-head"><h3>예약 내용</h3></div>
 					<div class="pay-room">
 						<img src="<%= ctx %>/room/photo.jsp?roomId=${room.roomId}" alt="${room.roomType}">
 						<div>
@@ -69,27 +70,23 @@
 							<div class="muted">${room.breakfast == 1 ? '조식 포함' : '조식 미포함'} · ${room.bedLabel}</div>
 						</div>
 					</div>
-					<table class="form">
-						<tr><th>체크인</th><td>${param.checkIn} <span class="muted">15:00 부터</span></td></tr>
-						<tr><th>체크아웃</th><td>${param.checkOut} <span class="muted">11:00 까지</span></td></tr>
-						<tr><th>숙박</th><td>${nights}박</td></tr>
-						<tr><th>인원</th><td>${param.guests}명 <span class="muted">(기준 ${room.baseGuests}명 / 최대 ${room.capacity}명)</span></td></tr>
-					</table>
-				</div>
+					<div class="stay">
+						<div>체크인<b>${param.checkIn}</b>15:00 부터</div>
+						<div>체크아웃<b>${param.checkOut}</b>11:00 까지</div>
+						<div>숙박<b>${nights}박</b>&nbsp;</div>
+						<div>인원<b>${param.guests}명</b>기준 ${room.baseGuests}명 / 최대 ${room.capacity}명</div>
+					</div>
+				</section>
 
-				<div class="box">
-					<h3>예약자 정보</h3>
-					<table class="form">
-						<tr><th>이름</th><td><c:out value="${member.name}"/></td></tr>
-						<tr><th>연락처</th><td><c:out value="${member.phone}"/></td></tr>
-						<tr><th>이메일</th><td><c:out value="${member.email}"/></td></tr>
-					</table>
-					<p class="muted">정보가 다르면 <a href="<%= ctx %>/member/memberUpdateForm.jsp"><b>회원 정보 수정</b></a>에서 바꿀 수 있습니다.</p>
-				</div>
+				<section class="group">
+					<div class="group-head"><h3>투숙 정보</h3></div>
 
-				<!-- 투숙객 정보 : 본인 또는 마이페이지에 등록해 둔 투숙객을 고르면 이름·연락처가 채워진다 -->
-				<div class="box">
-					<h3>투숙객 정보</h3>
+					<h4 class="sub-title">예약자</h4>
+					<p class="who-line"><b><c:out value="${member.name}"/></b> · <c:out value="${member.phone}"/> · <c:out value="${member.email}"/></p>
+					<p class="muted" style="margin-top:0;">정보가 다르면 <a href="<%= ctx %>/member/memberUpdateForm.jsp"><b>회원 정보 수정</b></a>에서 바꿀 수 있습니다.</p>
+
+					<!-- 투숙객 정보 : 본인 또는 마이페이지에 등록해 둔 투숙객을 고르면 이름·연락처가 채워진다 -->
+					<h4 class="sub-title">투숙객</h4>
 					<div class="chips" id="guestPick">
 						<button type="button" class="on" data-name="<c:out value='${member.name}'/>" data-phone="<c:out value='${member.phone}'/>" onclick="pickGuest(this)">본인</button>
 						<c:forEach var="g" items="${guestList}">
@@ -101,11 +98,9 @@
 					<p><label>투숙객 연락처</label><input type="text" name="guestPhone" maxlength="20" value="<c:out value='${member.phone}'/>"></p>
 					<p id="saveGuestRow" style="display:none;"><label><input type="checkbox" name="saveGuest" value="1"> 이 투숙객을 마이페이지에 저장해서 다음에도 불러오기</label></p>
 					<p class="muted">투숙객 목록은 <a href="<%= ctx %>/mypage/guest.jsp"><b>마이페이지 &gt; 투숙객</b></a>에서 관리합니다.</p>
-				</div>
 
-				<!-- 고객 요청사항 : 자주 쓰는 요청 버튼을 누르면 글이 덧붙고, 직접 써도 됨 -->
-				<div class="box">
-					<h3>요청사항 <span class="muted">(선택)</span></h3>
+					<!-- 고객 요청사항 : 자주 쓰는 요청 버튼을 누르면 글이 덧붙고, 직접 써도 됨 -->
+					<h4 class="sub-title">요청사항 <span class="muted">(선택)</span></h4>
 					<div class="chips">
 						<button type="button" onclick="addRequest(this)">높은 층 희망</button>
 						<button type="button" onclick="addRequest(this)">조용한 객실 희망</button>
@@ -115,10 +110,10 @@
 						<button type="button" onclick="addRequest(this)">기념일 (케이크 문의)</button>
 					</div>
 					<textarea name="requestNote" maxlength="500" placeholder="호텔에 전달할 내용을 적어 주세요. 요청사항은 객실 사정에 따라 제공되지 않을 수 있습니다."></textarea>
-				</div>
+				</section>
 
-				<div class="box">
-					<h3>결제 방법</h3>
+				<section class="group">
+					<div class="group-head"><h3>결제 방법</h3></div>
 					<div class="pay-methods">
 						<label><input type="radio" name="payMethod" value="카드결제" checked onclick="showPay()"> 카드결제</label>
 						<label><input type="radio" name="payMethod" value="계좌이체" onclick="showPay()"> 계좌이체</label>
@@ -148,21 +143,21 @@
 					<div class="pay-detail" id="pay-현장결제" style="display:none;">
 						<p>체크인할 때 프런트에서 카드 또는 현금으로 결제합니다.</p>
 					</div>
-				</div>
 
-				<div class="box">
-					<h3>취소 규정</h3>
+					<h4 class="sub-title">취소 규정</h4>
 					<p class="muted" style="margin-top:0;">
 						체크인 날짜 전까지는 마이페이지에서 무료로 취소할 수 있습니다.<br>
 						체크인 당일부터는 온라인 취소가 불가능하며 호텔로 문의해 주세요.
 					</p>
-					<label><input type="checkbox" name="agree" value="1"> 예약 내용과 취소 규정을 확인했으며, 결제에 동의합니다. (필수)</label>
-				</div>
+					<div class="agree">
+						<label><input type="checkbox" name="agree" value="1"> 예약 내용과 취소 규정을 확인했으며, 결제에 동의합니다. (필수)</label>
+					</div>
+				</section>
 			</div>
 
 			<!-- 오른쪽 : 금액 내역 (스크롤해도 따라옴) -->
 			<div>
-				<div class="box pay-sum">
+				<div class="box box-key pay-sum">
 					<span class="eyebrow">PAYMENT</span>
 					<table class="sum">
 						<tr><td>객실 1박 요금</td><td><fmt:formatNumber value="${room.salePrice}" pattern="#,###"/>원</td></tr>

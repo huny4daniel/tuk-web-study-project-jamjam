@@ -13,7 +13,7 @@
 <c:set var="qnaList" value="<%= qnaList %>"/>
 
 <h2 class="page-title">문의 답변</h2>
-<div class="box">
+<div class="qna-list">
 	<c:if test="${empty qnaList}"><p class="muted">문의가 없습니다.</p></c:if>
 	<c:forEach var="qna" items="${qnaList}">
 		<div class="qna-item">

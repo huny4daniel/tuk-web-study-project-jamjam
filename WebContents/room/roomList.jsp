@@ -45,7 +45,7 @@
 	<div class="room-layout">
 
 		<!-- 왼쪽 : 검색 / 필터 / 정렬 (GET 방식이라 조건이 주소창에 남음) -->
-		<form class="filter" action="roomList.jsp" method="get">
+		<form class="filter box-key" action="roomList.jsp" method="get">
 			<h3>날짜 · 인원</h3>
 			<p><label class="title">체크인</label><input type="date" name="checkIn" value="${search.checkIn}"></p>
 			<p><label class="title">체크아웃</label><input type="date" name="checkOut" value="${search.checkOut}"></p>
@@ -122,7 +122,7 @@
 			</div>
 
 			<c:if test="${viewData.roomTotalCount == 0}">
-				<div class="box">조건에 맞는 객실이 없습니다. 날짜나 필터를 바꿔 보세요.</div>
+				<div class="empty">조건에 맞는 객실이 없습니다. 날짜나 필터를 바꿔 보세요.</div>
 			</c:if>
 
 			<div class="cards">

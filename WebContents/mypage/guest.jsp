@@ -28,7 +28,7 @@
 
 	<div class="box">
 		<h3>투숙객 등록</h3>
-		<p class="muted" style="margin-top:-6px;">자주 함께 묵는 분을 등록해 두면 예약할 때 골라서 바로 불러올 수 있습니다. (최대 10명)</p>
+		<p class="muted" style="margin-top:-10px;">자주 함께 묵는 분을 등록해 두면 예약할 때 골라서 바로 불러올 수 있습니다. (최대 10명)</p>
 		<form action="guestSave.jsp" method="post" class="guest-form" onsubmit="return checkForm(this)">
 			<input type="text" name="name" placeholder="이름" maxlength="50">
 			<input type="text" name="phone" placeholder="연락처 010-0000-0000" maxlength="20">
@@ -39,8 +39,8 @@
 		</form>
 	</div>
 
-	<div class="box">
-		<h3>등록한 투숙객 (${guestList.size()}명)</h3>
+	<section class="group" style="margin-top:56px;">
+		<div class="group-head"><h3>등록한 투숙객<span class="count">${guestList.size()}명</span></h3></div>
 		<table class="list">
 			<tr><th>이름</th><th>연락처</th><th>관계</th><th>관리</th></tr>
 			<c:if test="${empty guestList}">
@@ -55,7 +55,7 @@
 				</tr>
 			</c:forEach>
 		</table>
-	</div>
+	</section>
 </div>
 <script>
 	function checkForm(f) {

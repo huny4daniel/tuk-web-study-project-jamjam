@@ -28,7 +28,7 @@
 <h2 class="page-title">자주 묻는 질문 관리</h2>
 <p class="muted">여기 등록한 질문은 이용자 [자주 묻는 질문] 화면과 AI 상담 챗봇의 답변 근거로 쓰입니다.</p>
 
-<div class="box">
+<div class="box" style="margin-top:24px;">
 	<h3>${isEdit ? '질문 수정' : '새 질문 등록'}</h3>
 	<form action="faqSave.jsp" method="post" onsubmit="return checkForm(this)">
 		<input type="hidden" name="faqId" value="${editFaq.faqId}">
@@ -53,6 +53,8 @@
 	</form>
 </div>
 
+<section class="group" style="margin-top:56px;">
+<div class="group-head"><h3>등록된 질문<span class="count">${faqList.size()}개</span></h3></div>
 <table class="list">
 	<tr><th>번호</th><th>분류</th><th>질문</th><th>관리</th></tr>
 	<c:if test="${empty faqList}">
@@ -70,6 +72,7 @@
 		</tr>
 	</c:forEach>
 </table>
+</section>
 <script>
 	function checkForm(f) {
 		if (f.question.value.trim() == "" || f.answer.value.trim() == "") {

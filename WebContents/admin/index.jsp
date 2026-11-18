@@ -26,8 +26,8 @@
 	<div class="item">답변 대기 문의<b><a href="qna/qnaList.jsp"><%= unansweredCount %>건</a></b></div>
 </div>
 
-<div class="box">
-	<h3>오늘 체크인 예정</h3>
+<section class="group" style="margin-top:56px;">
+	<div class="group-head"><h3>오늘 체크인 예정<span class="count">${todayList.size()}건</span></h3></div>
 	<table class="list">
 		<tr><th>예약번호</th><th>객실</th><th>예약자</th><th>숙박 기간</th><th>인원</th><th>결제</th><th>요청사항</th></tr>
 		<c:if test="${empty todayList}">
@@ -45,5 +45,5 @@
 			</tr>
 		</c:forEach>
 	</table>
-</div>
+</section>
 <%@ include file="/inc/adminFooter.jsp" %>

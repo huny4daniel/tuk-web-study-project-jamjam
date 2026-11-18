@@ -12,6 +12,7 @@
 	<a href="${pageContext.request.contextPath}/room/roomDetail.jsp?roomId=${room.roomId}&checkIn=${param.checkIn}&checkOut=${param.checkOut}&guests=${param.guests}">
 		<div class="photo">
 			<img src="${pageContext.request.contextPath}/room/photo.jsp?roomId=${room.roomId}" alt="${room.roomType}">
+			<c:if test="${room.resCount >= 2 and not room.soldOut}"><span class="hot">인기</span></c:if>
 			<c:if test="${room.soldOut}">
 				<div class="sold-out"><b>SOLD OUT</b><span>${room.bookedText} 예약 마감</span></div>
 			</c:if>
@@ -24,12 +25,8 @@
 				<c:if test="${room.reviewCount == 0}"><span class="new">NEW</span></c:if>
 				<c:if test="${room.reviewCount > 0}"><span class="stars">★</span> <fmt:formatNumber value="${room.avgRating}" pattern="0.0"/> <span class="muted">(${room.reviewCount})</span></c:if>
 			</div>
-			<div class="tags">
-				<span class="badge badge-blue">${room.viewType}</span>
-				<c:if test="${room.breakfast == 1}"><span class="badge badge-gold">조식 포함</span></c:if>
-				<c:if test="${room.pet == 1}"><span class="badge badge-green">반려동물</span></c:if>
-				<c:if test="${room.resCount >= 2}"><span class="badge badge-red">인기</span></c:if>
-			</div>
+			<%-- 옵션은 테두리 배지 대신 점(·)으로 이은 글자 한 줄 : 카드 안에 작은 상자가 여러 개 생기지 않게 --%>
+			<div class="tags">${room.viewType}<c:if test="${room.breakfast == 1}"><span>조식 포함</span></c:if><c:if test="${room.pet == 1}"><span>반려동물</span></c:if></div>
 			<div class="price">
 				<c:if test="${room.discountRate > 0}">
 					<span class="origin"><fmt:formatNumber value="${room.price}" pattern="#,###"/>원</span>

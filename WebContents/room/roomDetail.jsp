@@ -55,21 +55,24 @@
 			</p>
 
 			<!-- 예약 현황 달력 : 예약된 날은 '마감', 날짜를 누르면 오른쪽 예약 폼에 체크인/체크아웃이 들어간다 -->
-			<div class="box">
-				<span class="eyebrow">AVAILABILITY</span>
-				<h3>예약 현황</h3>
-				<p class="muted" style="margin-top:-6px;">체크인 날짜를 누른 뒤 체크아웃 날짜를 누르세요. 줄이 그어진 날은 이미 예약이 찬 날입니다.</p>
+			<section class="group">
+				<div class="group-head">
+					<h3>예약 현황</h3>
+					<span class="desc">체크인 날짜를 누른 뒤 체크아웃 날짜를 누르세요. 줄이 그어진 날은 이미 예약이 찬 날입니다.</span>
+				</div>
 				<div class="cal-nav">
 					<button type="button" class="btn btn-small btn-line" onclick="moveMonth(-1)">‹ 이전</button>
 					<button type="button" class="btn btn-small btn-line" onclick="moveMonth(1)">다음 ›</button>
 				</div>
 				<div id="calendar" class="calendar"></div>
 				<div class="cal-legend"><span class="c-free"></span>예약 가능 <span class="c-booked"></span>예약 마감 <span class="c-sel"></span>선택한 기간</div>
-			</div>
+			</section>
 
-			<div class="box">
-				<span class="eyebrow">REVIEWS</span>
-				<h3>투숙객 리뷰 (${room.reviewCount})</h3>
+			<section class="group">
+				<div class="group-head">
+					<h3>투숙객 리뷰<span class="count">${room.reviewCount}개</span></h3>
+					<c:if test="${room.reviewCount > 0}"><span><span class="stars">★</span> <b><fmt:formatNumber value="${room.avgRating}" pattern="0.0"/></b></span></c:if>
+				</div>
 				<c:if test="${empty reviewList}">
 					<p class="muted">아직 작성된 리뷰가 없습니다.</p>
 				</c:if>
@@ -83,12 +86,12 @@
 					</div>
 				</c:forEach>
 				<p class="muted">※ 리뷰는 숙박을 마친 고객만 마이페이지에서 작성할 수 있습니다.</p>
-			</div>
+			</section>
 		</div>
 
 		<!-- 오른쪽 : 예약 폼 -->
 		<div class="right">
-			<div class="box reserve-box">
+			<div class="box box-key reserve-box">
 				<span class="eyebrow">RESERVATION</span>
 				<div class="price" style="margin-bottom:20px;">
 					<c:if test="${room.discountRate > 0}">

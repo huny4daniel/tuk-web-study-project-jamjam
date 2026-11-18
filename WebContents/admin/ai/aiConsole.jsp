@@ -64,8 +64,9 @@
 <h2 class="page-title">AI 도우미</h2>
 <p class="muted">하고 싶은 일을 우리말로 적으면 AI 가 SQL 을 만들어 줍니다. 내용을 확인한 뒤 [실행]을 눌러야 DB 에 반영됩니다.</p>
 
-<div class="box">
-	<h3>① 요청하기</h3>
+<div class="box" style="margin-top:24px;">
+	<div class="part">
+	<h4 class="sub-title">① 요청하기</h4>
 	<form method="post" action="aiConsole.jsp" onsubmit="this.mk.disabled=true; this.mk.value='SQL 만드는 중...';">
 		<input type="hidden" name="step" value="make">
 		<textarea name="ask" rows="2" maxlength="500" placeholder="예) 이번 달에 체크인하는 예약을 보여줘"><c:out value="${param.ask}"/></textarea>
@@ -78,14 +79,14 @@
 		</div>
 		<input type="submit" name="mk" class="btn btn-gold" value="SQL 만들기">
 	</form>
-</div>
+	</div>
 
-<c:if test="${not empty error}">
-	<p class="warn box"><c:out value="${error}"/></p>
-</c:if>
+	<c:if test="${not empty error}">
+		<p class="warn"><c:out value="${error}"/></p>
+	</c:if>
 
-<div class="box">
-	<h3>② 확인하고 실행하기</h3>
+	<div class="part">
+	<h4 class="sub-title">② 확인하고 실행하기</h4>
 	<c:if test="${not empty explain}"><p>AI 설명 : <b><c:out value="${explain}"/></b></p></c:if>
 	<form method="post" action="aiConsole.jsp" onsubmit="return confirmRun(this)">
 		<input type="hidden" name="step" value="run">
@@ -98,12 +99,12 @@
 		</p>
 		<input type="submit" class="btn btn-gold" value="실행">
 	</form>
+	</div>
 </div>
 
 <c:if test="${result != null}">
-	<div class="box">
-		<h3>실행 결과</h3>
-		<p><c:out value="${result.message}"/></p>
+	<section class="group" style="margin-top:56px;">
+		<div class="group-head"><h3>실행 결과</h3><span class="desc"><c:out value="${result.message}"/></span></div>
 		<c:if test="${result.select}">
 			<div class="table-scroll">
 				<table class="list">
@@ -114,16 +115,16 @@
 				</table>
 			</div>
 		</c:if>
-	</div>
+	</section>
 </c:if>
 
-<div class="box">
-	<h3>최근 실행 기록</h3>
+<section class="group" style="margin-top:56px;">
+	<div class="group-head"><h3>최근 실행 기록</h3></div>
 	<c:if test="${empty aiLog}"><p class="muted">아직 실행한 SQL 이 없습니다.</p></c:if>
 	<c:forEach var="log" items="${aiLog}">
 		<div class="ai-log"><code><c:out value="${log.sql}"/></code><span class="muted"><c:out value="${log.message}"/></span></div>
 	</c:forEach>
-</div>
+</section>
 
 <script>
 	function setAsk(btn) {
