@@ -45,11 +45,14 @@
 	try {
 		RoomDao dao = new RoomDao();
 		if (room.getRoomId() == 0) {
-			dao.insert(conn, room);    // 사진이 없으면 photo 는 NULL -> photo.jsp 가 기본 그림을 보여줌
+			dao.insert(conn, room);    // 사진이 없으면 photo 는 NULL -> photo.jsp 가 유형·전망에 맞는 기본 그림을 보여줌
 		} else {
 			dao.update(conn, room);              // 사진을 뺀 정보 수정
 			if (room.getPhotoData() != null) {
 				dao.updatePhoto(conn, room);     // 새 사진을 골랐을 때만 사진도 바꿈
+			} else if (multi.getParameter("photoReset") != null) {
+				// [기본 사진 쓰기] 체크 : photo 를 NULL 로 -> photo.jsp 가 유형·전망에 맞는 기본 그림을 보여줌
+				dao.updatePhoto(conn, room);     // photoData, photoType 이 null 이므로 NULL 로 저장된다
 			}
 		}
 	} finally {

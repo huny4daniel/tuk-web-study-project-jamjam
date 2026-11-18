@@ -189,4 +189,35 @@ public class Room {
 		}
 		return getSalePrice() + extraGuests * extraPrice;
 	}
+
+	// ★ 기본 사진 : 관리자가 사진을 올리지 않은 객실(photo 가 NULL)은 images/rooms 의 그림을 쓴다.
+	//   파일 이름 = 객실 유형 영어 이름 + "-" + 전망 영어 이름 + ".png"   예) 디럭스 + 시티뷰 -> deluxe-city.png
+	//   room/photo.jsp 에서 이 이름으로 파일이 있는지 확인하고, 없으면 같은 유형의 다른 전망 그림을 찾는다.
+
+	// 객실 유형 -> 그림 파일 이름 앞부분 (목록에 없는 새 유형이면 null -> 기본 그림 noimage.svg)
+	public String getTypeImage() {
+		if ("스탠다드".equals(roomType)) return "standard";
+		if ("스탠다드 트윈".equals(roomType)) return "standard-twin";
+		if ("슈페리어 트리플".equals(roomType)) return "superior-triple";
+		if ("디럭스".equals(roomType)) return "deluxe";
+		if ("디럭스 오션뷰".equals(roomType)) return "deluxe-oceanview";
+		if ("디럭스 테라스".equals(roomType)) return "deluxe-terrace";
+		if ("이그제큐티브 킹".equals(roomType)) return "executive-king";
+		if ("패밀리".equals(roomType)) return "family";
+		if ("펫 프렌들리".equals(roomType)) return "pet";
+		if ("펫 패밀리".equals(roomType)) return "pet-family";
+		if ("한실 온돌".equals(roomType)) return "ondol";
+		if ("복층 로프트".equals(roomType)) return "loft";
+		if ("주니어 스위트".equals(roomType)) return "junior-suite";
+		if ("스파 스위트".equals(roomType)) return "spa-suite";
+		if ("로열 스위트".equals(roomType)) return "royal-suite";
+		return null;
+	}
+
+	// 전망 -> 그림 파일 이름 뒷부분
+	public String getViewImage() {
+		if ("오션뷰".equals(viewType)) return "ocean";
+		if ("파크뷰".equals(viewType)) return "park";
+		return "city";
+	}
 }

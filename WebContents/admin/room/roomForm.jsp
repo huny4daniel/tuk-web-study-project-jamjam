@@ -59,7 +59,11 @@
 						<img src="<%= ctx %>/room/photo.jsp?roomId=${room.roomId}" width="160" style="border-radius:4px;"><br>
 						<span class="muted">새 파일을 고르지 않으면 지금 사진이 그대로 유지됩니다.</span><br>
 					</c:if>
-					<input type="file" name="photo" accept="image/*">
+					<input type="file" name="photo" accept="image/*"><br>
+					<span class="muted">사진을 올리지 않으면 객실 유형·전망에 맞는 기본 사진(images/rooms)이 자동으로 나옵니다.</span>
+					<c:if test="${isEdit}">
+						<br><label><input type="checkbox" name="photoReset" value="1"> 올린 사진을 지우고 기본 사진 쓰기</label>
+					</c:if>
 				</td>
 			</tr>
 		</table>

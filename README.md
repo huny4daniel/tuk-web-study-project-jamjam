@@ -10,7 +10,7 @@
 ## 1. 실행 방법
 
 1. **DB 만들기** : HeidiSQL로 접속(root / 12345)해서 아래 중 하나를 열고 전체 실행(F9)
-   - `db/hotel.sql` : 객실 50실·15종(2~10층) + 테이블 10개 + 샘플 데이터(테스트 계정, 객실, 사진) → **개발·발표용은 이것**
+   - `db/hotel.sql` : 객실 50실·15종(2~10층) + 테이블 10개 + 샘플 데이터(테스트 계정, 객실 등) → **개발·발표용은 이것**
    - `db/hotel_schema.sql` : 테이블 구조만 (데이터 없음) → 빈 DB가 필요한 다른 서버용
    - 둘 다 `hotel` 데이터베이스를 새로 만듭니다 (이미 있으면 지우고 다시 만듦)
 2. **이클립스로 가져오기** : File → Import → General → Existing Projects into Workspace → `hotel` 폴더 선택
@@ -40,9 +40,8 @@ Tomcat 경로 입력 → 자바 컴파일 → `hotel.war` 생성 → 실행 중�
 
 ```
 hotel/
-├─ db/hotel.sql                  DB 테이블 + 샘플 데이터 (샘플 객실 사진 포함)
+├─ db/hotel.sql                  DB 테이블 + 샘플 데이터 (객실 사진은 비워 둠 → 기본 사진 사용)
 ├─ db/hotel_schema.sql           DB 구조만 (빈 테이블)
-├─ db/sample-photos/             샘플 사진 원본 (객실 종류-전망별 그림, 참고용, 이미 hotel.sql 안에 들어 있음)
 ├─ src/main/java/
 │   ├─ pool.jocl                 DB 접속 정보 (수업과 동일, DB 이름만 hotel)
 │   └─ my/
@@ -81,7 +80,8 @@ hotel/
     │   ├─ ai/                   AI 도우미 (요청 → SQL 작성 → 확인 후 실행)
     │   ├─ review/               리뷰 관리
     │   └─ member/               회원 목록
-    └─ images/                   메인 배경, 기본 그림(사진 없는 객실용)
+    └─ images/                   메인 배경, 기본 그림(noimage.svg)
+        └─ rooms/                객실 유형-전망별 기본 사진 (예 : deluxe-city.png)
 ```
 
 이용자 폴더(room, reserve, review, qna, member)와 관리자 폴더(admin/room, admin/reservation, admin/review, admin/qna, admin/member)는 같은 기능끼리 이름을 맞춰 두었습니다.
@@ -136,7 +136,7 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 |---|---|---|
 | 1) 회원 관리 | member/*, inc/loginCheck.jsp, inc/adminCheck.jsp | 로그인 성공 시 `session.setAttribute("LOGIN", 아이디)`. 아이디가 admin 이면 관리자. 관리자는 header.jsp·loginCheck.jsp 에서 관리자 대시보드로 보내서 이용자 화면을 쓰지 않음 |
 | 2) 객실 관리 | admin/room/roomList, roomForm, roomSave, roomDelete | 등록·수정 폼 하나를 같이 씀. 사진은 cos.jar 로 받아 byte 배열로 읽어서 **DB에 저장** |
-| 객실 사진 출력 | room/photo.jsp, RoomDao.selectPhoto() | `<img src=".../room/photo.jsp?roomId=3">` → DB 의 사진 바이트를 이미지로 그대로 내보냄 |
+| 객실 사진 출력 | room/photo.jsp, RoomDao.selectPhoto(), Room.getTypeImage()/getViewImage() | `<img src=".../room/photo.jsp?roomId=3">` → 관리자가 올린 사진이 DB 에 있으면 그 바이트를 그대로 내보내고, 없으면 유형·전망에 맞는 `images/rooms/유형-전망.png` 로 보냄(그 전망 그림이 없으면 같은 유형 다른 전망, 모르는 유형이면 noimage.svg) |
 | 3) 객실 조회·검색 | room/roomList.jsp, RoomDao.WHERE / setSearch() | ? 8개짜리 고정 SQL 하나. 조건을 안 고르면 항상 참이 되는 값을 넣음 (예: `breakfast >= 0`). 날짜를 넣으면 그 기간에 예약된 객실은 `not in` 으로 뺌 |
 | SOLD OUT 표시 | room/roomList.jsp, inc/roomCard.jsp, ReservationDao.selectOverlap(), Room.addBooked() | 날짜를 넣으면 그 기간과 겹치는 예약을 읽어 JSP for 문으로 같은 객실에 예약 기간을 붙임 → 카드에 SOLD OUT + 마감 기간. [예약 가능한 객실만] 을 체크하면 기존처럼 `not in` 으로 숨김 |
 | 예약 현황 달력 | room/roomDetail.jsp, ReservationDao.selectBookedByRoom() | 객실의 앞으로의 예약을 JS 배열로 넘겨 두 달 달력을 그림. 예약된 밤은 줄 긋기, 날짜를 누르면 체크인 → 체크아웃 순서로 예약 폼에 들어감 |
@@ -170,9 +170,10 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 
 - **한글 처리** : POST 를 받는 처리 페이지 맨 위에 `request.setCharacterEncoding("utf-8")`
 - **include 변수** : header.jsp 가 `ctx`, `loginId`, `loginName` 변수를 만들기 때문에 header 를 include 한 페이지에서 같은 이름의 변수를 또 만들면 안 됩니다.
-- **사진은 DB에 저장** : 객실 사진은 파일이 아니라 room 테이블의 photo(LONGBLOB) 컬럼에 들어갑니다.
-  그래서 서버를 Clean 하거나 다른 팀원 PC에서 실행해도 hotel.sql 만 실행하면 사진이 그대로 나옵니다.
-  지금 들어 있는 사진은 임시 그림이니 관리자 화면 [객실 관리 > 수정]에서 실제 호텔 사진으로 바꾸세요.
+- **객실 사진 = 기본 사진 + 관리자가 올린 사진** : 사진을 올리지 않은 객실은 `images/rooms/유형-전망.png` 가 자동으로 나옵니다.
+  (객실 유형 → 파일 이름 대응은 Room.getTypeImage(). 새 객실 유형을 만들면 여기에 한 줄, images/rooms 에 그림을 추가)
+  관리자 화면 [객실 관리 > 수정]에서 사진을 올리면 room 테이블의 photo(LONGBLOB) 컬럼에 저장되고 그 객실은 올린 사진이 우선합니다.
+  올린 사진은 DB 에 있으므로 서버를 Clean 하거나 다른 PC 에서 실행해도 그대로 나오고, [올린 사진을 지우고 기본 사진 쓰기]로 되돌릴 수 있습니다.
   (MySQL 기본 설정상 한 번에 보낼 수 있는 크기 제한이 있으니 사진은 수 MB 이하로 올리는 것이 좋습니다.)
 - **사진을 바꾼 뒤 팀원과 공유하려면** : HeidiSQL 에서 hotel DB 를 우클릭 → [데이터베이스를 SQL로 내보내기] 로 덤프해서 넘기면 됩니다.
 - **메인 배경** : `images/hero.svg` 를 원하는 사진으로 바꾸고 style.css 의 `.hero` 경로만 고치면 됩니다.
