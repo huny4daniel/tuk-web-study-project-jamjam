@@ -179,4 +179,5 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 - **메인 배경** : `images/hero.svg` 를 원하는 사진으로 바꾸고 style.css 의 `.hero` 경로만 고치면 됩니다.
 - **디자인 수정** : 색과 글꼴은 `css/style.css` 맨 위 `:root` 변수만 바꾸면 전체에 적용됩니다. JSP 는 드림위버에서 열어 HTML 부분을 편집할 수 있습니다.
 - **AI 기능** : 수업과 같은 Ollama 서버(`http://localhost:11435`, 모델 `gemma3:12b`)가 켜져 있어야 답이 나옵니다. 주소·모델은 `my/ai/OllamaClient.java` 맨 위 두 줄만 바꾸면 됩니다. 꺼져 있으면 화면에 연결 실패 안내가 나옵니다.
+  - **학교 Ollama 서버 접속 (`ollama.bat`)** : 더블클릭 → 학교 서버 계정(stud08, stud12 등 각자 학번 계정) 입력 → 새로 뜨는 SSH 창에 비밀번호 입력하면 SSH 터널(36443→6443)과 `kubectl port-forward svc/ollama 11435:11434` 가 차례로 열립니다. 창을 켜 둔 동안 연결이 유지되고, 닫으면 둘 다 끊깁니다. 입력한 계정은 `ollama.local.txt` 에 저장돼 다음부터 엔터만 치면 됩니다. (ssh, kubectl, 수업 kubeconfig 필요)
 - 비밀번호를 평문으로 저장합니다. 수업 예제 수준이므로 실제 서비스라면 암호화가 필요합니다.

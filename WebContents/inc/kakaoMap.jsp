@@ -28,19 +28,49 @@
 				+ fromLat + "," + fromLng + "/" + to;
 	}
 
-	// 브라우저에게 현재 위치를 물어본 뒤 카카오맵 길찾기를 새 창으로 연다
-	// (위치 권한을 거절하거나 실패하면 도착지만 정해진 길찾기 화면으로)
-	function openRoute(by) {
-		// 팝업 차단을 피하려고 클릭하자마자 빈 창부터 열어 두고, 위치를 알면 주소를 넣는다
-		var win = window.open("about:blank", "_blank");
+	// 내 위치 (findMyPos 로 미리 받아 둔다. 모르면 null)
+	var myLat = null;
+	var myLng = null;
+	var posWaiting = false;   // 위치를 물어보고 아직 답을 기다리는 중인지
+
+	// 페이지가 열릴 때 미리 현재 위치를 물어본다 (오시는 길 location.jsp 에서 부름)
+	//   예전에는 버튼을 누른 뒤에 물어봤는데, 그러면
+	//   ① 위치 권한 질문이 새로 연 빈 창 뒤(원래 탭)에 숨어서 답을 못 하고 빈 페이지가 계속 남거나
+	//   ② PC 는 위치 찾는 데 몇 초씩 걸려서 그동안 빈 페이지로 기다려야 했다
+	//   maximumAge : 10분 안에 찾은 위치가 있으면 다시 찾지 않고 그 값을 바로 씀
+	function findMyPos() {
 		if (!navigator.geolocation) {
-			win.location.href = routeUrl(by, null, null);
 			return;
 		}
+		posWaiting = true;
 		navigator.geolocation.getCurrentPosition(function (pos) {
-			win.location.href = routeUrl(by, pos.coords.latitude, pos.coords.longitude);
+			myLat = pos.coords.latitude;
+			myLng = pos.coords.longitude;
+			posWaiting = false;
 		}, function () {
-			win.location.href = routeUrl(by, null, null);
-		}, { timeout: 10000 });
+			posWaiting = false;   // 거절하거나 실패 → 도착지만 정해진 길찾기로
+		}, { timeout: 8000, maximumAge: 600000 });
+	}
+
+	// 카카오맵 길찾기를 새 창으로 연다
+	function openRoute(by) {
+		// 위치를 이미 알거나(허용) 모르는 게 확정됐으면(거절·실패) 바로 카카오맵으로
+		if (!posWaiting) {
+			window.open(routeUrl(by, myLat, myLng), "_blank");
+			return;
+		}
+		// 아직 위치를 찾는 중 : 팝업 차단을 피하려고 클릭하자마자 빈 창부터 열고,
+		// 0.1초마다 확인하다가 위치가 오면 바로, 최대 3초가 지나면 도착지만 넣은 길찾기로 보낸다
+		var win = window.open("about:blank", "_blank");
+		var count = 0;
+		var timer = setInterval(function () {
+			count++;
+			if (!posWaiting || count >= 30) {
+				clearInterval(timer);
+				if (win) {
+					win.location.href = routeUrl(by, myLat, myLng);
+				}
+			}
+		}, 100);
 	}
 </script>

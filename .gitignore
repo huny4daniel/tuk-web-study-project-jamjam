@@ -5,3 +5,4 @@ bin/
 *.class
 deploy.local.txt
 CLAUDE.md
+ollama.local.txt

@@ -25,7 +25,16 @@
 			팀 잠 좀 자자
 		</div>
 	</div>
-	<div class="copy">© 2026 HOTEL JAMJAM. All rights reserved.</div>
+	<div class="copy">
+		<%-- 약관 이름 : 실제 약관 페이지는 없어서 링크 없이 글자로만 보여준다 --%>
+		<div class="policy">
+			<span>이용약관</span>
+			<span><b>개인정보처리방침</b></span>
+			<span>취소·환불 규정</span>
+			<span>위치기반서비스 이용약관</span>
+		</div>
+		<div>© 2026 HOTEL JAMJAM. All rights reserved.</div>
+	</div>
 </footer>
 <%-- 영어를 골랐으면 화면의 한글을 영어로 바꾸는 스크립트 실행 --%>
 <c:if test="${sessionScope.LANG == 'en'}">

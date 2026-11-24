@@ -64,7 +64,7 @@
 			<div id="end"></div>
 		</div>
 
-		<!-- 자주 하는 질문 : 누르면 입력칸에 들어감 -->
+		<!-- 자주 하는 질문 : 누르면 그 문장으로 바로 질문을 보냄 -->
 		<div class="chips">
 			<button type="button" onclick="ask(this)">체크인, 체크아웃 시간이 언제인가요?</button>
 			<button type="button" onclick="ask(this)">4명이 묵을 수 있는 객실을 추천해 주세요.</button>
@@ -74,7 +74,9 @@
 		</div>
 
 		<form name="cf" class="chat-form" method="post" action="chatbot.jsp" onsubmit="return send(this)">
-			<textarea name="question" rows="2" maxlength="500" placeholder="궁금한 점을 입력하세요 (Enter 전송, Shift+Enter 줄바꿈)"
+			<%-- 서버로 가는 질문은 이 숨은 칸 : 보내는 순간 입력칸(input)은 비우고 글은 여기에 옮겨 담는다 --%>
+			<input type="hidden" name="question">
+			<textarea name="input" rows="2" maxlength="500" placeholder="궁금한 점을 입력하세요 (Enter 전송, Shift+Enter 줄바꿈)"
 				onkeydown="if (event.key == 'Enter' && !event.shiftKey) { event.preventDefault(); if (send(this.form)) this.form.submit(); }"></textarea>
 			<input type="submit" id="sendBtn" class="btn btn-gold" value="보내기">
 		</form>
@@ -83,20 +85,56 @@
 </div>
 
 <script>
+	// 예시 문장을 누르면 입력칸에 넣고 바로 보낸다 (보내기 버튼을 누른 것과 같음)
 	function ask(btn) {
-		document.cf.question.value = btn.textContent;
-		document.cf.question.focus();
+		var f = document.cf;
+		f.input.value = btn.textContent;
+		if (send(f)) {
+			f.submit();
+		}
 	}
-	// AI 가 답을 만드는 데 시간이 걸리므로 버튼을 막고 안내 (수업 ollama.jsp 와 같음)
+
+	// 채팅창 맨 아래에 말풍선 하나 붙이기 (who : "me" 내 질문 / "bot" AI)
+	//   textContent 로 넣으므로 사용자가 쓴 글에 태그가 있어도 글자 그대로 보인다 (JSTL c:out 과 같은 효과)
+	function addBubble(who, text) {
+		var msg = document.createElement("div");
+		msg.className = "msg " + who;
+		var bubble = document.createElement("div");
+		bubble.className = "bubble pre";
+		bubble.textContent = text;
+		msg.appendChild(bubble);
+		box.appendChild(msg);
+		box.scrollTop = box.scrollHeight;
+		return bubble;
+	}
+
+	// 보내기 : AI 가 답을 만드는 데 시간이 걸리므로 (수업 ollama.jsp 처럼 버튼을 막고 안내)
+	//   서버 답을 기다리지 않고 내 질문을 바로 채팅창에 띄우고, 그 아래에 "답변 생성 중" 말풍선을 보여준다.
+	//   답이 오면 페이지가 새로 열리면서 서버에 저장된 대화(세션 CHAT)로 다시 그려진다.
 	function send(f) {
-		if (f.question.value.trim() == "") return false;
-		var btn = document.getElementById("sendBtn");
-		btn.disabled = true;
-		btn.value = "답변 생성 중...";
+		var text = f.input.value.trim();
+		if (text == "" || f.question.value != "") return false;   // 빈 글, 이미 보내는 중이면 무시
+		f.question.value = text;   // 서버로 갈 칸에 옮기고
+		f.input.value = "";        // 입력칸은 비운다 (보낸 것처럼)
+		addBubble("me", text);
+		addBubble("bot", "${sessionScope.LANG == 'en' ? 'Writing an answer' : '답변 생성 중'}").className += " typing";
+		// 답을 기다리는 동안 다시 보내지 못하게 버튼들을 막는다
+		document.getElementById("sendBtn").disabled = true;
+		var chips = document.querySelectorAll(".chips button");
+		for (var i = 0; i < chips.length; i++) {
+			chips[i].disabled = true;
+		}
 		return true;
 	}
 	// 마지막 대화가 보이게 아래로
 	var box = document.querySelector(".chat-box");
 	box.scrollTop = box.scrollHeight;
+
+	// 뒤로 가기로 돌아오면 브라우저가 "보내는 중" 화면을 그대로 꺼내 보여줄 수 있어서, 그럴 땐 새로 불러온다
+	window.onpageshow = function (e) {
+		if (e.persisted) {
+			location.reload();
+		}
+	};
 </script>
 <%@ include file="/inc/footer.jsp" %>
