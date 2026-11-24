@@ -9,6 +9,7 @@
 CREATE DATABASE IF NOT EXISTS hotel DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE hotel;
 
+DROP TABLE IF EXISTS pay_card;
 DROP TABLE IF EXISTS guest;
 DROP TABLE IF EXISTS member_coupon;
 DROP TABLE IF EXISTS translation;
@@ -77,6 +78,17 @@ CREATE TABLE guest (
 	phone         VARCHAR(20)  NOT NULL,
 	relation      VARCHAR(10)  NOT NULL,          -- 가족 / 배우자 / 친구 / 동료 / 기타
 	PRIMARY KEY (guestId)
+);
+
+-- 회원이 등록해 둔 결제수단 (모의 결제) : 결제 화면에서 골라서 씀
+CREATE TABLE pay_card (
+	cardId        INT          NOT NULL AUTO_INCREMENT,
+	userId        VARCHAR(50)  NOT NULL,          -- 등록한 회원
+	cardCompany   VARCHAR(20)  NOT NULL,          -- 카드사
+	cardName      VARCHAR(30)  NOT NULL,          -- 별칭
+	last4         CHAR(4)      NOT NULL,          -- 카드번호 끝 4자리 (전체 번호는 저장하지 않음)
+	isDefault     TINYINT      NOT NULL DEFAULT 0,-- 결제 화면에서 먼저 선택되는 기본 카드면 1
+	PRIMARY KEY (cardId)
 );
 
 -- 회원 쿠폰함 : 회원이 받은 디지털 쿠폰 한 장 = 한 줄 (같은 쿠폰은 한 사람에 한 장)
@@ -260,6 +272,7 @@ INSERT INTO faq (category, question, answer) VALUES
 ('예약·결제', '예약은 어떻게 하나요?', '[객실 예약]에서 날짜와 인원을 고른 뒤 객실을 선택하고, 결제 화면에서 쿠폰과 결제 방법을 고르면 예약이 완료됩니다.\n로그인한 회원만 예약할 수 있습니다.'),
 ('예약·결제', '예약을 취소하고 싶어요.', '체크인 날짜 전까지는 마이페이지 [내 예약 내역]에서 무료로 취소할 수 있습니다.\n체크인 당일부터는 온라인 취소가 불가능하니 호텔(031-000-0000)로 연락해 주세요.'),
 ('예약·결제', '어떤 결제 방법이 있나요?', '카드결제, 계좌이체, 현장결제(체크인 시 프런트에서 결제) 중에서 고를 수 있습니다.'),
+('예약·결제', '카드를 등록해 두고 결제할 수 있나요?', '마이페이지 [결제수단]에 카드를 등록해 두면 결제 화면에서 원하는 카드를 골라 결제할 수 있습니다.'),
 ('예약·결제', '쿠폰은 어떻게 사용하나요?', '쿠폰은 번호를 입력하지 않는 디지털 쿠폰입니다. 마이페이지 [쿠폰함]에서 쿠폰을 받아 두면 결제 화면에서 골라 쓸 수 있습니다. 회원가입하면 10% 할인 쿠폰이 자동으로 들어오고, 예약을 취소하면 쓴 쿠폰은 다시 돌아옵니다.'),
 ('예약·결제', '인원이 늘면 요금이 달라지나요?', '객실마다 기준 인원이 있고, 기준 인원을 넘는 1명마다 1박 추가 요금이 붙습니다. 객실 상세 화면에서 예상 금액을 확인할 수 있습니다.'),
 ('객실', '체크인, 체크아웃 시간은 언제인가요?', '체크인은 오후 3시부터, 체크아웃은 오전 11시까지입니다. 얼리 체크인·늦은 체크인은 결제 화면 요청사항에 남겨 주세요.'),
@@ -636,6 +649,27 @@ INSERT INTO translation (ko, en) VALUES
 ('객실이 깨끗하고 조식이 맛있었어요. 다음에도 이용하겠습니다.', 'The room was clean and breakfast was delicious. I''ll stay again.'),
 ('넓고 조용해서 좋았습니다. 욕조도 만족스러웠어요.', 'Spacious and quiet. I loved the bathtub too.'),
 ('기준 객실', '· Rooms:'),
+('결제수단', 'Payment Methods'),
+('결제수단 관리', 'Payment Methods'),
+('카드 등록', 'Add a Card'),
+('카드를 등록해 두면 결제 화면에서 골라 바로 결제할 수 있습니다. (최대 5장)', 'Save a card and pick it at checkout. (up to 5)'),
+('카드번호 끝 4자리', 'Last 4 digits'),
+('별칭 (선택)', 'Nickname (optional)'),
+('※ 수업용 모의 결제라서 카드번호 전체, 유효기간, CVC 는 받지 않습니다.', '※ This is a mock payment for a class project. We never ask for the full card number, expiry date or CVC.'),
+('등록한 카드', 'Saved Cards'),
+('카드', 'Card'),
+('별칭', 'Nickname'),
+('기본 카드', 'Default card'),
+('기본', 'Default'),
+('기본으로 지정', 'Set as default'),
+('등록한 카드가 없습니다.', 'No saved cards.'),
+('등록 카드', 'Saved card'),
+('다른 카드', 'Another card'),
+('카드 번호', 'Card number'),
+('마이페이지 > 결제수단', 'My Page > Payment Methods'),
+('카드를 등록해 두고 결제할 수 있나요?', 'Can I save a card and pay with it?'),
+('마이페이지 [결제수단]에 카드를 등록해 두면 결제 화면에서 원하는 카드를 골라 결제할 수 있습니다.', 'Yes. Save a card in My Page [Payment Methods], then choose the card you want at checkout.'),
+('탈퇴하면 같은 아이디로 다시 로그인할 수 없고, 회원 정보와 등록한 투숙객·결제수단은 바로 삭제됩니다.', 'Once you leave, you cannot log in with the same ID, and your account details, saved guests and payment methods are deleted immediately.'),
 ('투숙객', 'Guests'),
 ('투숙객 관리', 'Guest List'),
 ('투숙객 등록', 'Add a Guest'),

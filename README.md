@@ -10,7 +10,7 @@
 ## 1. 실행 방법
 
 1. **DB 만들기** : HeidiSQL로 접속(root / 12345)해서 아래 중 하나를 열고 전체 실행(F9)
-   - `db/hotel.sql` : 객실 50실·15종(2~10층) + 테이블 10개 + 샘플 데이터(테스트 계정, 객실 등) → **개발·발표용은 이것**
+   - `db/hotel.sql` : 객실 50실·15종(2~10층) + 테이블 11개 + 샘플 데이터(테스트 계정, 객실 등) → **개발·발표용은 이것**
    - `db/hotel_schema.sql` : 테이블 구조만 (데이터 없음) → 빈 DB가 필요한 다른 서버용
    - 둘 다 `hotel` 데이터베이스를 새로 만듭니다 (이미 있으면 지우고 다시 만듦)
 2. **이클립스로 가져오기** : File → Import → General → Existing Projects into Workspace → `hotel` 폴더 선택
@@ -42,6 +42,7 @@ Tomcat 경로 입력 → 자바 컴파일 → `hotel.war` 생성 → 실행 중�
 hotel/
 ├─ db/hotel.sql                  DB 테이블 + 샘플 데이터 (객실 사진은 비워 둠 → 기본 사진 사용)
 ├─ db/hotel_schema.sql           DB 구조만 (빈 테이블)
+├─ db/pay_card.sql               쓰고 있는 DB 에 결제수단 기능만 추가
 ├─ src/main/java/
 │   ├─ pool.jocl                 DB 접속 정보 (수업과 동일, DB 이름만 hotel)
 │   └─ my/
@@ -63,7 +64,7 @@ hotel/
     ├─ member/                   회원가입, 아이디 중복확인, 로그인/로그아웃, 정보 수정, 회원 탈퇴
     ├─ room/                     객실 목록(검색·필터·정렬·페이징), 객실 상세
     ├─ reserve/                  결제 화면(payForm), 예약 처리, 예약 확인서(resDetail), 예약 취소
-    ├─ mypage/                   마이페이지 (내 예약, 내 리뷰, 쿠폰함, 투숙객)
+    ├─ mypage/                   마이페이지 (내 예약, 내 리뷰, 쿠폰함, 투숙객, 결제수단)
     ├─ review/                   리뷰 쓰기 폼 / 등록 처리
     ├─ qna/                      1:1 문의 목록·작성 / 등록 처리
     ├─ info/                     오시는 길, 주변 즐길거리
@@ -124,6 +125,7 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 | coupon | 쿠폰 종류 | couponCode, couponName, discountRate, startDate ~ endDate, issueType(가입축하/다운로드/관리자지급) |
 | member_coupon | 회원 쿠폰함 (디지털 쿠폰) | userId, couponCode + 받을 때 복사한 couponName·discountRate·기간(join 불필요), used, usedResId |
 | guest | 회원이 등록한 투숙객 | userId(등록한 회원), name, phone, relation(가족/배우자/친구/동료/기타) |
+| pay_card | 회원이 등록한 결제수단 (모의) | userId(등록한 회원), cardCompany, cardName(별칭), last4(끝 4자리만), isDefault(기본 카드) |
 | qna | 1:1 문의 | title, content, answer(NULL 이면 답변 대기) |
 | faq | 자주 묻는 질문 | category(예약·결제/객실/시설·서비스/회원), question, answer |
 | translation | 영어 번역 캐시 | ko(화면 한글 문장, PK), en(영어). 메뉴·버튼 등 기본 문구는 미리 넣어 두고, 나머지는 처음 볼 때 Ollama 가 번역해서 추가 |
@@ -147,6 +149,7 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 | 예약 취소 | reserve/cancel.jsp (이용자), admin/reservation/resCancel.jsp (관리자) | 이용자는 체크인 전까지만 취소 가능 |
 | 디지털 쿠폰 | mypage/coupon.jsp(쿠폰함·받기), couponDown.jsp, admin/coupon/couponIssue.jsp, MemberCouponDao, inc/reserveCheck.jsp | 쿠폰 번호 입력 대신 쿠폰함에서 고름. 가입 시 자동 지급 / 쿠폰함에서 다운로드 / 관리자 지급(개인·전체). 결제 시 본인·미사용·기간 재검사 → 예약하면 used=1, 예약 취소하면 쿠폰 반환 |
 | 투숙객 등록 | mypage/guest.jsp(+guestSave, guestDelete), reserve/payForm.jsp, GuestDao | 마이페이지에 투숙객을 등록(최대 10명) → 결제 화면에서 본인/등록 투숙객/직접 입력을 고르면 이름·연락처가 채워짐. 직접 입력한 투숙객은 [저장] 체크 시 목록에 추가. 예약에 투숙객 이름·연락처 저장, 확인서와 관리자 화면에 표시. 회원 탈퇴 시 함께 삭제 |
+| 결제수단 등록 | mypage/card.jsp(+cardSave, cardDefault, cardDelete), reserve/payForm.jsp, reserve.jsp, PayCardDao | 마이페이지에 카드를 등록(최대 5장, 첫 카드는 자동으로 기본) → 결제 화면에서 등록 카드(기본 카드가 먼저 선택됨)를 골라 [결제하기]. 본인 카드인지 서버에서 확인. [다른 카드]는 카드사와 카드 번호를 직접 입력. 모의 결제라 카드 번호는 끝 4자리만 서버로 보내고 저장. 회원 탈퇴 시 함께 삭제. 기존 DB 에는 db/pay_card.sql 실행 |
 | 고객 요청사항 | reserve/payForm.jsp, reserve.jsp, resDetail.jsp, admin/index.jsp, admin/reservation/reservationList.jsp | 결제 화면에서 자주 쓰는 요청 버튼 + 직접 입력 → reservation.requestNote 에 저장, 확인서와 관리자 화면(대시보드 오늘 체크인, 예약 관리)에 표시 |
 | 6) 할인 | 객실 할인율(room.discountRate) + 디지털 쿠폰(coupon → member_coupon) | 금액 = 1박 요금 × 박 수 × (100 − 쿠폰 할인율) / 100 |
 | 인원별 요금 | Room.getNightPrice(), reserve/reserve.jsp, roomDetail.jsp 의 nightPrice() | 1박 요금 = 객실 할인가 + (인원 − 기준 인원, 0 미만이면 0) × 1인 추가 요금 |
@@ -155,7 +158,7 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 | 회원 탈퇴 | member/withdrawForm.jsp → withdraw.jsp, MemberDao.delete(), ReservationDao.countActiveByUser() | 비밀번호 재확인 + 동의. 이용 예정 예약이 있으면 탈퇴 불가. 회원 정보만 삭제하고 예약·리뷰·문의 기록은 남김 |
 | 자주 묻는 질문 | faq/faqList.jsp, admin/faq/*, FaqDao | 분류 탭(category like ?, 안 고르면 '%') + details/summary 로 펼치기. 관리자가 등록·수정·삭제, 챗봇 프롬프트에도 들어감 |
 | AI 상담 챗봇 | chat/chatbot.jsp, my/ai/HotelChatbot.java, my/ai/OllamaClient.java | 수업 OllamaClient 그대로(gson, localhost:11435, gemma3:12b). 호텔 안내 + DB 객실 목록 + 최근 대화 6줄 + 질문을 프롬프트로 보냄. 대화는 세션(CHAT)에 저장, Ollama 가 꺼져 있으면 1:1 문의 안내 |
-| 관리자 AI 도우미 | admin/ai/aiConsole.jsp, my/ai/AdminAi.java | 우리말 요청 → AI 가 테이블 구조를 보고 SQL 한 문장 + 설명 작성(실행 안 함) → 관리자가 확인·수정 후 [실행]. 실행 전 checkSql() 로 select/insert/update/delete 한 문장만, where 없는 update/delete·drop 등·password/photo 컬럼·select * 차단, 20행 넘게 바뀌면 rollback. 실행 기록은 세션(AI_LOG) |
+| 관리자 AI 도우미 | admin/ai/aiConsole.jsp, my/ai/AdminAi.java | 우리말 요청 → AI 가 테이블 구조를 보고 SQL 한 문장 + 설명 작성(실행 안 함) → 관리자가 확인·수정 후 [실행]. 실행 전 checkSql() 로 select/insert/update/delete 한 문장만, where 없는 update/delete·drop 등·password/photo 컬럼·pay_card 테이블·select * 차단, 20행 넘게 바뀌면 rollback. 실행 기록은 세션(AI_LOG) |
 | 영어 화면 | header.jsp 의 KO/EN, lang/setLang.jsp, inc/translate.jsp, lang/translate.jsp, my/ai/Translator.java | 세션 LANG=en 이면 footer 에서 번역 스크립트 실행 → 화면의 한글을 모아 40개씩 서버로 → 번역 캐시(DB) 확인 → 없는 것만 Ollama 로 한 번에(JSON 배열) 번역해 저장. 가격·평수·호실 같은 숫자 문구는 스크립트 규칙으로 바로 변환. 챗봇은 영어로 답함. (자바스크립트 alert 문구와 관리자 화면은 번역하지 않음) |
 | 8) 마이페이지 | mypage/myPage.jsp, member/memberUpdateForm.jsp | 내 예약(상태별 버튼), 내 리뷰, 정보 수정 |
 | 9) 관리자 페이지 | admin/*/ (기능별 폴더) | 대시보드, 예약 현황, 쿠폰, 문의 답변, 리뷰 관리, 회원 목록 |

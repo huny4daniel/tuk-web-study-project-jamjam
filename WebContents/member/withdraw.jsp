@@ -24,6 +24,7 @@
 		} else {
 			memberDao.delete(conn, loginId);
 			new GuestDao().deleteByUser(conn, loginId);   // 등록한 투숙객(개인정보)도 삭제
+			new PayCardDao().deleteByUser(conn, loginId); // 등록한 결제수단도 삭제
 		}
 	} finally {
 		JdbcUtil.close(conn);

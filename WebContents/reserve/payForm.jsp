@@ -7,7 +7,7 @@
 	결제 상세 화면 (객실 상세의 [예약하기] → 여기 → [결제하기] → reserve.jsp)
 	검사와 금액 계산은 inc/reserveCheck.jsp 에서 하고, 여기서는 결과를 보여주기만 한다.
 	쿠폰은 쿠폰함(디지털 쿠폰)에서 고른다 : 고르면 같은 주소에 mcId 를 붙여서 다시 여는 방식 (GET) → 금액은 서버에서 다시 계산
-	※ 실제 결제사(PG) 연동이 없는 모의 결제 : 카드번호 같은 정보는 받지 않는다.
+	※ 실제 결제사(PG) 연동이 없는 모의 결제 : 카드번호는 화면에서만 확인하고 끝 4자리만 서버로 보낸다.
 --%>
 <%
 	if (checkError != null) {
@@ -23,10 +23,12 @@
 	// 예약자 정보 (로그인한 회원)
 	Member member = null;
 	List<Guest> guestList = null;   // 마이페이지에 등록해 둔 투숙객
+	List<PayCard> cardList = null;  // 마이페이지에 등록해 둔 결제수단 (기본 카드가 맨 위)
 	Connection conn = ConnectionProvider.getConnection();
 	try {
 		member = new MemberDao().selectById(conn, loginId);
 		guestList = new GuestDao().selectByUser(conn, loginId);
+		cardList = new PayCardDao().selectByUser(conn, loginId);
 	} finally {
 		JdbcUtil.close(conn);
 	}
@@ -34,6 +36,7 @@
 <c:set var="room" value="<%= room %>"/>
 <c:set var="member" value="<%= member %>"/>
 <c:set var="guestList" value="<%= guestList %>"/>
+<c:set var="cardList" value="<%= cardList %>"/>
 <c:set var="coupon" value="<%= coupon %>"/>
 <c:set var="usableCoupons" value="<%= usableCoupons %>"/>
 <c:set var="nights" value="<%= nights %>"/>
@@ -120,12 +123,30 @@
 						<label><input type="radio" name="payMethod" value="현장결제" onclick="showPay()"> 현장결제</label>
 					</div>
 					<div class="pay-detail" id="pay-카드결제">
-						<p>
+						<!-- 등록 카드 : 고르면 카드사·카드 번호 칸은 숨긴다. [다른 카드]면 cardId 가 비고 카드사와 번호를 직접 넣는다. 별칭은 () 안에 (따로 안 정했으면 생략) -->
+						<c:if test="${not empty cardList}">
+							<p>
+								<label>등록 카드</label>
+								<select name="cardId" onchange="showCard()">
+									<c:forEach var="pc" items="${cardList}">
+										<option value="${pc.cardId}"><c:out value="${pc.label}"/><c:if test="${pc.cardName != pc.cardCompany}"> (<c:out value="${pc.cardName}"/>)</c:if></option>
+									</c:forEach>
+									<option value="">다른 카드</option>
+								</select>
+							</p>
+						</c:if>
+						<p id="cardCompanyRow">
 							<label>카드사</label>
 							<select name="cardCompany">
 								<option>신한카드</option><option>국민카드</option><option>삼성카드</option>
 								<option>현대카드</option><option>롯데카드</option><option>하나카드</option><option>우리카드</option><option>BC카드</option>
 							</select>
+						</p>
+						<!-- 카드 번호 칸은 name 이 없어서 서버로 가지 않는다. 끝 4자리만 newLast4 에 담아 보낸다 -->
+						<p id="cardNoRow">
+							<label>카드 번호</label>
+							<input type="text" id="cardNo" maxlength="19" placeholder="0000-0000-0000-0000" inputmode="numeric" autocomplete="off" oninput="formatCardNo(this)">
+							<input type="hidden" name="newLast4">
 						</p>
 						<p>
 							<label>할부</label>
@@ -133,6 +154,7 @@
 								<option>일시불</option><option>2개월</option><option>3개월</option><option>6개월</option>
 							</select>
 						</p>
+						<p class="muted"><a href="<%= ctx %>/mypage/card.jsp"><b>마이페이지 &gt; 결제수단</b></a></p>
 						<p class="muted">※ 수업용 모의 결제입니다. 실제 카드 결제는 이루어지지 않습니다.</p>
 					</div>
 					<div class="pay-detail" id="pay-계좌이체" style="display:none;">
@@ -184,7 +206,7 @@
 					</select>
 					<p class="muted" style="margin-top:6px;"><a href="<%= ctx %>/mypage/coupon.jsp">쿠폰함에서 쿠폰 받기 →</a></p>
 
-					<input type="submit" class="btn btn-gold btn-block" value="<fmt:formatNumber value='${payTotal}' pattern='#,###'/>원 결제하기">
+					<input type="submit" id="payBtn" class="btn btn-gold btn-block" value="<fmt:formatNumber value='${payTotal}' pattern='#,###'/>원 결제하기">
 				</div>
 			</div>
 		</div>
@@ -198,6 +220,19 @@
 		for (var i = 0; i < radios.length; i++) {
 			document.getElementById("pay-" + radios[i].value).style.display = radios[i].checked ? "" : "none";
 		}
+	}
+
+	// 등록 카드를 골랐으면 카드사·카드 번호 칸을 숨긴다 (등록 카드가 없으면 cardId 칸 자체가 없음)
+	function showCard() {
+		var sel = document.pf.cardId;
+		var show = (sel && sel.value != "") ? "none" : "";
+		document.getElementById("cardCompanyRow").style.display = show;
+		document.getElementById("cardNoRow").style.display = show;
+	}
+
+	// 카드 번호 : 숫자만 남기고 4자리마다 - 를 넣는다
+	function formatCardNo(box) {
+		box.value = box.value.replace(/[^0-9]/g, "").substring(0, 16).replace(/(\d{4})(?=\d)/g, "$1-");
 	}
 
 	// 고른 쿠폰 번호(mcId)를 붙여서 이 화면을 다시 연다 (금액은 서버에서 다시 계산)
@@ -228,6 +263,12 @@
 		btn.className = "on";
 	}
 
+	// 결제 버튼 잠그기 / 풀기 (더블클릭으로 두 번 제출되는 것을 막음)
+	function lockPay(lock) {
+		document.getElementById("payBtn").disabled = lock;
+	}
+
+	// [결제하기] : 입력 검사 → 확인창 → 버튼 잠그고 제출
 	function checkPay(f) {
 		if (!f.agree.checked) {
 			alert("취소 규정을 확인하고 결제에 동의해 주세요.");
@@ -241,7 +282,26 @@
 			alert("입금자명을 입력해 주세요.");
 			return false;
 		}
-		return confirm("결제하시겠습니까?");
+		// 다른 카드(직접 입력)로 결제할 때만 카드 번호를 확인하고 끝 4자리만 보낸다
+		f.newLast4.value = "";
+		if (f.payMethod.value == "카드결제" && !(f.cardId && f.cardId.value != "")) {
+			var no = document.getElementById("cardNo").value.replace(/-/g, "");
+			if (!/^[0-9]{15,16}$/.test(no)) {
+				alert("카드 번호 15~16자리를 입력해 주세요.");
+				return false;
+			}
+			f.newLast4.value = no.substring(no.length - 4);
+		}
+		if (!confirm("결제하시겠습니까?")) return false;
+		lockPay(true);
+		return true;
 	}
+
+	// 뒤로 가기로 돌아오면 (오류 안내 후 history.go(-1) 포함) 버튼을 풀고, 남아 있는 선택에 맞게 칸을 다시 보여줌
+	window.addEventListener("pageshow", function () {
+		lockPay(false);
+		showPay();
+		showCard();
+	});
 </script>
 <%@ include file="/inc/footer.jsp" %>

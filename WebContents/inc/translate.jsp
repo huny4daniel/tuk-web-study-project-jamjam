@@ -48,8 +48,19 @@
 	var memory = {};
 	try { memory = JSON.parse(sessionStorage.getItem("JAMJAM_EN") || "{}"); } catch (e) { memory = {}; }
 
+	// 등록 카드 문구용 카드사 영어 이름 (카드 끝자리가 AI 와 번역 캐시에 남지 않게 규칙으로 바꾼다)
+	var CARDS = { "신한카드": "Shinhan Card", "국민카드": "KB Card", "삼성카드": "Samsung Card", "현대카드": "Hyundai Card",
+			"롯데카드": "Lotte Card", "하나카드": "Hana Card", "우리카드": "Woori Card", "BC카드": "BC Card" };
+	function cardEn(all, dot, company, last4, rest) {
+		rest = (rest || "").replace("일시불", "Pay in full").replace(/(\d+)개월/, "$1 months");
+		for (var name in CARDS) rest = rest.replace(name, CARDS[name]);   // 별칭이 카드사 이름인 경우
+		return (dot || "") + (CARDS[company] || company) + " ****" + last4 + rest;
+	}
+
 	// 숫자만 다른 문구(가격, 평수, 호실, 인원)는 AI 에게 묻지 않고 규칙으로 바로 바꾼다
 	var RULES = [
+		[/^(· )?(\S+카드) \*{4}(\d{4})( [·\/] .+| \(.+\))?$/, cardEn],
+		[/^(\d+)장$/, "$1"],
 		[/^([\d,]+)원(~?)$/, "KRW $1$2"],
 		[/^([\d,]+)원 결제하기$/, "Pay KRW $1"],
 		[/^(\d+)평 \((\d+)㎡\)$/, "$1 pyeong ($2㎡)"],

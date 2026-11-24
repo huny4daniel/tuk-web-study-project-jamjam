@@ -22,6 +22,7 @@
 		<a href="myPage.jsp">예약 · 리뷰</a>
 		<a href="coupon.jsp">쿠폰함</a>
 		<a class="on" href="guest.jsp">투숙객</a>
+		<a href="card.jsp">결제수단</a>
 		<a href="../qna/qnaList.jsp">1:1 문의</a>
 		<a href="../member/memberUpdateForm.jsp">회원 정보 수정</a>
 	</div>

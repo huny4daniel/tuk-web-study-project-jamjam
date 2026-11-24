@@ -97,6 +97,10 @@ public class AdminAi {
 		if (words.indexOf(" password ") >= 0 || words.indexOf(" photo ") >= 0) {
 			return "비밀번호(password)와 사진(photo) 컬럼은 다룰 수 없습니다.";
 		}
+		// 회원이 등록한 결제수단은 관리자 AI 로 다루지 않는다
+		if (words.indexOf(" pay_card ") >= 0) {
+			return "회원의 결제수단(pay_card)는 다룰 수 없습니다.";
+		}
 		if (s.startsWith("select ") && s.indexOf("*") >= 0 && s.indexOf("count(*)") < 0) {
 			return "select * 는 쓸 수 없습니다 (사진, 비밀번호가 함께 나옴). 필요한 컬럼 이름을 적어 주세요.";
 		}

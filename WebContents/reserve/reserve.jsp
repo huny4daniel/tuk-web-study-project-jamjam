@@ -21,7 +21,30 @@
 	// ③ 결제 방법에 따라 확인서에 보여줄 결제 상세 (정해진 3가지만 허용)
 	String payDetail = null;
 	if ("카드결제".equals(payMethod)) {
-		payDetail = request.getParameter("cardCompany") + " / " + request.getParameter("installment");
+		String cardIdStr = request.getParameter("cardId");
+		if (cardIdStr == null || cardIdStr.equals("")) {
+			// 다른 카드(직접 입력) : 카드 번호는 끝 4자리만 넘어온다
+			String newLast4 = request.getParameter("newLast4");
+			if (newLast4 != null && newLast4.matches("[0-9]{4}")) {
+				payDetail = request.getParameter("cardCompany") + " ****" + newLast4 + " / " + request.getParameter("installment");
+			} else if (error == null) {
+				error = "카드 번호를 입력해 주세요.";
+			}
+		} else {
+			// 등록 카드 : 폼에서는 번호만 받고, 본인 카드인지 DB 에서 확인한 뒤 카드사·끝 4자리를 가져온다
+			PayCard payCard = null;
+			Connection cardConn = ConnectionProvider.getConnection();
+			try {
+				payCard = new PayCardDao().selectMine(cardConn, Integer.parseInt(cardIdStr), loginId);
+			} finally {
+				JdbcUtil.close(cardConn);
+			}
+			if (payCard != null) {
+				payDetail = payCard.getLabel() + " / " + request.getParameter("installment");
+			} else if (error == null) {
+				error = "등록된 카드를 찾을 수 없습니다. 카드를 다시 선택해 주세요.";
+			}
+		}
 	} else if ("계좌이체".equals(payMethod)) {
 		payDetail = "입금자 " + request.getParameter("depositor") + " · 잠잠은행 000-0000-0000";
 	} else if ("현장결제".equals(payMethod)) {
