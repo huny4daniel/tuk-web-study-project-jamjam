@@ -2,6 +2,9 @@ package my.model;
 
 // 객실 정보 (room 테이블 한 줄 + 목록 화면용 통계값)
 public class Room {
+	// 조식 미포함 객실에서 조식을 추가할 때 1인 1박 가격 (가격을 바꾸려면 여기만 고치면 됨)
+	public static final int BREAKFAST_PRICE = 20000;
+
 	private int roomId;
 	private String roomType;
 	private String roomNo;

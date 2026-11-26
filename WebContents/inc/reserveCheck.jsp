@@ -7,13 +7,15 @@
 
 	이 조각이 만드는 변수 (include 한 페이지에서 바로 쓸 수 있음, 같은 이름의 변수를 또 만들면 안 됨)
 	  roomId, checkIn, checkOut, guests, mcId  : 폼에서 받은 값 (mcId : 고른 쿠폰함 쿠폰 번호, 안 골랐으면 0)
+	  breakfastCount : 조식 추가 인원 (조식 미포함 객실만, 0 ~ 투숙 인원. 조식 포함 객실이면 항상 0)
 	  room        : 객실 정보
 	  nights      : 몇 박
 	  nightPrice  : 인원에 따른 1박 요금 (Room.getNightPrice)
 	  roomTotal   : 1박 요금 x 박 수 (쿠폰 적용 전)
 	  coupon      : 적용한 쿠폰함 쿠폰 MemberCoupon (없으면 null)
 	  usableCoupons : 이 회원이 지금 쓸 수 있는 쿠폰 목록 (결제 화면 선택 칸용)
-	  payTotal    : 최종 결제 금액 = roomTotal x (100 - 쿠폰 할인율) / 100
+	  breakfastTotal : 조식 추가 금액 = breakfastCount x 박 수 x Room.BREAKFAST_PRICE (쿠폰 할인 없음)
+	  payTotal    : 최종 결제 금액 = roomTotal x (100 - 쿠폰 할인율) / 100 + breakfastTotal
 	  couponDiscount : 쿠폰으로 깎인 금액 (roomTotal - payTotal)
 	  checkError  : 문제가 있으면 오류 메시지, 없으면 null
 --%>
@@ -24,10 +26,18 @@
 	int guests = Integer.parseInt(request.getParameter("guests"));
 	String mcIdStr = request.getParameter("mcId");
 	int mcId = (mcIdStr == null || mcIdStr.equals("")) ? 0 : Integer.parseInt(mcIdStr);
+	String breakfastStr = request.getParameter("breakfastCount");
+	int breakfastCount = 0;
+	boolean breakfastBad = false;   // 숫자가 아닌 값이 들어왔나?
+	try {
+		breakfastCount = (breakfastStr == null || breakfastStr.equals("")) ? 0 : Integer.parseInt(breakfastStr);
+	} catch (NumberFormatException e) {
+		breakfastBad = true;
+	}
 
 	Room room = null;
 	long nights = 0;
-	int nightPrice = 0, roomTotal = 0, payTotal = 0, couponDiscount = 0;
+	int nightPrice = 0, roomTotal = 0, payTotal = 0, couponDiscount = 0, breakfastTotal = 0;
 	MemberCoupon coupon = null;
 	java.util.List<MemberCoupon> usableCoupons = null;
 	String checkError = null;
@@ -55,6 +65,13 @@
 			checkError = "선택한 기간에 이미 예약이 있습니다. 다른 날짜를 선택해 주세요.";
 		}
 
+		// ②-1 조식 추가 : 조식 포함 객실은 추가할 필요가 없으므로 무시, 미포함 객실은 0 ~ 투숙 인원만 허용
+		if (checkError == null && room.getBreakfast() == 1) {
+			breakfastCount = 0;
+		} else if (checkError == null && (breakfastBad || breakfastCount < 0 || breakfastCount > guests)) {
+			checkError = "조식 인원은 0명부터 투숙 인원(" + guests + "명)까지 고를 수 있습니다.";
+		}
+
 		// ③ 쿠폰 확인 (고른 경우에만) : 내 쿠폰함의 쿠폰이고, 안 썼고, 오늘이 사용 기간 안이어야 함
 		MemberCouponDao mcDao = new MemberCouponDao();
 		usableCoupons = mcDao.selectUsable(checkConn, (String) session.getAttribute("LOGIN"));
@@ -75,6 +92,9 @@
 				payTotal = roomTotal * (100 - coupon.getDiscountRate()) / 100;
 			}
 			couponDiscount = roomTotal - payTotal;
+			// 조식은 쿠폰과 상관없이 정가로 더한다 (쿠폰은 객실 요금에만 적용)
+			breakfastTotal = breakfastCount * Room.BREAKFAST_PRICE * (int) nights;
+			payTotal += breakfastTotal;
 		}
 	} catch (java.time.format.DateTimeParseException e) {
 		checkError = "체크인과 체크아웃 날짜를 선택하세요.";   // 날짜를 비워서 보낸 경우

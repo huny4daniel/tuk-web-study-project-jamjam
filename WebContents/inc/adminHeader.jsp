@@ -18,7 +18,7 @@
 <meta charset="UTF-8">
 <title>호텔 잠잠 관리자</title>
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
-<link href="<%= ctx %>/css/style.css?v=4" rel="stylesheet" type="text/css">
+<link href="<%= ctx %>/css/style.css?v=6" rel="stylesheet" type="text/css">
 </head>
 <body class="admin">
 <aside class="admin-side">

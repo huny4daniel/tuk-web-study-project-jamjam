@@ -37,7 +37,7 @@
 				<c:if test="${not empty res.requestNote}"><br><span class="badge badge-gold" title="<c:out value='${res.requestNote}'/>">요청사항</span></c:if>
 			</td>
 			<td>${res.checkIn} ~ ${res.checkOut}</td>
-			<td>${res.guests}명</td>
+			<td>${res.guests}명<c:if test="${res.breakfastCount > 0}"><br><span class="muted">조식 ${res.breakfastCount}명</span></c:if></td>
 			<td><fmt:formatNumber value="${res.totalPrice}" pattern="#,###"/>원</td>
 			<td>${empty res.couponCode ? '-' : res.couponCode}</td>
 			<td>${res.payMethod}</td>

@@ -45,7 +45,7 @@ public class RoomDao {
 	}
 
 	// ------------------------------------------------------------
-	// ★ 검색 조건 where 절 (? 8개, 순서 고정)
+	// ★ 검색 조건 where 절 (? 10개, 순서 고정)
 	//   조건을 안 골랐을 때도 항상 참이 되는 값을 넣어서 SQL 하나로 처리한다.
 	//     인원      capacity  >= ?   (안 고르면 1)
 	//     침대 수   bedCount  >= ?   (안 고르면 0 -> 항상 참)
@@ -56,13 +56,16 @@ public class RoomDao {
 	//     날짜      [예약 가능한 객실만] 을 체크했을 때만 그 기간에 예약이 있는 객실을 not in 으로 제외
 	//               (체크 안 하면 예약된 객실도 목록에 나오고 화면에서 SOLD OUT 으로 표시)
 	//               겹치는 조건 : 기존 체크인 < 새 체크아웃 그리고 기존 체크아웃 > 새 체크인
+	//     1박 가격  할인가 between ? and ?  (객실 카드에 크게 보이는 가격, 인원 추가 요금은 제외)
+	//               (안 고르면 0 ~ 아주 큰 값 -> 전부. 할인가 계산은 Room.getSalePrice 와 같게 소수점 버림)
 	// ------------------------------------------------------------
 	private static final String WHERE =
 			" where capacity >= ? and bedCount >= ? and breakfast >= ? and pet >= ? and amenities like ? and viewType like ?"
 			+ " and roomId not in (select roomId from reservation"
-			+ " where status = '예약완료' and checkIn < ? and checkOut > ?)";
+			+ " where status = '예약완료' and checkIn < ? and checkOut > ?)"
+			+ " and floor(price * (100 - discountRate) / 100) between ? and ?";
 
-	// 위 WHERE 의 ? 8개에 순서대로 값 넣기
+	// 위 WHERE 의 ? 10개에 순서대로 값 넣기
 	private void setSearch(PreparedStatement pstmt, RoomSearch search) throws SQLException {
 		pstmt.setInt(1, RoomSearch.has(search.getGuests()) ? Integer.parseInt(search.getGuests()) : 1);
 		pstmt.setInt(2, RoomSearch.has(search.getBedCount()) ? Integer.parseInt(search.getBedCount()) : 0);
@@ -78,6 +81,9 @@ public class RoomDao {
 			pstmt.setString(7, "1000-01-01");
 			pstmt.setString(8, "9999-12-31");
 		}
+		int[] range = search.priceRange();
+		pstmt.setInt(9, range[0]);
+		pstmt.setInt(10, range[1]);
 	}
 
 	// 정렬 기준 -> order by 절
@@ -115,8 +121,8 @@ public class RoomDao {
 			pstmt = conn.prepareStatement("select " + COLUMNS + " from room" + WHERE
 					+ makeOrderBy(search.getSort()) + " limit ?, ?");
 			setSearch(pstmt, search);
-			pstmt.setInt(9, offset);
-			pstmt.setInt(10, count);
+			pstmt.setInt(11, offset);
+			pstmt.setInt(12, count);
 			rs = pstmt.executeQuery();
 			while (rs.next()) {
 				roomList.add(makeRoom(rs));
@@ -151,6 +157,21 @@ public class RoomDao {
 	}
 
 	// ★ 뷰 추천 : 그 전망의 객실 중 평점이 가장 높은 객실 1개 (없으면 null)
+	// 가격대 슬라이더 오른쪽 끝 : 객실 1박 할인가 중 가장 비싼 값 (객실이 없으면 0)
+	public int selectMaxSalePrice(Connection conn) throws SQLException {
+		Statement stmt = null;
+		ResultSet rs = null;
+		try {
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("select ifnull(max(floor(price * (100 - discountRate) / 100)), 0) from room");
+			rs.next();
+			return rs.getInt(1);
+		} finally {
+			JdbcUtil.close(rs);
+			JdbcUtil.close(stmt);
+		}
+	}
+
 	public Room selectBestByView(Connection conn, String viewType) throws SQLException {
 		RoomSearch search = new RoomSearch();
 		search.setViewType(viewType);

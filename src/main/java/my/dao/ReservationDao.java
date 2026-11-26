@@ -22,6 +22,8 @@ public class ReservationDao {
 		res.setCheckOut(rs.getString("checkOut"));
 		res.setGuests(rs.getInt("guests"));
 		res.setTotalPrice(rs.getInt("totalPrice"));
+		res.setBreakfastCount(rs.getInt("breakfastCount"));
+		res.setBreakfastPrice(rs.getInt("breakfastPrice"));
 		res.setCouponCode(rs.getString("couponCode"));
 		res.setPayMethod(rs.getString("payMethod"));
 		res.setPayDetail(rs.getString("payDetail"));
@@ -39,8 +41,8 @@ public class ReservationDao {
 		try {
 			pstmt = conn.prepareStatement(
 					"insert into reservation (userId, roomId, roomType, roomNo, checkIn, checkOut, guests,"
-					+ " totalPrice, couponCode, payMethod, payDetail, requestNote, guestName, guestPhone, status, reviewed, resDate)"
-					+ " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '예약완료', 0, now())");
+					+ " totalPrice, couponCode, payMethod, payDetail, requestNote, guestName, guestPhone, breakfastCount, breakfastPrice, status, reviewed, resDate)"
+					+ " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '예약완료', 0, now())");
 			pstmt.setString(1, res.getUserId());
 			pstmt.setInt(2, res.getRoomId());
 			pstmt.setString(3, res.getRoomType());
@@ -55,6 +57,8 @@ public class ReservationDao {
 			pstmt.setString(12, res.getRequestNote());
 			pstmt.setString(13, res.getGuestName());
 			pstmt.setString(14, res.getGuestPhone());
+			pstmt.setInt(15, res.getBreakfastCount());
+			pstmt.setInt(16, res.getBreakfastPrice());
 			pstmt.executeUpdate();
 		} finally {
 			JdbcUtil.close(pstmt);
@@ -205,6 +209,25 @@ public class ReservationDao {
 			JdbcUtil.close(pstmt);
 		}
 		return list;
+	}
+
+	// 관리자 대시보드 : 오늘 아침 조식 인원 (레스토랑 준비용)
+	//   조식은 묵은 다음 날 아침에 먹으므로 체크인 < 오늘 <= 체크아웃 인 예약이 대상
+	//   조식 포함 객실은 투숙 인원 전원, 미포함 객실은 조식을 추가한 인원만 센다
+	public int countBreakfastToday(Connection conn) throws SQLException {
+		Statement stmt = null;
+		ResultSet rs = null;
+		try {
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery("select ifnull(sum(case when room.breakfast = 1 then res.guests else res.breakfastCount end), 0)"
+					+ " from reservation res join room on res.roomId = room.roomId"
+					+ " where res.status = '예약완료' and res.checkIn < curdate() and res.checkOut >= curdate()");
+			rs.next();
+			return rs.getInt(1);
+		} finally {
+			JdbcUtil.close(rs);
+			JdbcUtil.close(stmt);
+		}
 	}
 
 	// 관리자 대시보드 : 앞으로 투숙 예정인 예약 수

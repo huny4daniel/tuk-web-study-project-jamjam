@@ -54,7 +54,7 @@
 					<td><a href="../reserve/resDetail.jsp?resId=${res.resId}" title="예약 확인서 보기"><b>${res.resId}</b> <span class="muted">확인서</span></a></td>
 					<td><a href="../room/roomDetail.jsp?roomId=${res.roomId}"><b>${res.roomType}</b> ${res.roomNo}</a></td>
 					<td>${res.checkIn} ~ ${res.checkOut}</td>
-					<td>${res.guests}명</td>
+					<td>${res.guests}명<c:if test="${res.breakfastCount > 0}"><br><span class="muted">조식 ${res.breakfastCount}명</span></c:if></td>
 					<td><fmt:formatNumber value="${res.totalPrice}" pattern="#,###"/>원
 						<c:if test="${not empty res.couponCode}"><br><span class="muted">쿠폰 ${res.couponCode}</span></c:if>
 					</td>

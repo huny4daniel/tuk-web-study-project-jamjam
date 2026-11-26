@@ -14,6 +14,8 @@ public class Reservation {
 	private String checkOut;
 	private int guests;
 	private int totalPrice;
+	private int breakfastCount; // 조식 추가 인원 (조식 미포함 객실에서 추가했을 때, 안 했으면 0)
+	private int breakfastPrice; // 조식 추가 금액 (인원 x 박 수 x 1인 1박 가격, totalPrice 에 포함)
 	private String couponCode;
 	private String payMethod;
 	private String payDetail;   // 결제 상세 (예 : "신한카드 / 일시불")
@@ -109,6 +111,18 @@ public class Reservation {
 	}
 	public void setTotalPrice(int totalPrice) {
 		this.totalPrice = totalPrice;
+	}
+	public int getBreakfastCount() {
+		return breakfastCount;
+	}
+	public void setBreakfastCount(int breakfastCount) {
+		this.breakfastCount = breakfastCount;
+	}
+	public int getBreakfastPrice() {
+		return breakfastPrice;
+	}
+	public void setBreakfastPrice(int breakfastPrice) {
+		this.breakfastPrice = breakfastPrice;
 	}
 	public String getCouponCode() {
 		return couponCode;

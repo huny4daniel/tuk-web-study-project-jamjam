@@ -15,9 +15,12 @@
 
 	Connection conn = ConnectionProvider.getConnection();
 	RoomListView viewData = null;
+	int priceMax = 0;   // 가격대 슬라이더 오른쪽 끝 (가장 비싼 1박 할인가를 1만 원 단위로 올림)
 	try {
 		RoomDao dao = new RoomDao();
 		viewData = dao.getRoomList(conn, search, pageNumber);
+		priceMax = (dao.selectMaxSalePrice(conn) + 9999) / 10000 * 10000;
+		if (priceMax == 0) priceMax = 500000;
 
 		// ★ SOLD OUT 표시 : 날짜를 골랐으면 그 기간과 겹치는 예약을 읽어서
 		//   이번 페이지 객실 중 같은 객실(roomId)에 예약 기간을 붙여 준다 → room.soldOut 이 true 가 됨
@@ -37,6 +40,7 @@
 %>
 <c:set var="viewData" value="<%= viewData %>"/>
 <c:set var="search" value="<%= search %>"/>
+<c:set var="priceMax" value="<%= priceMax %>"/>
 
 <div class="container">
 	<span class="eyebrow">ROOMS</span>
@@ -92,6 +96,29 @@
 					<option value="빔프로젝터" ${search.amenity == '빔프로젝터' ? 'selected' : ''}>빔프로젝터</option>
 				</select>
 			</p>
+			<!-- 1박 가격대 : 손잡이 두 개를 끌거나 버튼을 눌러 고른다
+			     range 두 개(name 없음)는 화면용이고, 실제로 검색에 보내는 값은 아래 hidden 두 개
+			     (왼쪽 끝 = 하한 없음, 오른쪽 끝 = 상한 없음 → 빈 값) -->
+			<div class="price-filter">
+				<label class="title">1박 요금 <span id="priceText"></span></label>
+				<input type="hidden" name="minPrice" value="<c:out value='${search.minPrice}'/>">
+				<input type="hidden" name="maxPrice" value="<c:out value='${search.maxPrice}'/>">
+				<div class="price-slider">
+					<div class="track"></div>
+					<div class="fill" id="priceFill"></div>
+					<input type="range" id="priceLo" min="0" max="${priceMax}" step="10000" aria-label="최저 가격" oninput="slidePrice(this)" onchange="hideBubble()" onblur="hideBubble()">
+					<input type="range" id="priceHi" min="0" max="${priceMax}" step="10000" aria-label="최고 가격" oninput="slidePrice(this)" onchange="hideBubble()" onblur="hideBubble()">
+					<span class="bubble" id="priceBubble"></span>
+				</div>
+				<div class="chips" id="pricePick">
+					<button type="button" data-min="" data-max="100000" onclick="pickPrice(this)">10만 원 이하</button>
+					<button type="button" data-min="100000" data-max="150000" onclick="pickPrice(this)">10~15만 원</button>
+					<button type="button" data-min="150000" data-max="200000" onclick="pickPrice(this)">15~20만 원</button>
+					<button type="button" data-min="200000" data-max="300000" onclick="pickPrice(this)">20~30만 원</button>
+					<button type="button" data-min="300000" data-max="" onclick="pickPrice(this)">30만 원 이상</button>
+				</div>
+				<span class="muted price-note">할인가 기준 · 인원 추가 요금 제외</span>
+			</div>
 
 			<h3>정렬</h3>
 			<p>
@@ -140,4 +167,92 @@
 		</div>
 	</div>
 </div>
+<script>
+	// ===== 1박 가격대 슬라이더 =====
+	// range 두 개를 겹쳐서 손잡이 두 개를 만든다. 손잡이를 움직이면 hidden 칸(minPrice, maxPrice)이 바뀌고
+	// [검색]을 누르면 그 값으로 검색한다 (서버 검색 방식은 숫자 칸일 때와 같음)
+	var PRICE_MAX = ${priceMax};   // 오른쪽 끝 (가장 비싼 1박 할인가, 1만 원 단위 올림)
+	var PRICE_STEP = 10000;
+	var EN = ${sessionScope.LANG == 'en'};   // 영어 화면이면 금액을 KRW 로 (번역 스크립트는 처음 한 번만 바꾸므로)
+	var pf = document.querySelector("form.filter");
+	var lo = document.getElementById("priceLo");
+	var hi = document.getElementById("priceHi");
+
+	// 금액 글자 : 150000 → "150,000원" (영어 : "KRW 150,000")
+	function won(n) {
+		var s = String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+		return EN ? "KRW " + s : s + "원";
+	}
+
+	// hidden 칸 값 → 숫자 (비었거나 이상하면 null)
+	function readPrice(input) {
+		var n = parseInt(input.value.replace(/,/g, ""), 10);
+		return isNaN(n) || n < 0 ? null : n;
+	}
+
+	// 손잡이 위치에 맞게 색칠한 구간, 제목 옆 범위 글자, 버튼 켜짐 상태를 다시 그린다
+	function drawPrice() {
+		var a = Number(lo.value), b = Number(hi.value);
+		var fill = document.getElementById("priceFill");
+		fill.style.left = (a / PRICE_MAX * 100) + "%";
+		fill.style.right = (100 - b / PRICE_MAX * 100) + "%";
+		// 왼쪽 손잡이가 오른쪽 끝 가까이 가면 위로 올려서 두 손잡이가 겹쳐도 잡을 수 있게 함
+		lo.style.zIndex = a > PRICE_MAX / 2 ? 3 : 1;
+		document.getElementById("priceText").textContent = "(" + won(a) + " - " + won(b) + (b >= PRICE_MAX ? "+" : "") + ")";
+
+		var buttons = document.querySelectorAll("#pricePick button");
+		for (var i = 0; i < buttons.length; i++) {
+			var same = buttons[i].dataset.min == pf.minPrice.value && buttons[i].dataset.max == pf.maxPrice.value;
+			buttons[i].className = same ? "on" : "";
+		}
+	}
+
+	// 손잡이를 움직일 때 : 서로 넘어가지 않게 막고(최소 1만 원 차이), hidden 칸을 채우고, 말풍선을 띄운다
+	function slidePrice(input) {
+		var a = Number(lo.value), b = Number(hi.value);
+		if (a > b - PRICE_STEP) {
+			if (input == lo) lo.value = Math.max(0, b - PRICE_STEP);
+			else hi.value = Math.min(PRICE_MAX, a + PRICE_STEP);
+		}
+		pf.minPrice.value = Number(lo.value) <= 0 ? "" : lo.value;            // 왼쪽 끝 = 하한 없음
+		pf.maxPrice.value = Number(hi.value) >= PRICE_MAX ? "" : hi.value;    // 오른쪽 끝 = 상한 없음
+
+		// 말풍선 : 움직이는 손잡이 바로 위 (손잡이 너비 22px 를 고려해서 가운데를 맞춤)
+		var p = Number(input.value) / PRICE_MAX;
+		var bubble = document.getElementById("priceBubble");
+		bubble.textContent = won(Number(input.value)) + (input == hi && p >= 1 ? "+" : "");
+		bubble.style.left = "calc(" + (p * 100) + "% + " + (11 - 22 * p) + "px)";
+		bubble.className = "bubble show";
+		drawPrice();
+	}
+
+	function hideBubble() {
+		document.getElementById("priceBubble").className = "bubble";
+	}
+
+	// 가격대 버튼 : 손잡이를 그 구간으로 옮긴다. 이미 켜진 버튼을 또 누르면 전체 범위로 되돌림
+	function pickPrice(btn) {
+		var on = btn.className == "on";
+		pf.minPrice.value = on ? "" : btn.dataset.min;
+		pf.maxPrice.value = on ? "" : btn.dataset.max;
+		setSlider();
+	}
+
+	// hidden 칸 값 → 손잡이 위치 (처음 열 때, 버튼을 눌렀을 때)
+	//   비었으면 양 끝, 범위를 벗어나면 끝에 맞추고, 거꾸로 들어왔으면 서로 바꾼다 (서버 검색과 같은 규칙)
+	function setSlider() {
+		var a = readPrice(pf.minPrice), b = readPrice(pf.maxPrice);
+		if (a == null) pf.minPrice.value = "";
+		if (b == null) pf.maxPrice.value = "";
+		if (a != null && b != null && a > b) {
+			var temp = a; a = b; b = temp;
+			pf.minPrice.value = a;
+			pf.maxPrice.value = b;
+		}
+		lo.value = a == null ? 0 : Math.min(a, PRICE_MAX);
+		hi.value = b == null ? PRICE_MAX : Math.min(b, PRICE_MAX);
+		drawPrice();
+	}
+	setSlider();
+</script>
 <%@ include file="/inc/footer.jsp" %>

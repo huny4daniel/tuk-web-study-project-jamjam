@@ -117,7 +117,9 @@ CREATE TABLE reservation (
 	checkIn       DATE         NOT NULL,
 	checkOut      DATE         NOT NULL,
 	guests        INT          NOT NULL,
-	totalPrice    INT          NOT NULL,
+	totalPrice    INT          NOT NULL,          -- 결제 금액 (조식 추가 금액 포함)
+	breakfastCount INT         NOT NULL DEFAULT 0,-- 조식 추가 인원 (조식 미포함 객실에서 추가했을 때)
+	breakfastPrice INT         NOT NULL DEFAULT 0,-- 조식 추가 금액 (인원 x 박 수 x 1인 1박 가격)
 	couponCode    VARCHAR(30),
 	payMethod     VARCHAR(20)  NOT NULL,          -- 현장결제 / 계좌이체 / 카드결제
 	payDetail     VARCHAR(100),                   -- 결제 상세 (카드사 / 할부, 입금자명 ...) 예약 확인서에 표시
@@ -279,7 +281,7 @@ INSERT INTO faq (category, question, answer) VALUES
 ('객실', '바다가 보이는 객실이 있나요?', '오션뷰 객실에서 서해 바다와 노을을 볼 수 있습니다. 객실 검색의 전망 필터에서 [오션뷰]를 선택해 보세요.'),
 ('객실', '반려동물과 함께 묵을 수 있나요?', '반려동물 동반 가능 객실에서만 함께 머무를 수 있습니다. 객실 검색의 [반려동물 동반] 필터를 이용해 주세요.'),
 ('시설·서비스', '주차가 가능한가요?', '투숙객은 지하 주차장을 무료로 이용할 수 있습니다. (1객실 1대)'),
-('시설·서비스', '조식은 어디서 먹나요?', '조식 포함 객실은 2층 레스토랑에서 오전 7시 ~ 10시에 조식을 드실 수 있습니다.'),
+('시설·서비스', '조식은 어디서 먹나요?', '조식은 2층 레스토랑에서 오전 7시 ~ 10시에 드실 수 있습니다. 조식 미포함 객실도 결제 화면의 [추가 옵션]에서 1인 1박 20,000원에 조식을 추가할 수 있습니다.'),
 ('시설·서비스', '자전거를 빌릴 수 있나요?', '프런트에서 자전거를 무료로 빌려 배곧한울공원 해안 산책로를 달릴 수 있습니다.'),
 ('회원', '회원 정보는 어디서 바꾸나요?', '마이페이지 [회원 정보 수정]에서 비밀번호, 이름, 연락처, 이메일을 바꿀 수 있습니다.'),
 ('회원', '회원 탈퇴는 어떻게 하나요?', '[회원 정보 수정] 화면 아래 [회원 탈퇴]에서 할 수 있습니다. 이용 예정인 예약이 있으면 먼저 취소해야 합니다.');
@@ -330,6 +332,14 @@ INSERT INTO translation (ko, en) VALUES
 ('오션뷰', 'Ocean View'),
 ('파크뷰', 'Park View'),
 ('조식 포함', 'Breakfast included'),
+('추가 옵션', 'Add-ons'),
+('조식 추가', 'Add breakfast'),
+('조식 인원', 'Breakfast guests'),
+('2층 레스토랑 07:00~10:00 · 1인 1박', '2F restaurant 07:00–10:00 · per person per night'),
+('2층 레스토랑 07:00~10:00', '2F restaurant 07:00–10:00'),
+('오늘 아침 조식', 'Today''s breakfast'),
+('조식 미포함 · 결제 화면에서 1인 1박 20,000원에 추가할 수 있습니다', 'No breakfast · add it on the payment page for KRW 20,000 per person per night'),
+('조식은 2층 레스토랑에서 오전 7시 ~ 10시에 드실 수 있습니다. 조식 미포함 객실도 결제 화면의 [추가 옵션]에서 1인 1박 20,000원에 조식을 추가할 수 있습니다.', 'Breakfast is served at the 2nd-floor restaurant from 7 to 10 AM. If your room does not include breakfast, you can add it on the payment page under [Add-ons] for KRW 20,000 per person per night.'),
 ('인기', 'Popular'),
 ('/ 1박', '/ night'),
 ('반려동물', 'Pets OK'),
@@ -379,6 +389,13 @@ INSERT INTO translation (ko, en) VALUES
 ('세탁기', 'Washer'),
 ('펫침대', 'Pet bed'),
 ('정렬', 'Sort'),
+('1박 요금', 'Price per night'),
+('10만 원 이하', 'Under KRW 100,000'),
+('10~15만 원', 'KRW 100,000–150,000'),
+('15~20만 원', 'KRW 150,000–200,000'),
+('20~30만 원', 'KRW 200,000–300,000'),
+('30만 원 이상', 'KRW 300,000+'),
+('할인가 기준 · 인원 추가 요금 제외', 'Discounted rate · excludes extra-guest fees'),
 ('기본순', 'Default'),
 ('낮은 가격순', 'Price: low to high'),
 ('높은 가격순', 'Price: high to low'),
@@ -615,7 +632,6 @@ INSERT INTO translation (ko, en) VALUES
 ('체크인 당일부터는 온라인 취소가 불가능하며 호텔로 문의해 주세요.', 'From the check-in date, online cancellation is not available; please contact the hotel.'),
 ('예약 내용과 취소 규정을 확인했으며, 결제에 동의합니다. (필수)', 'I have reviewed the booking and cancellation policy and agree to pay. (required)'),
 ('객실 1박 요금', 'Room rate per night'),
-('1박 × 2박', 'Per night × 2 nights'),
 ('총 결제 금액', 'Total'),
 ('쿠폰 번호', 'Coupon code'),
 ('적용', 'Apply'),

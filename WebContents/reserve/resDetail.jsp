@@ -53,6 +53,9 @@
 				<tr><th>체크인</th><td>${res.checkIn} <span class="muted">15:00 부터</span></td></tr>
 				<tr><th>체크아웃</th><td>${res.checkOut} <span class="muted">11:00 까지</span></td></tr>
 				<tr><th>인원</th><td>${res.guests}명</td></tr>
+				<c:if test="${res.breakfastCount > 0}">
+					<tr><th>조식 추가</th><td>${res.breakfastCount}명 · <fmt:formatNumber value="${res.breakfastPrice}" pattern="#,###"/>원 <span class="muted">· 2층 레스토랑 07:00~10:00</span></td></tr>
+				</c:if>
 				<tr><th>결제 금액</th><td><b><fmt:formatNumber value="${res.totalPrice}" pattern="#,###"/>원</b>
 					<c:if test="${not empty res.couponCode}"><span class="muted"> · 쿠폰 ${res.couponCode} 적용</span></c:if></td></tr>
 				<tr><th>요청사항</th><td class="pre">${empty res.requestNote ? '없음' : ''}<c:out value="${res.requestNote}"/></td></tr>

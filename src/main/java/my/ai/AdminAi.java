@@ -27,7 +27,7 @@ public class AdminAi {
 			"room(roomId PK, roomType 객실유형, roomNo 호실, roomSize 평수, price 정가, discountRate 할인율%, capacity 최대인원,"
 			+ " baseGuests 기준인원, extraPrice 1인추가요금, bedCount, breakfast 0/1, pet 0/1, viewType '오션뷰'/'시티뷰'/'파크뷰',"
 			+ " amenities 쉼표구분, description, photo 사진(조회 금지), photoType, avgRating, reviewCount, resCount)\n"
-			+ "reservation(resId PK, userId, roomId, roomType, roomNo, checkIn DATE, checkOut DATE, guests, totalPrice,"
+			+ "reservation(resId PK, userId, roomId, roomType, roomNo, checkIn DATE, checkOut DATE, guests, totalPrice, breakfastCount 조식추가인원, breakfastPrice 조식추가금액,"
 			+ " couponCode, payMethod '카드결제'/'계좌이체'/'현장결제', payDetail, requestNote 요청사항, status '예약완료'/'취소', reviewed 0/1, resDate DATETIME)\n"
 			+ "coupon(couponCode PK, couponName, discountRate, startDate DATE, endDate DATE)\n"
 			+ "review(reviewId PK, resId, userId, roomId, roomType, rating 1~5, content, regDate)\n"

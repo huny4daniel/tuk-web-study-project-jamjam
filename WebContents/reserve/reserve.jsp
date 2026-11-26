@@ -74,6 +74,8 @@
 		res.setCheckOut(checkOut);
 		res.setGuests(guests);
 		res.setTotalPrice(payTotal);
+		res.setBreakfastCount(breakfastCount);   // 조식 추가 (reserveCheck.jsp 에서 검사·계산한 값)
+		res.setBreakfastPrice(breakfastTotal);
 		res.setCouponCode(coupon == null ? null : coupon.getCouponCode());
 		res.setPayMethod(payMethod);
 		res.setPayDetail(payDetail);

@@ -17,6 +17,8 @@ public class RoomSearch {
 	private String viewType;  // 전망 (오션뷰 / 시티뷰 / 파크뷰), 비어 있으면 상관없음
 	private String sort;      // 정렬 기준 (price, rating, popular)
 	private String available; // "1" 이면 예약 가능한 객실만 (아니면 마감 객실도 SOLD OUT 으로 보여줌)
+	private String minPrice;  // 1박 할인가 하한 (이 금액 이상), 비어 있으면 상관없음
+	private String maxPrice;  // 1박 할인가 상한 (이 금액 이하), 비어 있으면 상관없음
 
 	// 값이 들어 있는지 확인하는 도우미
 	public static boolean has(String s) {
@@ -37,7 +39,35 @@ public class RoomSearch {
 		q += param("viewType", viewType);
 		q += param("sort", sort);
 		q += param("available", available);
+		q += param("minPrice", minPrice);
+		q += param("maxPrice", maxPrice);
 		return q;
+	}
+
+	// 가격 칸 값 -> 숫자. 비었거나 숫자가 아니거나 음수면 -1 (그 조건은 무시). 쉼표는 지우고 읽는다
+	private static int toPrice(String s) {
+		if (!has(s)) return -1;
+		try {
+			int v = Integer.parseInt(s.replace(",", "").trim());
+			return v < 0 ? -1 : v;
+		} catch (NumberFormatException e) {
+			return -1;
+		}
+	}
+
+	// 검색에 쓸 1박 할인가 범위 { 최소, 최대 } (RoomDao.setSearch 에서 사용)
+	//   안 넣은 쪽은 0 / 아주 큰 값 → 항상 참. 최소가 최대보다 크면 서로 바꾼다
+	public int[] priceRange() {
+		int min = toPrice(minPrice);
+		int max = toPrice(maxPrice);
+		if (min < 0) min = 0;
+		if (max < 0) max = Integer.MAX_VALUE;
+		if (min > max) {
+			int temp = min;
+			min = max;
+			max = temp;
+		}
+		return new int[] { min, max };
 	}
 
 	private String param(String name, String value) {
@@ -100,6 +130,18 @@ public class RoomSearch {
 	// 날짜(체크인, 체크아웃)를 둘 다 넣었나?
 	public boolean isDateSelected() {
 		return has(checkIn) && has(checkOut);
+	}
+	public String getMinPrice() {
+		return minPrice;
+	}
+	public void setMinPrice(String minPrice) {
+		this.minPrice = minPrice;
+	}
+	public String getMaxPrice() {
+		return maxPrice;
+	}
+	public void setMaxPrice(String maxPrice) {
+		this.maxPrice = maxPrice;
 	}
 	public String getViewType() {
 		return viewType;

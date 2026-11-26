@@ -102,6 +102,9 @@
 					<c:if test="${room.extraPrice > 0 and room.capacity > room.baseGuests}">
 						<div class="muted">기준 인원 초과 시 1인당 1박 +<fmt:formatNumber value="${room.extraPrice}" pattern="#,###"/>원</div>
 					</c:if>
+					<c:if test="${room.breakfast == 0}">
+						<div class="muted">조식 미포함 · 결제 화면에서 1인 1박 <%= String.format("%,d", Room.BREAKFAST_PRICE) %>원에 추가할 수 있습니다</div>
+					</c:if>
 				</div>
 
 				<form name="rf" action="../reserve/payForm.jsp" method="get" onsubmit="return checkForm(this)">

@@ -44,6 +44,9 @@
 <c:set var="roomTotal" value="<%= roomTotal %>"/>
 <c:set var="couponDiscount" value="<%= couponDiscount %>"/>
 <c:set var="payTotal" value="<%= payTotal %>"/>
+<c:set var="breakfastCount" value="<%= breakfastCount %>"/>
+<c:set var="breakfastTotal" value="<%= breakfastTotal %>"/>
+<c:set var="breakfastPrice" value="<%= Room.BREAKFAST_PRICE %>"/>
 <c:set var="extraGuests" value="<%= guests - room.getBaseGuests() %>"/>
 
 <div class="container">
@@ -114,6 +117,25 @@
 					</div>
 					<textarea name="requestNote" maxlength="500" placeholder="호텔에 전달할 내용을 적어 주세요. 요청사항은 객실 사정에 따라 제공되지 않을 수 있습니다."></textarea>
 				</section>
+
+				<!-- 추가 옵션 : 조식 미포함 객실만. 체크하면 인원을 고르고, 금액은 오른쪽 표에 바로 반영 (실제 금액은 서버에서 다시 계산)
+				     서버로 가는 값은 hidden breakfastCount 하나 (체크 안 하면 0) -->
+				<c:if test="${room.breakfast == 0}">
+					<section class="group">
+						<div class="group-head"><h3>추가 옵션</h3></div>
+						<p><label><input type="checkbox" id="breakfastOn" ${breakfastCount > 0 ? 'checked' : ''} onclick="drawBreakfast()"> 조식 추가</label>
+							<span class="muted">2층 레스토랑 07:00~10:00 · 1인 1박 <fmt:formatNumber value="${breakfastPrice}" pattern="#,###"/>원</span></p>
+						<p id="breakfastPick" style="${breakfastCount > 0 ? '' : 'display:none;'}">
+							<label>조식 인원</label>
+							<select id="breakfastSel" onchange="drawBreakfast()">
+								<c:forEach var="n" begin="1" end="${param.guests}">
+									<option value="${n}" ${n == (breakfastCount > 0 ? breakfastCount : param.guests) ? 'selected' : ''}>${n}명</option>
+								</c:forEach>
+							</select>
+						</p>
+						<input type="hidden" name="breakfastCount" value="${breakfastCount}">
+					</section>
+				</c:if>
 
 				<section class="group">
 					<div class="group-head"><h3>결제 방법</h3></div>
@@ -189,11 +211,14 @@
 						<c:if test="${extraGuests > 0}">
 							<tr><td>인원 추가 (${extraGuests}명)</td><td>+<fmt:formatNumber value="${extraGuests * room.extraPrice}" pattern="#,###"/>원</td></tr>
 						</c:if>
-						<tr><td>1박 × ${nights}박</td><td><fmt:formatNumber value="${roomTotal}" pattern="#,###"/>원</td></tr>
+						<tr><td>객실 요금 (${nights}박)</td><td><fmt:formatNumber value="${roomTotal}" pattern="#,###"/>원</td></tr>
 						<c:if test="${coupon != null}">
 							<tr class="minus"><td>쿠폰 할인 (${coupon.discountRate}%)<br><span class="muted"><c:out value="${coupon.couponName}"/></span></td><td>−<fmt:formatNumber value="${couponDiscount}" pattern="#,###"/>원</td></tr>
 						</c:if>
-						<tr class="total"><td>총 결제 금액</td><td><fmt:formatNumber value="${payTotal}" pattern="#,###"/>원</td></tr>
+						<c:if test="${room.breakfast == 0}">
+							<tr id="breakfastSum" style="${breakfastTotal > 0 ? '' : 'display:none;'}"><td id="breakfastLabel">조식 (${breakfastCount}명 × ${nights}박)</td><td id="breakfastAmount">+<fmt:formatNumber value="${breakfastTotal}" pattern="#,###"/>원</td></tr>
+						</c:if>
+						<tr class="total"><td>총 결제 금액</td><td id="payTotalCell"><fmt:formatNumber value="${payTotal}" pattern="#,###"/>원</td></tr>
 					</table>
 
 					<!-- 쿠폰 고르기 : 내 쿠폰함에서 지금 쓸 수 있는 쿠폰만 나온다. 고르면 같은 화면을 다시 열어 금액 계산 -->
@@ -239,7 +264,8 @@
 	function applyCoupon(mcId) {
 		var f = document.pf;
 		location.href = "payForm.jsp?roomId=" + f.roomId.value + "&checkIn=" + f.checkIn.value + "&checkOut=" + f.checkOut.value
-				+ "&guests=" + f.guests.value + "&mcId=" + mcId;
+				+ "&guests=" + f.guests.value + "&mcId=" + mcId
+				+ "&breakfastCount=" + (f.breakfastCount ? f.breakfastCount.value : 0);   // 고른 조식 인원도 유지
 	}
 
 	// 투숙객 고르기 : 버튼에 담아 둔 이름·연락처를 입력칸에 채운다. [직접 입력]이면 비우고 저장 체크 칸을 보여줌
@@ -261,6 +287,32 @@
 		if (box.value.indexOf(text) >= 0) return;
 		box.value = box.value.trim() == "" ? text : box.value.trim() + ", " + text;
 		btn.className = "on";
+	}
+
+	// ===== 조식 추가 : 체크·인원에 따라 hidden 값과 오른쪽 금액 표를 바꾼다 =====
+	var BREAKFAST_PRICE = ${breakfastPrice};   // 1인 1박 (Room.BREAKFAST_PRICE)
+	var NIGHTS = ${nights};
+	var BASE_TOTAL = ${payTotal - breakfastTotal};   // 조식을 뺀 결제 금액 (쿠폰까지 적용된 객실 요금)
+	var EN = ${sessionScope.LANG == 'en'};   // 영어 화면이면 금액 글자를 영어로 (번역 스크립트는 처음 한 번만 바꾸므로)
+
+	// 150000 → "150,000"
+	function comma(n) {
+		return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	}
+
+	function drawBreakfast() {
+		var on = document.getElementById("breakfastOn");
+		if (!on) return;   // 조식 포함 객실 : 옵션 칸이 없음
+		var count = on.checked ? Number(document.getElementById("breakfastSel").value) : 0;
+		var amount = count * BREAKFAST_PRICE * NIGHTS;
+		document.pf.breakfastCount.value = count;
+		document.getElementById("breakfastPick").style.display = on.checked ? "" : "none";
+		document.getElementById("breakfastSum").style.display = count > 0 ? "" : "none";
+		document.getElementById("breakfastLabel").textContent = EN ? "Breakfast (" + count + " × " + NIGHTS + " night(s))" : "조식 (" + count + "명 × " + NIGHTS + "박)";
+		document.getElementById("breakfastAmount").textContent = EN ? "+KRW " + comma(amount) : "+" + comma(amount) + "원";
+		var total = BASE_TOTAL + amount;
+		document.getElementById("payTotalCell").textContent = EN ? "KRW " + comma(total) : comma(total) + "원";
+		document.getElementById("payBtn").value = EN ? "Pay KRW " + comma(total) : comma(total) + "원 결제하기";
 	}
 
 	// 결제 버튼 잠그기 / 풀기 (더블클릭으로 두 번 제출되는 것을 막음)
@@ -302,6 +354,7 @@
 		lockPay(false);
 		showPay();
 		showCard();
+		drawBreakfast();
 	});
 </script>
 <%@ include file="/inc/footer.jsp" %>

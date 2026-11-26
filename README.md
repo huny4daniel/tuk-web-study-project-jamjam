@@ -42,6 +42,7 @@ Tomcat 경로 입력 → 자바 컴파일 → `hotel.war` 생성 → 실행 중�
 hotel/
 ├─ db/hotel.sql                  DB 테이블 + 샘플 데이터 (객실 사진은 비워 둠 → 기본 사진 사용)
 ├─ db/hotel_schema.sql           DB 구조만 (빈 테이블)
+├─ db/breakfast.sql              쓰고 있는 DB 에 조식 추가 기능만 추가
 ├─ db/pay_card.sql               쓰고 있는 DB 에 결제수단 기능만 추가
 ├─ src/main/java/
 │   ├─ pool.jocl                 DB 접속 정보 (수업과 동일, DB 이름만 hotel)
@@ -139,7 +140,7 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 | 1) 회원 관리 | member/*, inc/loginCheck.jsp, inc/adminCheck.jsp | 로그인 성공 시 `session.setAttribute("LOGIN", 아이디)`. 아이디가 admin 이면 관리자. 관리자는 header.jsp·loginCheck.jsp 에서 관리자 대시보드로 보내서 이용자 화면을 쓰지 않음 |
 | 2) 객실 관리 | admin/room/roomList, roomForm, roomSave, roomDelete | 등록·수정 폼 하나를 같이 씀. 사진은 cos.jar 로 받아 byte 배열로 읽어서 **DB에 저장** |
 | 객실 사진 출력 | room/photo.jsp, RoomDao.selectPhoto(), Room.getTypeImage()/getViewImage() | `<img src=".../room/photo.jsp?roomId=3">` → 관리자가 올린 사진이 DB 에 있으면 그 바이트를 그대로 내보내고, 없으면 유형·전망에 맞는 `images/rooms/유형-전망.png` 로 보냄(그 전망 그림이 없으면 같은 유형 다른 전망, 모르는 유형이면 noimage.svg) |
-| 3) 객실 조회·검색 | room/roomList.jsp, RoomDao.WHERE / setSearch() | ? 8개짜리 고정 SQL 하나. 조건을 안 고르면 항상 참이 되는 값을 넣음 (예: `breakfast >= 0`). 날짜를 넣으면 그 기간에 예약된 객실은 `not in` 으로 뺌 |
+| 3) 객실 조회·검색 | room/roomList.jsp, RoomDao.WHERE / setSearch() | ? 10개짜리 고정 SQL 하나. 조건을 안 고르면 항상 참이 되는 값을 넣음 (예: `breakfast >= 0`). 날짜를 넣으면 그 기간에 예약된 객실은 `not in` 으로 뺌 |
 | SOLD OUT 표시 | room/roomList.jsp, inc/roomCard.jsp, ReservationDao.selectOverlap(), Room.addBooked() | 날짜를 넣으면 그 기간과 겹치는 예약을 읽어 JSP for 문으로 같은 객실에 예약 기간을 붙임 → 카드에 SOLD OUT + 마감 기간. [예약 가능한 객실만] 을 체크하면 기존처럼 `not in` 으로 숨김 |
 | 예약 현황 달력 | room/roomDetail.jsp, ReservationDao.selectBookedByRoom() | 객실의 앞으로의 예약을 JS 배열로 넘겨 두 달 달력을 그림. 예약된 밤은 줄 긋기, 날짜를 누르면 체크인 → 체크아웃 순서로 예약 폼에 들어감 |
 | 페이징 | RoomDao.getRoomList(), RoomListView | 수업 catalogPaging 과 같은 `limit ?, ?` 방식 |
@@ -149,7 +150,8 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 | 예약 취소 | reserve/cancel.jsp (이용자), admin/reservation/resCancel.jsp (관리자) | 이용자는 체크인 전까지만 취소 가능 |
 | 디지털 쿠폰 | mypage/coupon.jsp(쿠폰함·받기), couponDown.jsp, admin/coupon/couponIssue.jsp, MemberCouponDao, inc/reserveCheck.jsp | 쿠폰 번호 입력 대신 쿠폰함에서 고름. 가입 시 자동 지급 / 쿠폰함에서 다운로드 / 관리자 지급(개인·전체). 결제 시 본인·미사용·기간 재검사 → 예약하면 used=1, 예약 취소하면 쿠폰 반환 |
 | 투숙객 등록 | mypage/guest.jsp(+guestSave, guestDelete), reserve/payForm.jsp, GuestDao | 마이페이지에 투숙객을 등록(최대 10명) → 결제 화면에서 본인/등록 투숙객/직접 입력을 고르면 이름·연락처가 채워짐. 직접 입력한 투숙객은 [저장] 체크 시 목록에 추가. 예약에 투숙객 이름·연락처 저장, 확인서와 관리자 화면에 표시. 회원 탈퇴 시 함께 삭제 |
-| 결제수단 등록 | mypage/card.jsp(+cardSave, cardDefault, cardDelete), reserve/payForm.jsp, reserve.jsp, PayCardDao | 마이페이지에 카드를 등록(최대 5장, 첫 카드는 자동으로 기본) → 결제 화면에서 등록 카드(기본 카드가 먼저 선택됨)를 골라 [결제하기]. 본인 카드인지 서버에서 확인. [다른 카드]는 카드사와 카드 번호를 직접 입력. 모의 결제라 카드 번호는 끝 4자리만 서버로 보내고 저장. 회원 탈퇴 시 함께 삭제. 기존 DB 에는 db/pay_card.sql 실행 |
+| 조식 추가 | reserve/payForm.jsp [추가 옵션], inc/reserveCheck.jsp, Room.BREAKFAST_PRICE, admin/index.jsp | 조식 미포함 객실은 결제 화면에서 조식 인원(0~투숙 인원)을 골라 1인 1박 20,000원에 추가. 금액은 reserveCheck 에서 계산(쿠폰은 객실 요금에만 적용)해 reservation.breakfastCount / breakfastPrice 에 저장. 확인서·마이페이지·관리자 예약 목록에 표시, 대시보드에 오늘 아침 조식 인원. 기존 DB 에는 db/breakfast.sql 실행 |
+| 결제 카드 등록 | mypage/card.jsp(+cardSave, cardDefault, cardDelete), reserve/payForm.jsp, reserve.jsp, PayCardDao | 마이페이지에 카드를 등록(최대 5장, 첫 카드는 자동으로 기본) → 결제 화면에서 등록 카드(기본 카드가 먼저 선택됨)를 골라 [결제하기]. 본인 카드인지 서버에서 확인. [다른 카드]는 카드사와 카드 번호를 직접 입력. 모의 결제라 카드 번호는 끝 4자리만 서버로 보내고 저장. 회원 탈퇴 시 함께 삭제. 기존 DB 에는 db/pay_card.sql 실행 |
 | 고객 요청사항 | reserve/payForm.jsp, reserve.jsp, resDetail.jsp, admin/index.jsp, admin/reservation/reservationList.jsp | 결제 화면에서 자주 쓰는 요청 버튼 + 직접 입력 → reservation.requestNote 에 저장, 확인서와 관리자 화면(대시보드 오늘 체크인, 예약 관리)에 표시 |
 | 6) 할인 | 객실 할인율(room.discountRate) + 디지털 쿠폰(coupon → member_coupon) | 금액 = 1박 요금 × 박 수 × (100 − 쿠폰 할인율) / 100 |
 | 인원별 요금 | Room.getNightPrice(), reserve/reserve.jsp, roomDetail.jsp 의 nightPrice() | 1박 요금 = 객실 할인가 + (인원 − 기준 인원, 0 미만이면 0) × 1인 추가 요금 |
@@ -164,7 +166,7 @@ JSP (화면)  ──>  DAO (SQL 실행)  ──>  MySQL
 | 9) 관리자 페이지 | admin/*/ (기능별 폴더) | 대시보드, 예약 현황, 쿠폰, 문의 답변, 리뷰 관리, 회원 목록 |
 | 추가) 교통편 | info/location.jsp, inc/kakaoMap.jsp | 카카오 지도에 호텔 위치 표시. 교통편을 누르면 브라우저 현재 위치(geolocation)를 출발지로 카카오맵 길찾기(`map.kakao.com/link/by/...`)를 새 창으로 엶 |
 | 추가) 주변 체험 | info/tour.jsp | 관광지 / 체험 / 맛집 소개. 카드의 data-lat/data-lng 로 카카오 지도에 마커(수업 restaurant-map.jsp 방식), 카드를 누르면 그 위치로 이동, 탭으로 분류별 마커만 표시 |
-| 추가) 상세 필터 | room/roomList.jsp 왼쪽 | 조식, 반려동물, 침대 수, 전망, 편의시설(욕조·주방·테라스·스파욕조·온돌·복층·안마의자·빔프로젝터 ...), 정렬, 결제 방법(예약할 때 선택) |
+| 추가) 상세 필터 | room/roomList.jsp 왼쪽 | 조식, 반려동물, 침대 수, 전망, 편의시설(욕조·주방·테라스·스파욕조·온돌·복층·안마의자·빔프로젝터 ...), 1박 요금(할인가 기준 양쪽 손잡이 슬라이더 + 가격대 버튼 5개, 양 끝은 조건 없음, 최소 > 최대면 서로 바꿈), 정렬, 결제 방법(예약할 때 선택) |
 | 객실 종류·옵션 | db/hotel.sql, Room.getBedLabel() | 15종(스탠다드 ~ 로열 스위트, 한실 온돌, 복층 로프트, 스파 스위트 등). 같은 종류도 객실마다 조식 포함(+15,000원)·반려동물 허용·전망이 다를 수 있음. 침대가 없는 온돌 객실은 "온돌 (요)" 로 표시 |
 
 ---
